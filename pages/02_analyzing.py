@@ -44,13 +44,13 @@ st.markdown("""
         
         /* 분석 카드 스타일 */
         .analyzing-card {
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(100, 255, 71, 0.2);
             backdrop-filter: blur(25px);
             border: 3px solid #4CAF50;
             border-radius: 30px;
             padding: 40px 30px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(76, 175, 80, 0.25);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
             max-width: 600px;
             width: 90%;
             margin: 0 auto;
@@ -186,19 +186,6 @@ st.markdown("""
             border-left-color: #4CAF50;
             box-shadow: 0 4px 16px rgba(76, 175, 80, 0.25);
             transform: translateY(-2px);
-        }
-        
-        /* 펄스 애니메이션 */
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        /* 플로팅 애니메이션 */
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
         }
         
         
