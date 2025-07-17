@@ -88,6 +88,10 @@ st.markdown("""
             100% { content: "."; }
         }
         
+        .analyzing-text {
+            text-align: center;
+        }
+        
         .analyzing-text::after {
             content: ".";
             animation: ellipsis 1.5s infinite;
