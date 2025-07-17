@@ -169,7 +169,7 @@ st.markdown("""
         /* 상태 메시지 */
         .status-message {
             color: #2E7D32;
-            font-size: 0.8em;
+            font-size: 1.0em;
             font-weight: 600;
             margin: 20px 0;
             padding: 15px 20px;
