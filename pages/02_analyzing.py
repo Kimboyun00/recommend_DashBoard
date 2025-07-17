@@ -108,7 +108,7 @@ st.markdown("""
             animation: ellipsis 1.5s infinite;
             display: inline-block;
             width: 2em;
-            text-align: left;
+            text-align: center;
         }
 
         /* 제목 스타일 */
