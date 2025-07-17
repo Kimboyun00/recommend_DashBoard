@@ -259,11 +259,12 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 25px;
+        border-radius: 18px;
         padding: 25px 30px;
         margin: 25px 0;
         border-left: 6px solid #4CAF50;
         text-align: center;
+        min-height: 220px;
     }
     
     .recommendation-card {
@@ -362,6 +363,7 @@ st.markdown("""
         border-radius: 18px;
         padding: 25px 30px;
         margin: 25px 0;
+        min-height: 220px;
         transition: all 0.3s ease;
     }
     
