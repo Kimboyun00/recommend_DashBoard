@@ -60,7 +60,7 @@ def auth_css():
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         
-        h1 { font-size: 1.7em; color: #ffffff; font-weight: 600; margin-bottom: 25px; letter-spacing: 2px; }
+        h1 { font-size: 1.3em; color: #ffffff; font-weight: 600; margin-bottom: 25px; letter-spacing: 2px; }
 
         /* 로그인/회원가입 선택 라디오 버튼 스타일 */
         div[data-testid="stRadio"] {
