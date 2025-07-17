@@ -36,7 +36,6 @@ st.markdown("""
         font-size: 1.25em !important;
         line-height: 1.7;
         color: #2E7D32 !important;
-        font-weight: 600 !important;
     }
     
     /* 라디오 버튼과 체크박스 공통 스타일 - 완전 동일하게 */
