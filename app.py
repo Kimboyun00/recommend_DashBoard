@@ -165,28 +165,27 @@ def auth_page():
             new_password = st.text_input("사용할 비밀번호", type="password", key="signup_pass", placeholder="비밀번호를 입력하세요")
             confirm_password = st.text_input("비밀번호 확인", type="password", key="signup_confirm", placeholder="비밀번호를 다시 입력하세요")
 
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                if st.button("가입하기 ✨", key="signup_btn"):
-                    if new_password == confirm_password:
-                        if len(new_password) >= 4:
-                            try:
-                                conn = sqlite3.connect('wellness_users.db')
-                                c = conn.cursor()
-                                c.execute('INSERT INTO users (username, password) VALUES (?, ?)', 
-                                         (new_username, hash_password(new_password)))
-                                conn.commit()
-                                st.success("🎉 회원가입 성공! 이제 로그인해주세요.")
-                                st.session_state.choice_radio = "로그인" 
-                                st.rerun()
-                            except sqlite3.IntegrityError:
-                                st.error("⚠️ 이미 존재하는 아이디입니다.")
-                            finally:
-                                conn.close()
-                        else:
-                            st.warning("🔒 비밀번호는 4자 이상이어야 합니다.")
+            
+            if st.button("가입하기 ✨", key="signup_btn"):
+                if new_password == confirm_password:
+                    if len(new_password) >= 4:
+                        try:
+                            conn = sqlite3.connect('wellness_users.db')
+                            c = conn.cursor()
+                            c.execute('INSERT INTO users (username, password) VALUES (?, ?)', 
+                                        (new_username, hash_password(new_password)))
+                            conn.commit()
+                            st.success("🎉 회원가입 성공! 이제 로그인해주세요.")
+                            st.session_state.choice_radio = "로그인" 
+                            st.rerun()
+                        except sqlite3.IntegrityError:
+                            st.error("⚠️ 이미 존재하는 아이디입니다.")
+                        finally:
+                            conn.close()
                     else:
-                        st.error("❌ 비밀번호가 일치하지 않습니다.")
+                        st.warning("🔒 비밀번호는 4자 이상이어야 합니다.")
+                else:
+                    st.error("❌ 비밀번호가 일치하지 않습니다.")
 
 # --- 메인 라우터 ---
 if 'logged_in' not in st.session_state:
