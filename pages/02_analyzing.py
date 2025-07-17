@@ -102,7 +102,7 @@ st.markdown("""
             color: #2E7D32;
             font-size: 2.4em;
             font-weight: 800;
-            margin-left: 20px;
+            margin-left: 90px;
             margin-top: 20px;
             margin-bottom: 35px;
         }
