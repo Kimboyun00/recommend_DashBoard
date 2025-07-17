@@ -1,4 +1,4 @@
-# app.py (웰니스 투어 추천 시스템 - 로그인 전용) - 개선된 버전
+# app.py (웰니스 투어 추천 시스템 - 로그인 전용)
 
 import streamlit as st
 import sqlite3
@@ -25,28 +25,21 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 로그인 UI 스타일 (개선된 버전) ---
+# --- 로그인 UI 스타일 ---
 def auth_css():
     st.markdown("""
     <style>
         /* Streamlit 기본 UI 숨기기 */
-        [data-testid="stHeader"], 
-        [data-testid="stSidebar"], 
-        [data-testid="stSidebarNav"],
-        [data-testid="collapsedControl"],
-        footer { 
-            display: none !important; 
-        }
+        [data-testid="stHeader"], [data-testid="stSidebar"], footer { display: none; }
         
         /* 앱 배경 그라데이션 */
         [data-testid="stAppViewContainer"] > .main {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #4CAF50 100%);
+            background-image: linear-gradient(to top right, #0a192f, #1e3a5f, #4a6da7);
             background-size: cover;
             position: relative;
-            min-height: 100vh;
         }
 
-        /* 메인 컨테이너를 Flexbox로 중앙 정렬 */
+        /* st.columns를 포함하는 메인 블록을 Flexbox로 만들어 수직 중앙 정렬 */
         .main .block-container {
             display: flex;
             align-items: center;
@@ -54,181 +47,57 @@ def auth_css():
             min-height: 100vh;
             width: 100%;
             padding: 0 !important;
-            margin: 0 !important;
         }
 
         /* 로그인 폼 컨테이너 */
         div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div[data-testid="stVerticalBlock"] {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            padding: 50px 40px;
-            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 15px;
             width: 100%;
-            max-width: 400px;
             text-align: center;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         
-        div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div[data-testid="stVerticalBlock"]:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 35px 70px rgba(0, 0, 0, 0.3);
-        }
-        
-        /* 제목 스타일 */
-        h1 { 
-            font-size: 2.5em; 
-            color: #ffffff; 
-            font-weight: 700; 
-            margin-bottom: 30px; 
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
+        h1 { font-size: 2.2em; color: #ffffff; font-weight: 600; margin-bottom: 25px; letter-spacing: 2px; }
 
         /* 로그인/회원가입 선택 라디오 버튼 스타일 */
         div[data-testid="stRadio"] {
-            display: flex; 
-            justify-content: center; 
-            margin-bottom: 30px;
+            display: flex; justify-content: center; margin-bottom: 25px;
         }
-        
-        div[data-testid="stRadio"] > div {
-            display: flex;
-            gap: 10px;
-        }
-        
         div[data-testid="stRadio"] label {
-            padding: 12px 25px; 
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 25px; 
-            margin: 0 8px; 
-            transition: all 0.3s ease;
-            background-color: rgba(255,255,255,0.1); 
-            color: rgba(255,255,255,0.8);
-            font-weight: 600;
-            cursor: pointer;
-            backdrop-filter: blur(10px);
+            padding: 8px 20px; border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px; margin: 0 5px; transition: all 0.3s;
+            background-color: transparent; color: rgba(255,255,255,0.7);
         }
-        
-        div[data-testid="stRadio"] label:hover {
-            background-color: rgba(255,255,255,0.2);
-            border-color: rgba(255,255,255,0.5);
-            transform: translateY(-2px);
-        }
-        
         div[data-testid="stRadio"] input:checked + div {
-            background: linear-gradient(45deg, #4CAF50, #66BB6A) !important;
-            color: white !important; 
-            border-color: #4CAF50 !important;
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+            background-color: rgba(0, 198, 255, 0.3);
+            color: white; border-color: #00c6ff;
         }
 
         /* 입력 필드 스타일 */
         div[data-testid="stTextInput"] input {
-            background: rgba(255, 255, 255, 0.15) !important; 
-            border: 2px solid rgba(255, 255, 255, 0.3) !important;
-            border-radius: 15px !important; 
-            color: #ffffff !important;
-            padding: 15px 20px !important; 
-            transition: all 0.3s ease !important;
-            font-size: 16px !important;
-            backdrop-filter: blur(10px) !important;
+            background-color: rgba(255, 255, 255, 0.1); 
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px; 
+            color: #000000 !important; /* 검정색으로 유지 */
+            padding: 12px; 
+            transition: all 0.3s;
         }
         
-        div[data-testid="stTextInput"] input:focus {
-            border-color: #4CAF50 !important;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4) !important;
-            background: rgba(255, 255, 255, 0.2) !important;
-        }
-        
-        div[data-testid="stTextInput"] input::placeholder {
-            color: rgba(255, 255, 255, 0.6) !important;
-        }
-        
-        /* 버튼 스타일 - 박스 완전 제거 */
+        /* 버튼 스타일 */
         div[data-testid="stButton"] > button {
-            width: 100% !important; 
-            padding: 15px 0 !important; 
-            background: linear-gradient(45deg, #4CAF50, #66BB6A) !important;
-            border: none !important;
-            outline: none !important;
-            border-radius: 15px !important; 
-            color: white !important; 
-            font-weight: 700 !important; 
-            font-size: 18px !important;
-            transition: all 0.3s ease !important;
-            cursor: pointer !important;
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3) !important;
-            text-transform: uppercase !important;
-            letter-spacing: 1px !important;
-            margin: 10px 0 !important;
-        }
-        
-        div[data-testid="stButton"] > button:hover {
-            background: linear-gradient(45deg, #388E3C, #4CAF50) !important;
-            transform: translateY(-3px) !important;
-            box-shadow: 0 12px 35px rgba(76, 175, 80, 0.4) !important;
-        }
-        
-        div[data-testid="stButton"] > button:active {
-            transform: translateY(-1px) !important;
-            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3) !important;
-        }
-        
-        div[data-testid="stButton"] > button:focus {
-            outline: none !important;
-            border: none !important;
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3), 0 0 0 3px rgba(76, 175, 80, 0.2) !important;
-        }
-        
-        /* 부제목 스타일 */
-        h2 {
-            color: #ffffff;
-            font-size: 1.8em;
-            font-weight: 600;
-            margin-bottom: 25px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-        }
-        
-        /* 설명 텍스트 스타일 */
-        p {
-            color: rgba(255,255,255,0.9);
-            font-size: 1.1em;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-        
-        /* 데모 계정 안내 스타일 */
-        div[data-testid="stAlert"] {
-            background: rgba(255, 255, 255, 0.1) !important;
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            border-radius: 12px !important;
-            color: rgba(255,255,255,0.9) !important;
-            backdrop-filter: blur(10px) !important;
-        }
-        
-        /* 성공/에러 메시지 스타일 */
-        .stSuccess, .stError {
-            border-radius: 12px !important;
-            backdrop-filter: blur(10px) !important;
-        }
-        
-        /* 반응형 디자인 */
-        @media (max-width: 768px) {
-            div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div[data-testid="stVerticalBlock"] {
-                padding: 30px 25px;
-                margin: 20px;
-            }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
-            div[data-testid="stButton"] > button {
-                padding: 12px 0 !important;
-                font-size: 16px !important;
-            }
+            width: 100%; 
+            padding: 12px 0; 
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            border: none; 
+            border-radius: 10px; 
+            color: white; 
+            font-weight: bold; 
+            font-size: 18px;
+            transition: all 0.3s;
         }
     </style>
     """, unsafe_allow_html=True)
