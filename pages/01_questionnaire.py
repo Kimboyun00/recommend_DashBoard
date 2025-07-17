@@ -41,7 +41,7 @@ st.markdown("""
     /* 라디오 버튼과 체크박스 공통 스타일 - 완전 동일하게 */
     div[data-testid="stRadio"],
     div[data-testid="stCheckbox"] {
-        margin: 0 0 10px 0 !important;
+        margin: 0 0 0 0 !important;
         padding: 0 !important;
     }
     
