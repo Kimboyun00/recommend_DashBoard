@@ -524,11 +524,8 @@ def recommendations_page():
                 st.markdown(f"""
                 <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
                     <h3 style="color: {cluster_data['color']}; margin-bottom: 15px;">
-                        🏆 클러스터 {cluster_id}
+                        🏆 {cluster_data['name']}
                     </h3>
-                    <h4 style="color: #2E7D32; margin-bottom: 15px;">
-                        {cluster_data['name']}
-                    </h4>
                     <div class="score-display">
                         매칭 점수: {cluster_result['score']}/20
                     </div>
