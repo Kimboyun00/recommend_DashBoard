@@ -117,9 +117,8 @@ st.markdown("""
             color: #2E7D32;
             font-size: 2.4em;
             font-weight: 800;
+            margin-top: 20px;
             margin-bottom: 25px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            letter-spacing: 1px;
         }
         
         /* 설명 텍스트 */
@@ -228,9 +227,7 @@ st.markdown("""
             50% { transform: translateY(-10px); }
         }
         
-        .float-animation {
-            animation: float 3s ease-in-out infinite;
-        }
+        
         
         /* 반응형 디자인 */
         @media (max-width: 768px) {
@@ -284,7 +281,7 @@ if 'survey_completed' not in st.session_state or not st.session_state.survey_com
 def analyzing_page():
     # 분석 중 화면 구성 (완전 중앙 정렬)
     st.markdown("""
-    <div class="analyzing-card float-animation">
+    <div class="analyzing-card">
         <div class="spinning-brain">🧠</div>
         <h1 class="analyzing-title">
             <span class="analyzing-text">웰니스 성향 분석중</span>
@@ -349,12 +346,12 @@ def analyzing_page():
     with progress_placeholder.container():
         st.markdown("""
         <div class="progress-wrapper">
-            <div class="progress-container">
-                <div class="progress-bar" style="width: 100%;"></div>
-            </div>
             <p class="progress-text">
                 분석 완료! 100% 🎉
             </p>
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 100%;"></div>
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
