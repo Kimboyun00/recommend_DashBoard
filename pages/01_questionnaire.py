@@ -111,14 +111,11 @@ st.markdown("""
     /* 메인 제목 */
     h1 {
         color: #2E7D32 !important;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.9);
+        text-align: left;
         padding: 20px;
-        border-radius: 15px;
         font-size: 2.5em !important;
         margin-bottom: 30px;
         font-weight: 800 !important;
-        border: 3px solid #4CAF50;
     }
     
     /* 진행률 바 */
