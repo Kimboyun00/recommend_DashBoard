@@ -215,7 +215,7 @@ def wellness_questionnaire_page():
         margin: 15px 0;
         text-align: center;
     ">
-        <p style="color: #2E7D32; font-size: 1.1em; margin: 0; font-weight: 600;">
+        <p style="color: #2E7D32; text-align: left; font-size: 1.1em; margin: 0; font-weight: 600;">
             💚 당신만의 맞춤형 웰니스 여행지를 추천하기 위해 몇 가지 질문에 답해주세요 💚
         </p>
     </div>
