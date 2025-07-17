@@ -58,21 +58,6 @@ st.markdown("""
             overflow: hidden;
         }
         
-        /* 카드 내부 글로우 효과 */
-        .analyzing-card::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            background: linear-gradient(45deg, #4CAF50, #81C784, #66BB6A, #A5D6A7);
-            border-radius: 32px;
-            z-index: -1;
-            opacity: 0.3;
-            animation: borderGlow 3s ease-in-out infinite alternate;
-        }
-        
         @keyframes borderGlow {
             0% { opacity: 0.3; transform: scale(1); }
             100% { opacity: 0.6; transform: scale(1.01); }
@@ -143,7 +128,7 @@ st.markdown("""
             background: rgba(76, 175, 80, 0.15);
             border-radius: 15px;
             padding: 0px;
-            margin: 25px 0;
+            margin: 0 0;
             box-shadow: inset 0 2px 8px rgba(76, 175, 80, 0.2);
         }
         
@@ -156,18 +141,6 @@ st.markdown("""
             box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
             position: relative;
             overflow: hidden;
-        }
-        
-        /* 진행률 바 글로우 효과 */
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
-            animation: progressShine 2s ease-in-out infinite;
         }
         
         @keyframes progressShine {
