@@ -91,9 +91,9 @@ def auth_css():
             width: 100%; 
             padding: 12px 0; 
             background: linear-gradient(45deg, #00c6ff, #0072ff);
-            border: none;
-            border-radius: 10px;
-            color: white;
+                border: none;
+                border-radius: 10px;
+                color: white;
             font-weight: bold;
             transition: all 0.3s;
         }
@@ -123,31 +123,29 @@ def auth_page():
             username = st.text_input("아이디", key="login_user", placeholder="아이디를 입력하세요")
             password = st.text_input("비밀번호", type="password", key="login_pass", placeholder="비밀번호를 입력하세요")
             
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                if st.button("로그인 🚀", key="login_btn"):
-                    is_authenticated = False
-                    if username == "wellness" and password == "1234":
-                        is_authenticated = True
-                    else:
-                        conn = sqlite3.connect('wellness_users.db')
-                        c = conn.cursor()
-                        c.execute('SELECT password FROM users WHERE username = ?', (username,))
-                        db_password_hash = c.fetchone()
-                        conn.close()
+            if st.button("로그인 🚀", key="login_btn"):
+                is_authenticated = False
+                if username == "wellness" and password == "1234":
+                    is_authenticated = True
+                else:
+                    conn = sqlite3.connect('wellness_users.db')
+                    c = conn.cursor()
+                    c.execute('SELECT password FROM users WHERE username = ?', (username,))
+                    db_password_hash = c.fetchone()
+                    conn.close()
 
-                        if db_password_hash and db_password_hash[0] == hash_password(password):
-                            is_authenticated = True
-                    
-                    if is_authenticated:
-                        st.session_state.logged_in = True
-                        st.session_state.username = username
-                        st.session_state.reset_survey_flag = True
-                        st.success("✅ 로그인 성공! 웰니스 여행 추천을 시작합니다.")
-                        st.balloons()
-                        st.switch_page("pages/01_questionnaire.py")
-                    else:
-                        st.error("❌ 아이디 또는 비밀번호가 잘못되었습니다.")
+                    if db_password_hash and db_password_hash[0] == hash_password(password):
+                        is_authenticated = True
+                
+                if is_authenticated:
+                    st.session_state.logged_in = True
+                    st.session_state.username = username
+                    st.session_state.reset_survey_flag = True
+                    st.success("✅ 로그인 성공! 웰니스 여행 추천을 시작합니다.")
+                    st.balloons()
+                    st.switch_page("pages/01_questionnaire.py")
+                else:
+                    st.error("❌ 아이디 또는 비밀번호가 잘못되었습니다.")
             
             # 데모 계정 안내
             st.markdown("---")
