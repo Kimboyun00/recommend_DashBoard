@@ -104,7 +104,7 @@ st.markdown("""
     /* 문항 제목 웰니스 스타일 */
     h3 {
         font-size: 1.5em;
-        margin-bottom: 0.8em;
+        margin-bottom: 0.5em;
         color: #2E7D32 !important;
     }
     
@@ -148,13 +148,13 @@ st.markdown("""
         color: #d32f2f !important;
     }
     
-    /* 복수응답 안내 메시지 스타일 */
+    /* 복수응답 안내 메시지 스타일 - 박스 제거 */
     .multiple-choice-info {
-        background: rgba(76, 175, 80, 0.1);
-        border: 2px solid rgba(76, 175, 80, 0.3);
-        border-radius: 10px;
-        padding: 10px 15px;
-        margin: 10px 0;
+        background: none;
+        border: none;
+        border-radius: 0;
+        padding: 5px 0;
+        margin: 5px 0 15px 0;
         color: #2E7D32;
         font-weight: 600;
         font-size: 0.95em;
@@ -214,8 +214,8 @@ def wellness_questionnaire_page():
     st.markdown("""
     <div style="
         backdrop-filter: blur(10px);
-        padding: 20px;
-        margin: 20px 0;
+        padding: 15px;
+        margin: 15px 0;
         text-align: center;
     ">
         <p style="color: #2E7D32; font-size: 1.1em; margin: 0; font-weight: 600;">
