@@ -42,20 +42,20 @@ st.markdown("""
     /* 라디오 버튼과 체크박스 공통 스타일 - 완전 동일하게 */
     div[data-testid="stRadio"],
     div[data-testid="stCheckbox"] {
-        margin: 0 0 5px 0 !important;
+        margin: 0 0 10px 0 !important;
         padding: 0 !important;
     }
     
-    /* 라디오버튼 그룹 전체 간격 제거 */
+    /* 라디오버튼 그룹 전체 간격 조정 */
     div[data-testid="stRadio"] > div {
-        gap: 5px !important;
+        gap: 10px !important;
         margin: 0 !important;
         padding: 0 !important;
     }
     
-    /* 체크박스 그룹 전체 간격 제거 */
+    /* 체크박스 그룹 전체 간격 조정 */
     div[data-testid="stCheckbox"] > div {
-        margin: 0 !important;
+        margin: 0 0 10px 0 !important;
         padding: 0 !important;
     }
 
@@ -65,7 +65,7 @@ st.markdown("""
         border: 2px solid rgba(76, 175, 80, 0.5) !important;
         border-radius: 10px !important;
         padding: 8px 12px !important;
-        margin: 0 0 15px 0 !important;
+        margin: 0 0 10px 0 !important;
         transition: all 0.3s ease !important;
         backdrop-filter: blur(10px) !important;
         width: 100% !important;
@@ -82,7 +82,7 @@ st.markdown("""
         border: 2px solid rgba(76, 175, 80, 0.5) !important;
         border-radius: 10px !important;
         padding: 8px 12px !important;
-        margin: 0 0 15px 0 !important;
+        margin: 0 0 10px 0 !important;
         transition: all 0.3s ease !important;
         backdrop-filter: blur(10px) !important;
         display: flex !important;
