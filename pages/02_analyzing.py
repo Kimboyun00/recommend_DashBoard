@@ -314,7 +314,7 @@ def analyzing_page():
             st.markdown(f"""
             <div class="progress-wrapper">
                 <p class="progress-text">
-                    분석 진행률: {percentage}% 🌿
+                    <br>분석 진행률: {percentage}% 🌿
                 </p>
                 <div class="progress-container">
                     <div class="progress-bar" style="width: {percentage}%;"></div>
