@@ -264,7 +264,7 @@ st.markdown("""
         margin: 25px 0;
         border-left: 6px solid #4CAF50;
         text-align: center;
-        min-height: 220px;
+        min-height: 520px;
     }
     
     .recommendation-card {
