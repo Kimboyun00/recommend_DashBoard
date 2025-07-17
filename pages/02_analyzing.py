@@ -97,13 +97,168 @@ st.markdown("""
 
         /* 텍스트 점(.) 애니메이션 */
         @keyframes ellipsis {
-            0%   { content: '.'; }
-            33%  { content: '..'; }
-            66%  { content: '...'; }
-            100% { content: '.'; }
+            0% { content: "."; }
+            33% { content: ".."; }
+            66% { content: "..."; }
+            100% { content: "."; }
+        }
+        
+        .analyzing-text::after {
+            content: ".";
+            animation: ellipsis 1.5s infinite;
+            display: inline-block;
+            width: 2em;
+            text-align: center;
+            color: #4CAF50;
+        }
+
+        /* 제목 스타일 */
+        .analyzing-title {
+            color: #2E7D32;
+            font-size: 2.4em;
+            font-weight: 800;
+            margin-bottom: 25px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+        }
+        
+        /* 설명 텍스트 */
+        .analyzing-description {
+            color: #2E7D32;
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 35px;
+            line-height: 1.7;
+            opacity: 0.9;
+        }
+        
+        /* 진행률 컨테이너 */
+        .progress-container {
+            background: rgba(76, 175, 80, 0.15);
+            border-radius: 15px;
+            padding: 8px;
+            margin: 25px 0;
+            box-shadow: inset 0 2px 8px rgba(76, 175, 80, 0.2);
+        }
+        
+        /* 진행률 바 */
+        .progress-bar {
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            height: 12px;
+            border-radius: 8px;
+            transition: all 0.5s ease;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* 진행률 바 글로우 효과 */
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: progressShine 2s ease-in-out infinite;
+        }
+        
+        @keyframes progressShine {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+        
+        /* 진행률 텍스트 */
+        .progress-text {
+            text-align: center;
+            color: #2E7D32;
+            font-weight: 700;
+            font-size: 1.1em;
+            margin: 12px 0;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        /* 상태 메시지 */
+        .status-message {
+            color: #2E7D32;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin: 20px 0;
+            padding: 15px 20px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 12px;
+            border-left: 5px solid #4CAF50;
+            box-shadow: 0 3px 12px rgba(76, 175, 80, 0.15);
+            transition: all 0.3s ease;
+        }
+        
+        /* 완료 상태 메시지 */
+        .status-message.completed {
+            background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(129, 199, 132, 0.15));
+            border-left-color: #4CAF50;
+            box-shadow: 0 4px 16px rgba(76, 175, 80, 0.25);
+            transform: translateY(-2px);
+        }
+        
+        /* 펄스 애니메이션 */
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* 플로팅 애니메이션 */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .analyzing-card {
+                padding: 40px 30px;
+                max-width: 95%;
+            }
+            
+            .analyzing-title {
+                font-size: 2em;
+            }
+            
+            .spinning-brain {
+                font-size: 70px;
+            }
+            
+            .analyzing-description {
+                font-size: 1.1em;
+            }
+        }
+        
+        /* 작은 화면 대응 */
+        @media (max-width: 480px) {
+            .analyzing-card {
+                padding: 30px 20px;
+            }
+            
+            .analyzing-title {
+                font-size: 1.8em;
+            }
+            
+            .spinning-brain {
+                font-size: 60px;
+            }
         }
     </style>
-""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 # --- 직접 접근 방지 로직 (로그인 여부 및 설문 완료 여부 확인) ---
 if 'logged_in' not in st.session_state or not st.session_state.logged_in:
