@@ -246,7 +246,7 @@ def analyzing_page():
     <div class="analyzing-card">
         <div class="spinning-brain">🧠</div>
         <h1 class="analyzing-title">
-            <span class="analyzing-text">     웰니스 성향 분석중</span>
+            <span class="analyzing-text">맟춤 웰니스 성향 분석중</span>
         </h1>
         <p class="analyzing-description">
             답변해 주신 내용을 바탕으로<br>
