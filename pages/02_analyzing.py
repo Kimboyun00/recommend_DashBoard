@@ -103,7 +103,7 @@ st.markdown("""
             font-size: 2.4em;
             font-weight: 800;
             margin-top: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 35px;
         }
         
         /* 설명 텍스트 */
