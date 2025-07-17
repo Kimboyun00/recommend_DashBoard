@@ -342,12 +342,14 @@ def analyzing_page():
     
     with progress_placeholder.container():
         st.markdown("""
-        <div class="progress-container">
-            <div class="progress-bar" style="width: 100%;"></div>
+        <div class="progress-wrapper">
+            <div class="progress-container">
+                <div class="progress-bar" style="width: 100%;"></div>
+            </div>
+            <p class="progress-text">
+                분석 완료! 100% 🎉
+            </p>
         </div>
-        <p class="progress-text">
-            분석 완료! 100% 🎉
-        </p>
         """, unsafe_allow_html=True)
     
     time.sleep(1.5)
