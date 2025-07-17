@@ -123,8 +123,8 @@ st.markdown("""
         
         /* 설명 텍스트 */
         .analyzing-description {
-            color: #2E7D32;
-            font-size: 1.3em;
+            color: #333;
+            font-size: 1.05em;
             font-weight: 600;
             margin-bottom: 35px;
             line-height: 1.7;
@@ -289,8 +289,7 @@ def analyzing_page():
         </h1>
         <p class="analyzing-description">
             답변해 주신 내용을 바탕으로<br>
-            당신만의 맞춤형 웰니스 여행지를 찾고 있습니다.<br><br>
-            잠시만 기다려 주세요...
+            당신만의 맞춤형 웰니스 여행지를 찾고 있습니다.
         </p>
     </div>
     """, unsafe_allow_html=True)
