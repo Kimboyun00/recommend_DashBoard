@@ -87,7 +87,10 @@ st.markdown("""
             66% { content: "..."; }
             100% { content: "."; }
         }
-        
+        .analyzing-text {
+            text-align: center;
+            margin-left: 90px;
+        }
         .analyzing-text::after {
             content: ".";
             animation: ellipsis 1.5s infinite;
@@ -102,7 +105,6 @@ st.markdown("""
             color: #2E7D32;
             font-size: 2.4em;
             font-weight: 800;
-            margin-left: 90px;
             margin-top: 20px;
             margin-bottom: 35px;
         }
