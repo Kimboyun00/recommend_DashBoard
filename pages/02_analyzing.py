@@ -88,10 +88,6 @@ st.markdown("""
             100% { content: "."; }
         }
         
-        .analyzing-text {
-            text-align: center;
-        }
-        
         .analyzing-text::after {
             content: ".";
             animation: ellipsis 1.5s infinite;
@@ -106,6 +102,7 @@ st.markdown("""
             color: #2E7D32;
             font-size: 2.4em;
             font-weight: 800;
+            margin-left: 20px;
             margin-top: 20px;
             margin-bottom: 35px;
         }
@@ -250,7 +247,7 @@ def analyzing_page():
     <div class="analyzing-card">
         <div class="spinning-brain">🧠</div>
         <h1 class="analyzing-title">
-            <span class="analyzing-text">맟춤 웰니스 성향 분석중</span>
+            <span class="analyzing-text">웰니스 성향 분석중</span>
         </h1>
         <p class="analyzing-description">
             답변해 주신 내용을 바탕으로<br>
