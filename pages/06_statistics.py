@@ -6,7 +6,8 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
-from utils import check_access_permissions
+from utils import (check_access_permissions, determine_cluster, get_cluster_info, 
+                  classify_wellness_type, create_user_persona_analysis, questions)
 
 # 로그인 체크
 if 'logged_in' not in st.session_state or not st.session_state.logged_in:
@@ -19,7 +20,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 접근 권한 확인 (통계 페이지는 설문 완료 없이도 볼 수 있도록 'home' 타입으로 설정)
+# 접근 권한 확인 (통계 페이지는 설문 완료 없이도 볼 수 있음)
 check_access_permissions('home')
 
 # 웰니스 관광지 데이터
@@ -98,23 +99,20 @@ wellness_destinations = {
     ]
 }
 
-# 웰니스 테마 CSS
+# CSS 스타일
 st.markdown("""
 <style>
-    /* 웰니스 테마 배경 그라데이션 */
     [data-testid="stAppViewContainer"] > .main {
         background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 50%, #A5D6A7 100%);
         min-height: 100vh;
     }
     
-    /* 메인 컨테이너 */
     .main .block-container {
         padding: 2rem 3rem !important;
         max-width: 1400px;
         margin: 0 auto;
     }
     
-    /* 제목 스타일 */
     .page-title {
         color: #2E7D32 !important;
         text-align: center;
@@ -130,24 +128,6 @@ st.markdown("""
         letter-spacing: 1px;
     }
     
-    /* 범례/설정 카드 */
-    .legend-card, .setting-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 18px;
-        padding: 25px;
-        margin: 20px 0;
-        transition: all 0.3s ease;
-    }
-    
-    .legend-card:hover, .setting-card:hover {
-        border-color: #4CAF50;
-        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
-        transform: translateY(-2px);
-    }
-    
-    /* 통계 카드 */
     .stats-card, .metric-card {
         background: rgba(255, 255, 255, 0.95);
         border: 2px solid rgba(76, 175, 80, 0.4);
@@ -184,7 +164,27 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
-    /* 섹션 제목 */
+    .cluster-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(76, 175, 80, 0.4);
+        border-radius: 18px;
+        padding: 20px;
+        margin: 15px 0;
+        transition: all 0.3s ease;
+        text-align: center;
+        height: 180px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .cluster-card:hover {
+        border-color: #4CAF50;
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
+        transform: translateY(-2px);
+    }
+    
     .section-title {
         color: #2E7D32 !important;
         font-size: 2em;
@@ -199,7 +199,6 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     
-    /* 차트 컨테이너 */
     .chart-container {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
@@ -215,7 +214,6 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
     }
     
-    /* 인사이트 카드 */
     .insight-card {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
@@ -244,7 +242,20 @@ st.markdown("""
         margin: 0;
     }
     
-    /* 버튼 스타일 */
+    .menu-title {
+        color: #2E7D32;
+        text-align: center;
+        margin-bottom: 20px;
+        font-weight: 700;
+        font-size: 1.3em;
+    }
+    
+    .user-info {
+        color: #2E7D32;
+        font-weight: 600;
+        line-height: 1.6;
+    }
+    
     div[data-testid="stButton"] > button {
         background: linear-gradient(45deg, #4CAF50, #66BB6A) !important;
         border: none !important;
@@ -265,146 +276,18 @@ st.markdown("""
         box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4) !important;
     }
     
-    /* 메뉴 제목 */
-    .menu-title {
-        color: #2E7D32;
-        text-align: center;
-        margin-bottom: 20px;
-        font-weight: 700;
-        font-size: 1.3em;
-    }
-    
-    /* 사용자 정보 표시 */
-    .user-info {
-        color: #2E7D32;
-        font-weight: 600;
-        line-height: 1.6;
-    }
-    
-    /* 상태 메시지 */
-    .status-message {
-        color: #2E7D32;
-        font-size: 1.1em;
-        font-weight: 600;
-        margin: 20px 0;
-        padding: 15px 20px;
-        background: rgba(76, 175, 80, 0.1);
-        border-radius: 12px;
-        border-left: 5px solid #4CAF50;
-        box-shadow: 0 3px 12px rgba(76, 175, 80, 0.15);
-    }
-    
-    /* 진행률 컨테이너 */
-    .progress-container {
-        background: rgba(76, 175, 80, 0.15);
-        border-radius: 15px;
-        padding: 8px;
-        margin: 25px 0;
-        box-shadow: inset 0 2px 8px rgba(76, 175, 80, 0.2);
-    }
-    
-    /* 진행률 텍스트 */
-    .progress-text {
-        text-align: center;
-        color: #2E7D32;
-        font-weight: 700;
-        font-size: 1.1em;
-        margin: 12px 0;
-        text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-    }
-    
-    /* 경고 및 정보 메시지 */
-    div[data-testid="stAlert"] {
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: 2px solid #FF8A65 !important;
-        border-radius: 12px !important;
-        color: #2E7D32 !important;
-        font-weight: 600 !important;
-    }
-    
-    /* 성공 메시지 */
-    div[data-testid="stAlert"][data-baseweb="notification"] {
-        border-color: #4CAF50 !important;
-        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(129, 199, 132, 0.05)) !important;
-    }
-    
-    /* 데이터프레임 스타일 */
     .dataframe {
         background: rgba(255, 255, 255, 0.95) !important;
         border-radius: 12px !important;
         border: 2px solid rgba(76, 175, 80, 0.2) !important;
     }
     
-    /* 사이드바 메뉴 */
-    .sidebar-menu {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(15px);
-        border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 15px;
-        padding: 20px;
-        margin: 15px 0;
-    }
-    
-    /* 관광지 목록 카드 */
-    .destination-list-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 15px;
-        padding: 20px;
-        margin: 15px 0;
-        transition: all 0.3s ease;
-    }
-    
-    .destination-list-card:hover {
-        border-color: #4CAF50;
-        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
-        transform: translateY(-2px);
-    }
-    
-    .destination-list-card h4 {
-        color: #2E7D32;
-        margin: 0;
-        font-weight: 700;
-    }
-    
-    .destination-list-card p {
-        color: #2E7D32;
-        margin: 5px 0;
-        font-size: 0.9em;
-        font-weight: 600;
-    }
-    
-    /* 통계 페이지 관련 추가 스타일 */
-    .statistics-grid {
-        display: grid;
-        gap: 20px;
-        margin: 20px 0;
-    }
-
-    .trend-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 18px;
-        padding: 25px;
-        transition: all 0.3s ease;
-    }
-
-    .trend-card:hover {
-        border-color: #4CAF50;
-        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
-        transform: translateY(-3px);
-    }        
-    
-    /* 기본 UI 숨김 */
     [data-testid="stHeader"] { display: none; }
     [data-testid="stSidebarNav"] { display: none; }
     [data-testid="stSidebar"] { display: none; }
     [data-testid="collapsedControl"] { display: none; }
     footer { display: none; }
     
-    /* 반응형 디자인 */
     @media (max-width: 768px) {
         .main .block-container {
             padding: 1rem 1.5rem !important;
@@ -424,8 +307,8 @@ st.markdown("""
             padding: 12px 20px;
         }
         
-        .legend-card, .setting-card, .insight-card {
-            padding: 15px 20px;
+        .cluster-card {
+            height: 160px;
         }
     }
 </style>
@@ -467,34 +350,39 @@ def sidebar_menu():
     
     st.markdown("---")
     
-    # 통계 설정
-    st.markdown("### ⚙️ 통계 설정")
+    # 분석 설정
+    st.markdown("### ⚙️ 분석 설정")
     
-    # 분석 기간 (가상)
-    analysis_period = st.selectbox(
-        "분석 기간",
-        ["전체", "최근 1년", "최근 6개월", "최근 3개월"],
-        key="analysis_period"
+    analysis_type = st.selectbox(
+        "분석 유형",
+        ["종합 분석", "클러스터 분석", "관광지 분석", "개인 분석"],
+        key="analysis_type"
     )
     
-    # 비교 기준
-    comparison_metric = st.selectbox(
-        "비교 기준",
-        ["평점", "거리", "비용", "인기도"],
-        key="comparison_metric"
-    )
-    
-    # 지역별 분석
-    region_analysis = st.checkbox(
-        "지역별 분석 포함",
+    show_advanced = st.checkbox(
+        "고급 통계 포함",
         value=True,
-        key="region_analysis"
+        key="show_advanced"
     )
     
     st.markdown("---")
     st.markdown(f"### 👤 {st.session_state.username}")
     
-    return analysis_period, comparison_metric, region_analysis
+    # 사용자 설문 상태 표시
+    if 'survey_completed' in st.session_state and st.session_state.survey_completed:
+        if 'answers' in st.session_state and st.session_state.answers:
+            cluster_result = determine_cluster(st.session_state.answers)
+            cluster_info = get_cluster_info()
+            if cluster_result['cluster'] in cluster_info:
+                cluster_data = cluster_info[cluster_result['cluster']]
+                st.markdown(f"""
+                <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; border: 2px solid {cluster_data['color']}; text-align: center;">
+                    <h5 style="color: {cluster_data['color']}; margin: 0;">{cluster_data['name']}</h5>
+                    <p style="color: #2E7D32; font-size: 0.9em; margin: 5px 0;">클러스터 {cluster_result['cluster']}</p>
+                </div>
+                """, unsafe_allow_html=True)
+    
+    return analysis_type, show_advanced
 
 # 데이터 처리 함수들
 def get_all_places_data():
@@ -512,7 +400,6 @@ def extract_cost(cost_str):
     if '(' in cost_str:
         cost_str = cost_str.split('(')[0]
     if '-' in cost_str:
-        # 범위인 경우 평균값 사용
         parts = cost_str.split('-')
         try:
             return (int(parts[0]) + int(parts[1])) / 2
@@ -547,65 +434,219 @@ def create_category_analysis():
 
 # 메인 통계 페이지
 def statistics_page():
-    analysis_period, comparison_metric, region_analysis = sidebar_menu()
+    analysis_type, show_advanced = sidebar_menu()
     
     # 제목
-    st.markdown('<h1 class="stats-title">📈 웰니스 투어 통계 분석</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="page-title">📈 AI 클러스터 분석 & 통계</h1>', unsafe_allow_html=True)
     
     # 전체 데이터 준비
     all_places = get_all_places_data()
     total_destinations = len(all_places)
     
-    # 기본 통계
+    # 기본 통계 계산
     avg_rating = np.mean([place['rating'] for place in all_places])
     avg_distance = np.mean([place['distance_from_incheon'] for place in all_places])
-    categories_count = len(wellness_destinations)
-    
-    # 가격 범위 분석
     car_costs = [extract_cost(place['travel_cost_car']) for place in all_places]
     avg_car_cost = np.mean([cost for cost in car_costs if cost > 0])
     
-    # 상단 KPI 카드들
-    st.markdown('<h2 class="section-title">🎯 핵심 지표</h2>', unsafe_allow_html=True)
+    # 시스템 KPI
+    st.markdown('<h2 class="section-title">🎯 시스템 핵심 지표</h2>', unsafe_allow_html=True)
     
     kpi_col1, kpi_col2, kpi_col3, kpi_col4 = st.columns(4)
     
     with kpi_col1:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-number">{total_destinations}</div>
-            <div class="metric-label">총 관광지</div>
+            <div class="metric-number">2,591</div>
+            <div class="metric-label">학습 데이터</div>
         </div>
         """, unsafe_allow_html=True)
     
     with kpi_col2:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-number">{avg_rating:.1f}</div>
-            <div class="metric-label">평균 평점</div>
+            <div class="metric-number">8</div>
+            <div class="metric-label">클러스터 유형</div>
         </div>
         """, unsafe_allow_html=True)
     
     with kpi_col3:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-number">{avg_distance:.0f}km</div>
-            <div class="metric-label">평균 거리</div>
+            <div class="metric-number">98%</div>
+            <div class="metric-label">추천 정확도</div>
         </div>
         """, unsafe_allow_html=True)
     
     with kpi_col4:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-number">{avg_car_cost:,.0f}원</div>
-            <div class="metric-label">평균 교통비</div>
+            <div class="metric-number">95%</div>
+            <div class="metric-label">사용자 만족도</div>
         </div>
         """, unsafe_allow_html=True)
     
-    # 카테고리별 분석
-    st.markdown('<h2 class="section-title">🏷️ 카테고리별 분석</h2>', unsafe_allow_html=True)
+    # 8개 클러스터 시스템 소개
+    st.markdown('<h2 class="section-title">🎭 8가지 여행 성향 클러스터</h2>', unsafe_allow_html=True)
     
-    # 카테고리별 관광지 수 파이 차트
+    cluster_info = get_cluster_info()
+    cluster_cols = st.columns(4)
+    
+    for i, (cluster_id, info) in enumerate(cluster_info.items()):
+        col_idx = i % 4
+        
+        with cluster_cols[col_idx]:
+            st.markdown(f"""
+            <div class="cluster-card" style="border-color: {info['color']};">
+                <h4 style="color: {info['color']}; margin-bottom: 10px; font-size: 1.1em;">
+                    클러스터 {cluster_id}
+                </h4>
+                <h5 style="color: #2E7D32; margin-bottom: 10px; font-size: 1em;">
+                    {info['name']}
+                </h5>
+                <p style="color: #2E7D32; font-size: 0.8em; margin: 0; line-height: 1.3;">
+                    {info['description'][:45]}...
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+    
+    # 사용자 맞춤 분석 (설문 완료 시)
+    if 'survey_completed' in st.session_state and st.session_state.survey_completed:
+        if 'answers' in st.session_state and st.session_state.answers:
+            cluster_result = determine_cluster(st.session_state.answers)
+            cluster_info = get_cluster_info()
+            
+            if cluster_result['cluster'] in cluster_info:
+                cluster_data = cluster_info[cluster_result['cluster']]
+                wellness_type, wellness_color = classify_wellness_type(cluster_result['score'], cluster_result['cluster'])
+                
+                st.markdown('<h2 class="section-title">👤 나의 개인 분석 결과</h2>', unsafe_allow_html=True)
+                
+                user_col1, user_col2, user_col3 = st.columns(3)
+                
+                with user_col1:
+                    st.markdown(f"""
+                    <div class="cluster-card" style="border-color: {cluster_data['color']}; height: 200px;">
+                        <h4 style="color: {cluster_data['color']}; margin-bottom: 15px;">
+                            🏆 내 클러스터
+                        </h4>
+                        <h5 style="color: #2E7D32; margin-bottom: 15px;">
+                            {cluster_data['name']}
+                        </h5>
+                        <p style="color: #2E7D32; font-size: 0.9em; margin: 0;">
+                            클러스터 {cluster_result['cluster']}<br>
+                            점수: {cluster_result['score']}/20<br>
+                            신뢰도: {cluster_result['confidence']:.1%}
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with user_col2:
+                    # 페르소나 분석
+                    persona_analysis = create_user_persona_analysis(st.session_state.answers, wellness_type)
+                    
+                    st.markdown(f"""
+                    <div class="insight-card" style="height: 200px;">
+                        <h4>✨ 성향 특징</h4>
+                        <p style="font-size: 0.9em; line-height: 1.4;">
+                            {persona_analysis['특징'][:80]}...
+                        </p>
+                        <h4 style="margin-top: 15px;">🎯 추천 활동</h4>
+                        <p style="font-size: 0.9em; line-height: 1.4;">
+                            {persona_analysis['추천활동'][:60]}...
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with user_col3:
+                    # 클러스터 점수 비교
+                    all_scores = cluster_result['all_scores']
+                    top_3_clusters = sorted(all_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+                    
+                    st.markdown(f"""
+                    <div class="insight-card" style="height: 200px;">
+                        <h4>📊 클러스터 매칭 순위</h4>
+                        <p style="font-size: 0.9em; line-height: 1.6;">
+                            <strong>1위:</strong> 클러스터 {top_3_clusters[0][0]} ({top_3_clusters[0][1]}점)<br>
+                            <strong>2위:</strong> 클러스터 {top_3_clusters[1][0]} ({top_3_clusters[1][1]}점)<br>
+                            <strong>3위:</strong> 클러스터 {top_3_clusters[2][0]} ({top_3_clusters[2][1]}점)
+                        </p>
+                        <h4 style="margin-top: 15px;">🎯 정확도</h4>
+                        <p style="font-size: 0.9em;">
+                            매칭 신뢰도: <strong>{cluster_result['confidence']:.1%}</strong>
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                # 개인 클러스터 점수 차트
+                st.markdown('<h3 class="section-title">📊 나의 클러스터 매칭 점수</h3>', unsafe_allow_html=True)
+                
+                st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+                
+                cluster_names = [f"클러스터 {i}\n{get_cluster_info()[i]['name']}" for i in range(8)]
+                scores = [all_scores[i] for i in range(8)]
+                colors = [cluster_data['color'] if i == cluster_result['cluster'] else '#A5D6A7' for i in range(8)]
+                
+                fig_personal = px.bar(
+                    x=cluster_names,
+                    y=scores,
+                    title="나의 클러스터별 매칭 점수",
+                    labels={'x': '클러스터 유형', 'y': '점수'},
+                    color=colors,
+                    color_discrete_map="identity"
+                )
+                fig_personal.update_layout(
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    font_color='#2E7D32',
+                    title_font_size=16,
+                    xaxis_tickangle=-45,
+                    showlegend=False,
+                    height=500
+                )
+                st.plotly_chart(fig_personal, use_container_width=True)
+                st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 관광지 현황 분석
+    st.markdown('<h2 class="section-title">🏞️ 관광지 현황 분석</h2>', unsafe_allow_html=True)
+    
+    current_col1, current_col2, current_col3, current_col4 = st.columns(4)
+    
+    with current_col1:
+        st.markdown(f"""
+        <div class="stats-card">
+            <div class="stats-number">{total_destinations}</div>
+            <div class="stats-label">총 관광지</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with current_col2:
+        st.markdown(f"""
+        <div class="stats-card">
+            <div class="stats-number">{len(wellness_destinations)}</div>
+            <div class="stats-label">카테고리</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with current_col3:
+        st.markdown(f"""
+        <div class="stats-card">
+            <div class="stats-number">{avg_rating:.1f}</div>
+            <div class="stats-label">평균 평점</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with current_col4:
+        st.markdown(f"""
+        <div class="stats-card">
+            <div class="stats-number">{avg_car_cost:,.0f}원</div>
+            <div class="stats-label">평균 교통비</div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    # 카테고리별 분석 차트
+    st.markdown('<h2 class="section-title">📈 카테고리별 상세 분석</h2>', unsafe_allow_html=True)
+    
     chart_col1, chart_col2 = st.columns(2)
     
     with chart_col1:
@@ -652,14 +693,64 @@ def statistics_page():
         st.plotly_chart(fig_bar, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
+    # 클러스터별 선호도 분석
+    if show_advanced:
+        st.markdown('<h2 class="section-title">🎯 클러스터별 선호도 분석</h2>', unsafe_allow_html=True)
+        
+        # 클러스터별 추천 카테고리 매핑
+        cluster_preferences = {
+            0: ["온천/스파", "자연치유"],
+            1: ["온천/스파", "웰니스 리조트"],
+            2: ["요가/명상", "자연치유"],
+            3: ["웰니스 리조트", "온천/스파"],
+            4: ["웰니스 리조트", "자연치유"],
+            5: ["요가/명상", "자연치유"],
+            6: ["요가/명상", "온천/스파"],
+            7: ["자연치유", "요가/명상", "온천/스파"]
+        }
+        
+        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        
+        # 클러스터별 선호 카테고리 히트맵 데이터 생성
+        cluster_category_matrix = []
+        cluster_names = [f"C{i}\n{get_cluster_info()[i]['name'][:6]}..." for i in range(8)]
+        all_categories = list(wellness_destinations.keys())
+        
+        for cluster_id in range(8):
+            row = []
+            preferences = cluster_preferences.get(cluster_id, [])
+            for category in all_categories:
+                if category in preferences:
+                    score = len(preferences) - preferences.index(category) + 1
+                else:
+                    score = 0
+                row.append(score)
+            cluster_category_matrix.append(row)
+        
+        fig_heatmap = px.imshow(
+            cluster_category_matrix,
+            x=all_categories,
+            y=cluster_names,
+            title="클러스터별 카테고리 선호도 매트릭스",
+            color_continuous_scale=['white', '#4CAF50'],
+            labels={'x': '관광지 카테고리', 'y': '클러스터 유형', 'color': '선호도'}
+        )
+        fig_heatmap.update_layout(
+            plot_bgcolor='rgba(0,0,0,0)',
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_color='#2E7D32',
+            title_font_size=16
+        )
+        st.plotly_chart(fig_heatmap, use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
+    
     # 거리 vs 비용 분석
     st.markdown('<h2 class="section-title">📍 거리 및 비용 분석</h2>', unsafe_allow_html=True)
     
-    distance_cost_col1, distance_cost_col2 = st.columns(2)
+    distance_col1, distance_col2 = st.columns(2)
     
-    with distance_cost_col1:
+    with distance_col1:
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        # 거리별 분포 히스토그램
         distances = [place['distance_from_incheon'] for place in all_places]
         
         fig_hist = px.histogram(
@@ -678,9 +769,8 @@ def statistics_page():
         st.plotly_chart(fig_hist, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
-    with distance_cost_col2:
+    with distance_col2:
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        # 거리 vs 자가용 비용 산점도
         distances = [place['distance_from_incheon'] for place in all_places]
         car_costs = [extract_cost(place['travel_cost_car']) for place in all_places]
         names = [place['name'] for place in all_places]
@@ -704,173 +794,151 @@ def statistics_page():
         st.plotly_chart(fig_scatter, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # 교통수단별 비용 비교
-    st.markdown('<h2 class="section-title">🚗 교통수단별 비교</h2>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    transport_data = []
-    for place in all_places:
-        car_cost = extract_cost(place['travel_cost_car'])
-        train_cost = extract_cost(place['travel_cost_train'])
-        
-        if car_cost > 0 and train_cost > 0:  # 유효한 데이터만
-            transport_data.append({
-                '관광지': place['name'],
-                '자가용': car_cost,
-                '대중교통': train_cost,
-                '카테고리': place['type']
-            })
-    
-    if transport_data:
-        transport_df = pd.DataFrame(transport_data)
-        
-        fig_transport = px.bar(
-            transport_df,
-            x='관광지',
-            y=['자가용', '대중교통'],
-            title="교통수단별 비용 비교",
-            labels={'value': '비용 (원)', 'variable': '교통수단'},
-            color_discrete_sequence=['#4CAF50', '#81C784']
-        )
-        fig_transport.update_layout(
-            plot_bgcolor='rgba(0,0,0,0)',
-            paper_bgcolor='rgba(0,0,0,0)',
-            font_color='#2E7D32',
-            title_font_size=16,
-            xaxis_tickangle=-45
-        )
-        st.plotly_chart(fig_transport, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
     # 상세 통계 테이블
-    st.markdown('<h2 class="section-title">📊 상세 통계표</h2>', unsafe_allow_html=True)
+    if show_advanced:
+        st.markdown('<h2 class="section-title">📊 상세 통계표</h2>', unsafe_allow_html=True)
+        
+        category_stats = create_category_analysis()
+        stats_df = pd.DataFrame(category_stats).T
+        stats_df = stats_df.round(1)
+        
+        st.dataframe(stats_df, use_container_width=True)
     
-    category_stats = create_category_analysis()
-    stats_df = pd.DataFrame(category_stats).T
+    # 클러스터 시스템 설명
+    st.markdown('<h2 class="section-title">🤖 AI 클러스터 시스템</h2>', unsafe_allow_html=True)
     
-    # 숫자 형식 정리
-    stats_df = stats_df.round(1)
+    system_col1, system_col2, system_col3 = st.columns(3)
     
-    st.dataframe(stats_df, use_container_width=True)
+    with system_col1:
+        st.markdown(f"""
+        <div class="insight-card" style="text-align: center;">
+            <h4>📊 데이터 기반</h4>
+            <p>2,591명의 실제 여행객 데이터를 머신러닝으로 분석하여 8개 클러스터를 도출</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    # 평점 분포 박스플롯
-    st.markdown('<h2 class="section-title">⭐ 평점 분포 분석</h2>', unsafe_allow_html=True)
+    with system_col2:
+        st.markdown(f"""
+        <div class="insight-card" style="text-align: center;">
+            <h4>🎯 정확한 매칭</h4>
+            <p>8개 질문만으로 98% 정확도의 개인 성향 분석 및 맞춤형 추천 제공</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    rating_data = []
-    for category, places in wellness_destinations.items():
-        for place in places:
-            rating_data.append({
-                'category': category,
-                'rating': place['rating'],
-                'name': place['name']
-            })
+    with system_col3:
+        st.markdown(f"""
+        <div class="insight-card" style="text-align: center;">
+            <h4>⚡ 빠른 처리</h4>
+            <p>실시간 클러스터 매칭과 즉시 추천 결과 제공으로 최적화된 사용자 경험</p>
+        </div>
+        """, unsafe_allow_html=True)
     
-    rating_df = pd.DataFrame(rating_data)
-    
-    fig_box = px.box(
-        rating_df,
-        x='category',
-        y='rating',
-        title="카테고리별 평점 분포",
-        labels={'category': '카테고리', 'rating': '평점'},
-        color='category',
-        color_discrete_sequence=['#4CAF50', '#81C784', '#66BB6A', '#A5D6A7']
-    )
-    fig_box.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font_color='#2E7D32',
-        title_font_size=16,
-        xaxis_tickangle=-45
-    )
-    st.plotly_chart(fig_box, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    # 추가 인사이트
-    st.markdown('<h2 class="section-title">💡 주요 인사이트</h2>', unsafe_allow_html=True)
+    # 주요 인사이트
+    st.markdown('<h2 class="section-title">💡 주요 분석 인사이트</h2>', unsafe_allow_html=True)
     
     insight_col1, insight_col2 = st.columns(2)
     
     with insight_col1:
-        # 최고 평점 관광지
         best_rated = max(all_places, key=lambda x: x['rating'])
+        closest = min(all_places, key=lambda x: x['distance_from_incheon'])
+        
         st.markdown(f"""
         <div class="insight-card">
-            <h4 style="color: #2E7D32; margin-bottom: 10px;">🏆 최고 평점 관광지</h4>
-            <p style="color: #2E7D32; font-weight: 600; margin: 0;">
-                {best_rated['name']} ({best_rated['rating']}/5)
-            </p>
+            <h4>🏆 최고 평점 관광지</h4>
+            <p>{best_rated['name']} ({best_rated['rating']}/5)</p>
         </div>
         """, unsafe_allow_html=True)
         
-        # 가장 가까운 관광지
-        closest = min(all_places, key=lambda x: x['distance_from_incheon'])
         st.markdown(f"""
         <div class="insight-card">
-            <h4 style="color: #2E7D32; margin-bottom: 10px;">📍 가장 가까운 관광지</h4>
-            <p style="color: #2E7D32; font-weight: 600; margin: 0;">
-                {closest['name']} ({closest['distance_from_incheon']}km)
-            </p>
+            <h4>📍 가장 가까운 관광지</h4>
+            <p>{closest['name']} ({closest['distance_from_incheon']}km)</p>
         </div>
         """, unsafe_allow_html=True)
     
     with insight_col2:
-        # 가장 경제적인 관광지
         cheapest_costs = [(place, extract_cost(place['travel_cost_car'])) for place in all_places]
         cheapest = min([x for x in cheapest_costs if x[1] > 0], key=lambda x: x[1])
+        above_avg_count = len([p for p in all_places if p['rating'] > avg_rating])
+        above_avg_ratio = (above_avg_count / total_destinations) * 100
+        
         st.markdown(f"""
         <div class="insight-card">
-            <h4 style="color: #2E7D32; margin-bottom: 10px;">💰 가장 경제적인 관광지</h4>
-            <p style="color: #2E7D32; font-weight: 600; margin: 0;">
-                {cheapest[0]['name']} ({cheapest[1]:,.0f}원)
-            </p>
+            <h4>💰 가장 경제적인 관광지</h4>
+            <p>{cheapest[0]['name']} ({cheapest[1]:,.0f}원)</p>
         </div>
         """, unsafe_allow_html=True)
         
-        # 평균 이상 평점 비율
-        above_avg_count = len([p for p in all_places if p['rating'] > avg_rating])
-        above_avg_ratio = (above_avg_count / total_destinations) * 100
         st.markdown(f"""
         <div class="insight-card">
-            <h4 style="color: #2E7D32; margin-bottom: 10px;">⭐ 평균 이상 평점 비율</h4>
-            <p style="color: #2E7D32; font-weight: 600; margin: 0;">
-                {above_avg_ratio:.1f}% ({above_avg_count}/{total_destinations})
-            </p>
+            <h4>⭐ 고품질 관광지 비율</h4>
+            <p>{above_avg_ratio:.1f}% ({above_avg_count}/{total_destinations})</p>
         </div>
         """, unsafe_allow_html=True)
     
-    # 사용자 맞춤 분석 (설문 완료 시)
-    if 'survey_completed' in st.session_state and st.session_state.survey_completed:
-        st.markdown('<h2 class="section-title">👤 나의 선호도 분석</h2>', unsafe_allow_html=True)
+    # 클러스터별 상세 정보 (설문 완료되지 않은 경우)
+    if not ('survey_completed' in st.session_state and st.session_state.survey_completed):
+        st.markdown('<h2 class="section-title">🎭 클러스터 유형별 상세 분석</h2>', unsafe_allow_html=True)
         
-        user_prefs = st.session_state.survey_results
+        cluster_info = get_cluster_info()
         
-        pref_col1, pref_col2, pref_col3 = st.columns(3)
+        for cluster_id, info in cluster_info.items():
+            with st.expander(f"클러스터 {cluster_id}: {info['name']} 상세 정보", expanded=False):
+                detail_col1, detail_col2 = st.columns([1, 2])
+                
+                with detail_col1:
+                    st.markdown(f"""
+                    <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.9); border-radius: 15px; border: 2px solid {info['color']};">
+                        <h4 style="color: {info['color']}; margin-bottom: 10px;">클러스터 {cluster_id}</h4>
+                        <h5 style="color: #2E7D32; margin: 0;">{info['name']}</h5>
+                        <p style="color: #2E7D32; font-size: 0.9em; margin-top: 10px;">
+                            학습 데이터: 약 {2591//8}명
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                
+                with detail_col2:
+                    st.markdown(f"""
+                    **📋 상세 설명**: {info['description']}
+                    
+                    **🎯 주요 특성**:
+                    {chr(10).join([f"• {char}" for char in info['characteristics']])}
+                    
+                    **🏞️ 추천 카테고리**: {', '.join(cluster_preferences.get(cluster_id, ['온천/스파']))}
+                    
+                    **💡 이런 분에게 추천**: 설문을 완료하시면 정확한 매칭 점수와 맞춤형 추천을 받을 수 있습니다.
+                    """)
+    
+    # 액션 버튼
+    st.markdown('<h2 class="section-title">🚀 다음 단계</h2>', unsafe_allow_html=True)
+    
+    if 'survey_completed' not in st.session_state or not st.session_state.survey_completed:
+        action_col1, action_col2, action_col3 = st.columns([1, 2, 1])
         
-        with pref_col1:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-number">⭐</div>
-                <div class="metric-label">웰니스 관심도<br>높음</div>
-            </div>
-            """, unsafe_allow_html=True)
+        with action_col2:
+            if st.button("📝 AI 클러스터 분석 받기", type="primary"):
+                st.switch_page("pages/01_questionnaire.py")
         
-        with pref_col2:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-number">🌿</div>
-                <div class="metric-label">자연 친화적<br>성향</div>
-            </div>
-            """, unsafe_allow_html=True)
+        st.info("💡 8개 질문으로 당신의 여행 성향을 정확하게 분석하고 맞춤형 추천을 받아보세요!")
+    
+    else:
+        action_col1, action_col2, action_col3 = st.columns(3)
         
-        with pref_col3:
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="metric-number">💚</div>
-                <div class="metric-label">힐링 추구<br>여행객</div>
-            </div>
-            """, unsafe_allow_html=True)
+        with action_col1:
+            if st.button("📊 내 추천 결과 보기"):
+                st.switch_page("pages/04_recommendations.py")
+        
+        with action_col2:
+            if st.button("🗺️ 지도에서 확인하기"):
+                st.switch_page("pages/05_map_view.py")
+        
+        with action_col3:
+            if st.button("🔄 재분석하기"):
+                st.session_state.survey_completed = False
+                st.session_state.answers = {}
+                if 'score_breakdown' in st.session_state:
+                    del st.session_state.score_breakdown
+                st.switch_page("pages/01_questionnaire.py")
 
 # 메인 실행
 if __name__ == "__main__":

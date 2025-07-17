@@ -4,9 +4,10 @@ import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
-import sqlite3
-import json
-from utils import check_access_permissions, questions
+import numpy as np
+from utils import (check_access_permissions, questions, determine_cluster, 
+                  get_cluster_info, create_user_persona_analysis, 
+                  classify_wellness_type)
 
 # 로그인 체크
 if 'logged_in' not in st.session_state or not st.session_state.logged_in:
@@ -26,7 +27,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 접근 권한 확인 (기본값: 로그인 + 설문 완료 둘 다 확인)
+# 접근 권한 확인
 check_access_permissions()
 
 # 웰니스 관광지 데이터
@@ -169,77 +170,102 @@ wellness_destinations = {
     ]
 }
 
-# 추천 알고리즘
-def calculate_recommendations(survey_answers):
-    """설문 결과를 바탕으로 추천 관광지 계산"""
-    recommendations = []
+# 클러스터 기반 추천 알고리즘
+def calculate_cluster_recommendations(survey_answers):
+    """클러스터 기반 추천 계산"""
+    if not survey_answers:
+        return []
     
-    # answers에서 preferred_activities 추출
-    preferred_activities_indices = survey_answers.get("preferred_activities", [])
+    # 클러스터 결정
+    cluster_result = determine_cluster(survey_answers)
+    cluster_id = cluster_result['cluster']
     
-    # 선호 활동에 따른 카테고리 매핑
-    activity_to_category = {
-        0: "온천/스파",        # 스파/온천 체험
-        1: "요가/명상",        # 요가/명상 프로그램
-        2: "자연치유",         # 트레킹/하이킹
-        3: "웰니스 리조트",    # 건강한 식단 체험
-        4: "온천/스파"         # 마사지/아로마테라피
+    # 클러스터별 추천 카테고리
+    cluster_preferences = {
+        0: ["온천/스파", "자연치유"],          # 안전추구 모험가형
+        1: ["온천/스파", "웰니스 리조트"],      # 안전우선 편의형  
+        2: ["요가/명상", "자연치유"],          # 문화체험 힐링형
+        3: ["웰니스 리조트", "온천/스파"],      # 쇼핑마니아 사교형
+        4: ["웰니스 리조트", "자연치유"],      # 프리미엄 모험형
+        5: ["요가/명상", "자연치유"],          # 탐험형 문화애호가
+        6: ["요가/명상", "온천/스파"],         # 문화미식 여성형
+        7: ["자연치유", "요가/명상", "온천/스파"]  # 종합체험 활동형
     }
     
-    # 선호 카테고리 결정
-    preferred_categories = []
-    if isinstance(preferred_activities_indices, list):
-        for idx in preferred_activities_indices:
-            if idx in activity_to_category:
-                preferred_categories.append(activity_to_category[idx])
-    
-    # 기본값 설정
-    if not preferred_categories:
-        preferred_categories = ["온천/스파"]
+    preferred_categories = cluster_preferences.get(cluster_id, ["온천/스파"])
+    recommendations = []
     
     # 모든 관광지에 대해 점수 계산
     for category, places in wellness_destinations.items():
         for place in places:
             score = 0
             
-            # 카테고리 일치 보너스
+            # 클러스터 선호 카테고리 보너스
             if category in preferred_categories:
-                score += 10
+                bonus_index = preferred_categories.index(category)
+                score += (10 - bonus_index * 2)  # 첫 번째 선호: 10점, 두 번째: 8점
             
-            # 기본 평점 반영
-            score += place["rating"]
+            # 기본 평점 반영 (0-10점)
+            score += place["rating"] * 2
             
-            # 웰니스 관심도에 따른 추가 점수
-            wellness_interest = survey_answers.get("wellness_interest", 2)
-            if wellness_interest is not None:
-                score += wellness_interest * 0.5
+            # 클러스터 점수 반영 (0-2점)
+            score += cluster_result['score'] * 0.1
+            
+            # 거리 보정 (가까울수록 약간의 보너스)
+            distance_bonus = max(0, (500 - place['distance_from_incheon']) / 100)
+            score += distance_bonus
             
             place_with_score = place.copy()
-            place_with_score["recommendation_score"] = score
+            place_with_score["recommendation_score"] = round(score, 1)
+            place_with_score["cluster_id"] = cluster_id
+            place_with_score["cluster_confidence"] = cluster_result['confidence']
             recommendations.append(place_with_score)
     
     # 점수 순으로 정렬
     recommendations.sort(key=lambda x: x["recommendation_score"], reverse=True)
     
-    return recommendations[:6]  # 상위 6개 추천
+    return recommendations[:8]
 
-# 웰니스 테마 CSS
+# CSS 스타일
 st.markdown("""
 <style>
-    /* 웰니스 테마 배경 그라데이션 */
     [data-testid="stAppViewContainer"] > .main {
         background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 50%, #A5D6A7 100%);
         min-height: 100vh;
     }
     
-    /* 메인 컨테이너 */
     .main .block-container {
         padding: 2rem 3rem !important;
         max-width: 1400px;
         margin: 0 auto;
     }
     
-    /* 추천 카드 스타일 */
+    .recommendations-title {
+        color: #2E7D32 !important;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 25px 30px;
+        border-radius: 20px;
+        font-size: 2.8em !important;
+        margin-bottom: 40px;
+        font-weight: 800 !important;
+        border: 3px solid #4CAF50;
+        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        letter-spacing: 1px;
+    }
+    
+    .cluster-result-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(76, 175, 80, 0.4);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin: 25px 0;
+        border-left: 6px solid #4CAF50;
+        text-align: center;
+    }
+    
     .recommendation-card {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(25px);
@@ -270,7 +296,6 @@ st.markdown("""
         border-radius: 25px 25px 0 0;
     }
     
-    /* 랭킹 배지 */
     .ranking-badge {
         position: absolute;
         top: -15px;
@@ -285,34 +310,6 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
     
-    /* 제목 스타일 */
-    .recommendations-title {
-        color: #2E7D32 !important;
-        text-align: center;
-        background: rgba(255, 255, 255, 0.95);
-        padding: 25px 30px;
-        border-radius: 20px;
-        font-size: 2.8em !important;
-        margin-bottom: 40px;
-        font-weight: 800 !important;
-        border: 3px solid #4CAF50;
-        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        letter-spacing: 1px;
-    }
-    
-    /* 설문 요약 카드 */
-    .survey-summary {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(20px);
-        border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 18px;
-        padding: 25px 30px;
-        margin: 25px 0;
-        border-left: 6px solid #4CAF50;
-    }
-    
-    /* 점수 표시 */
     .score-display {
         background: linear-gradient(45deg, #4CAF50, #66BB6A);
         color: white;
@@ -325,7 +322,6 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
     
-    /* 정보 태그 */
     .info-tag {
         background: rgba(76, 175, 80, 0.15);
         border: 2px solid rgba(76, 175, 80, 0.3);
@@ -345,7 +341,6 @@ st.markdown("""
         transform: translateY(-1px);
     }
     
-    /* 섹션 제목 */
     .section-title {
         color: #2E7D32 !important;
         font-size: 2em;
@@ -360,7 +355,6 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     
-    /* 필터 카드 */
     .filter-card {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
@@ -376,27 +370,6 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
     }
     
-    /* 버튼 스타일 */
-    div[data-testid="stButton"] > button {
-        background: linear-gradient(45deg, #4CAF50, #66BB6A) !important;
-        border: none !important;
-        border-radius: 15px !important;
-        color: white !important;
-        font-weight: 700 !important;
-        padding: 12px 25px !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    div[data-testid="stButton"] > button:hover {
-        background: linear-gradient(45deg, #388E3C, #4CAF50) !important;
-        transform: translateY(-3px) !important;
-        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4) !important;
-    }
-    
-    /* 차트 스타일 */
     .chart-container {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
@@ -406,7 +379,11 @@ st.markdown("""
         margin: 20px 0;
     }
     
-    /* 관광지 카드 내용 스타일 */
+    .chart-container:hover {
+        border-color: #4CAF50;
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
+    }
+    
     .place-name {
         color: #2E7D32;
         font-size: 1.6em;
@@ -429,14 +406,12 @@ st.markdown("""
         line-height: 1.8;
     }
     
-    /* 사용자 정보 표시 */
     .user-info {
         color: #2E7D32;
         font-weight: 600;
         line-height: 1.6;
     }
     
-    /* 메뉴 제목 */
     .menu-title {
         color: #2E7D32;
         text-align: center;
@@ -444,29 +419,31 @@ st.markdown("""
         font-weight: 700;
     }
     
-    /* 경고 및 정보 메시지 */
-    div[data-testid="stAlert"] {
-        background: rgba(255, 255, 255, 0.95) !important;
-        border: 2px solid #FF8A65 !important;
-        border-radius: 12px !important;
-        color: #2E7D32 !important;
-        font-weight: 600 !important;
+    div[data-testid="stButton"] > button {
+        background: linear-gradient(45deg, #4CAF50, #66BB6A) !important;
+        border: none !important;
+        border-radius: 15px !important;
+        color: white !important;
+        font-weight: 700 !important;
+        padding: 12px 25px !important;
+        transition: all 0.3s ease !important;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
     
-    /* 성공 메시지 */
-    div[data-testid="stAlert"][data-baseweb="notification"] {
-        border-color: #4CAF50 !important;
-        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(129, 199, 132, 0.05)) !important;
+    div[data-testid="stButton"] > button:hover {
+        background: linear-gradient(45deg, #388E3C, #4CAF50) !important;
+        transform: translateY(-3px) !important;
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4) !important;
     }
     
-    /* 기본 UI 숨김 */
     [data-testid="stHeader"] { display: none; }
     [data-testid="stSidebarNav"] { display: none; }
     [data-testid="stSidebar"] { display: none; }
     [data-testid="collapsedControl"] { display: none; }
     footer { display: none; }
     
-    /* 반응형 디자인 */
     @media (max-width: 768px) {
         .main .block-container {
             padding: 1rem 1.5rem !important;
@@ -527,10 +504,61 @@ def recommendations_page():
     top_menu()
     
     # 제목
-    st.markdown('<h1 class="recommendations-title">🎯 맞춤형 웰니스 여행지 추천</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="recommendations-title">🎯 AI 클러스터 맞춤 추천</h1>', unsafe_allow_html=True)
+    
+    # 클러스터 분석 결과 표시
+    if 'answers' in st.session_state and st.session_state.answers:
+        cluster_result = determine_cluster(st.session_state.answers)
+        cluster_id = cluster_result['cluster']
+        cluster_info = get_cluster_info()
+        
+        if cluster_id in cluster_info:
+            cluster_data = cluster_info[cluster_id]
+            wellness_type, wellness_color = classify_wellness_type(cluster_result['score'], cluster_id)
+            
+            st.markdown('<h2 class="section-title">🎭 당신의 여행 성향 분석</h2>', unsafe_allow_html=True)
+            
+            analysis_col1, analysis_col2 = st.columns([1, 2])
+            
+            with analysis_col1:
+                st.markdown(f"""
+                <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
+                    <h3 style="color: {cluster_data['color']}; margin-bottom: 15px;">
+                        🏆 클러스터 {cluster_id}
+                    </h3>
+                    <h4 style="color: #2E7D32; margin-bottom: 15px;">
+                        {cluster_data['name']}
+                    </h4>
+                    <div class="score-display">
+                        매칭 점수: {cluster_result['score']}/20
+                    </div>
+                    <p style="color: #2E7D32; font-weight: 600; margin-top: 15px; font-size: 0.9em;">
+                        신뢰도: {cluster_result['confidence']:.1%}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with analysis_col2:
+                # 페르소나 분석 표시
+                persona_analysis = create_user_persona_analysis(st.session_state.answers, wellness_type)
+                
+                st.markdown(f"""
+                <div class="filter-card">
+                    <h4 style="color: #2E7D32; margin-bottom: 15px;">📊 성향 분석 결과</h4>
+                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                        <strong>✨ 특징:</strong><br>{persona_analysis['특징']}
+                    </p>
+                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                        <strong>🎯 추천활동:</strong><br>{persona_analysis['추천활동']}
+                    </p>
+                    <p style="color: #2E7D32; font-weight: 600; margin: 0;">
+                        <strong>💡 여행팁:</strong><br>{persona_analysis['여행팁']}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
     
     # 필터 섹션
-    st.markdown('<h2 class="section-title">🎛️ 필터 설정</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="section-title">🎛️ 추천 필터</h2>', unsafe_allow_html=True)
     
     st.markdown('<div class="filter-card">', unsafe_allow_html=True)
     filter_col1, filter_col2, filter_col3 = st.columns(3)
@@ -544,7 +572,7 @@ def recommendations_page():
     with filter_col1:
         # 카테고리 필터
         selected_categories = st.multiselect(
-            "카테고리 선택",
+            "관심 카테고리",
             list(wellness_destinations.keys()),
             default=st.session_state.category_filter,
             key="category_filter_new"
@@ -564,75 +592,60 @@ def recommendations_page():
         st.session_state.distance_filter = distance_max
     
     with filter_col3:
-        # 사용자 정보
+        # 사용자 정보 표시
+        cluster_name = "미분석"
+        if 'answers' in st.session_state and st.session_state.answers:
+            cluster_result = determine_cluster(st.session_state.answers)
+            cluster_info = get_cluster_info()
+            if cluster_result['cluster'] in cluster_info:
+                cluster_name = cluster_info[cluster_result['cluster']]['name']
+        
         st.markdown(f"""
         <div class="user-info">
             <strong>👤 사용자:</strong> {st.session_state.username}<br>
-            <strong>📊 필터된 카테고리:</strong> {len(selected_categories)}개<br>
-            <strong>📏 최대 거리:</strong> {distance_max}km
+            <strong>🎭 성향:</strong> {cluster_name}<br>
+            <strong>📊 필터:</strong> {len(selected_categories)}개 카테고리<br>
+            <strong>📏 범위:</strong> {distance_max}km 이내
         </div>
         """, unsafe_allow_html=True)
     
     st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown("---")
     
     # 설문 결과 요약
-    with st.expander("📋 설문 결과 요약", expanded=False):
-        st.markdown('<div class="survey-summary">', unsafe_allow_html=True)
-        
-        # survey_results 대신 answers 사용하고 적절한 형태로 변환
+    with st.expander("📋 설문 응답 내역", expanded=False):
         if 'answers' in st.session_state and st.session_state.answers:
-            from utils import questions
-            
             for key, answer in st.session_state.answers.items():
                 if key in questions:
                     question_title = questions[key]['title']
-                    
-                    # 다중 선택 문항 처리
-                    if key in ["travel_purpose", "preferred_activities"]:
-                        if isinstance(answer, list) and answer:
-                            selected_options = [questions[key]['options'][i] for i in answer]
-                            answer_text = ", ".join(selected_options)
-                        else:
-                            answer_text = "선택 안함"
-                    # 단일 선택 문항 처리
+                    if answer is not None and answer < len(questions[key]['options']):
+                        answer_text = questions[key]['options'][answer]
                     else:
-                        if answer is not None and answer < len(questions[key]['options']):
-                            answer_text = questions[key]['options'][answer]
-                        else:
-                            answer_text = "답변 없음"
-                    
+                        answer_text = "답변 없음"
                     st.markdown(f"**{question_title}**: {answer_text}")
         else:
             st.markdown("설문 답변 데이터가 없습니다.")
-        
-        st.markdown('</div>', unsafe_allow_html=True)
     
     # 추천 결과 계산
-    recommended_places = calculate_recommendations(st.session_state.answers)
+    recommended_places = calculate_cluster_recommendations(st.session_state.answers)
     
     # 필터 적용
     filtered_places = []
     for place in recommended_places:
-        # 카테고리 필터
         if place['type'] not in st.session_state.category_filter:
             continue
-        
-        # 거리 필터
         if place['distance_from_incheon'] > st.session_state.distance_filter:
             continue
-        
         filtered_places.append(place)
     
     # 추천 결과 표시
-    st.markdown(f'<h2 class="section-title">🏆 추천 관광지 TOP {len(filtered_places)}</h2>', unsafe_allow_html=True)
+    st.markdown(f'<h2 class="section-title">🏆 AI 추천 결과 TOP {len(filtered_places)}</h2>', unsafe_allow_html=True)
     
     if len(filtered_places) == 0:
         st.warning("⚠️ 필터 조건에 맞는 관광지가 없습니다. 필터를 조정해주세요.")
         return
     
     # 추천 점수 차트
-    st.markdown('<h3 class="section-title">📊 추천 점수 비교</h3>', unsafe_allow_html=True)
+    st.markdown('<h3 class="section-title">📊 클러스터 매칭 점수</h3>', unsafe_allow_html=True)
     
     st.markdown('<div class="chart-container">', unsafe_allow_html=True)
     names = [place['name'] for place in filtered_places[:6]]
@@ -651,7 +664,8 @@ def recommendations_page():
         paper_bgcolor='rgba(0,0,0,0)',
         font_color='#2E7D32',
         xaxis_tickangle=-45,
-        font_size=12
+        font_size=12,
+        height=400
     )
     st.plotly_chart(fig, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
@@ -676,7 +690,9 @@ def recommendations_page():
                 <h3 class="place-name">{place['name']}</h3>
                 <p class="place-description">{place['description']}</p>
                 
-                <div class="score-display">추천 점수: {place['recommendation_score']:.1f}/10</div>
+                <div class="score-display">
+                    🎯 추천 점수: {place['recommendation_score']}/20
+                </div>
                 
                 <div style="margin: 20px 0;">
                     <span class="info-tag">⭐ {place['rating']}/5</span>
@@ -687,7 +703,8 @@ def recommendations_page():
                 
                 <div class="place-details">
                     <strong>🚗 자가용:</strong> {place['travel_time_car']} ({place['travel_cost_car']})<br>
-                    <strong>🚊 대중교통:</strong> {place['travel_time_train']} ({place['travel_cost_train']})
+                    <strong>🚊 대중교통:</strong> {place['travel_time_train']} ({place['travel_cost_train']})<br>
+                    <strong>🤖 AI 신뢰도:</strong> {place['cluster_confidence']:.1%}
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -695,7 +712,7 @@ def recommendations_page():
             # 버튼들
             col_btn1, col_btn2, col_btn3 = st.columns(3)
             with col_btn1:
-                st.markdown(f'<a href="{place["website"]}" target="_blank" style="text-decoration: none;"><button style="background: linear-gradient(45deg, #4CAF50, #66BB6A); border: none; border-radius: 12px; color: white; padding: 10px 18px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase;">🌐 공식 사이트</button></a>', unsafe_allow_html=True)
+                st.markdown(f'<a href="{place["website"]}" target="_blank" style="text-decoration: none;"><button style="background: linear-gradient(45deg, #4CAF50, #66BB6A); border: none; border-radius: 12px; color: white; padding: 10px 18px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; width: 100%;">🌐 공식 사이트</button></a>', unsafe_allow_html=True)
             with col_btn2:
                 if st.button(f"🗺️ 지도에서 보기", key=f"map_{i}"):
                     st.session_state.selected_place = place
@@ -705,6 +722,88 @@ def recommendations_page():
                     st.success(f"✅ {place['name']} 저장됨!")
         
         st.markdown("---")
+    
+    # 클러스터 분석 인사이트
+    if 'answers' in st.session_state and st.session_state.answers:
+        cluster_result = determine_cluster(st.session_state.answers)
+        cluster_info = get_cluster_info()
+        
+        if cluster_result['cluster'] in cluster_info:
+            cluster_data = cluster_info[cluster_result['cluster']]
+            
+            st.markdown('<h3 class="section-title">💡 AI 분석 인사이트</h3>', unsafe_allow_html=True)
+            
+            insight_col1, insight_col2 = st.columns(2)
+            
+            with insight_col1:
+                st.markdown(f"""
+                <div class="filter-card">
+                    <h4 style="color: {cluster_data['color']};">🎯 당신의 성향 키워드</h4>
+                    <div style="margin: 15px 0;">
+                        {' '.join([f'<span class="info-tag" style="background: {cluster_data["color"]}20; border-color: {cluster_data["color"]}; color: {cluster_data["color"]};">{char}</span>' for char in cluster_data['characteristics']])}
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+            
+            with insight_col2:
+                # 전체 클러스터 점수 분포
+                all_scores = cluster_result['all_scores']
+                top_clusters = sorted(all_scores.items(), key=lambda x: x[1], reverse=True)[:3]
+                
+                st.markdown(f"""
+                <div class="filter-card">
+                    <h4 style="color: #2E7D32;">📊 클러스터 매칭 분석</h4>
+                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 10px;">
+                        <strong>1위:</strong> {cluster_info[top_clusters[0][0]]['name']} ({top_clusters[0][1]}점)<br>
+                        <strong>2위:</strong> {cluster_info[top_clusters[1][0]]['name']} ({top_clusters[1][1]}점)<br>
+                        <strong>3위:</strong> {cluster_info[top_clusters[2][0]]['name']} ({top_clusters[2][1]}점)
+                    </p>
+                    <p style="color: #2E7D32; font-weight: 600; font-size: 0.9em;">
+                        💡 매칭 정확도: {cluster_result['confidence']:.1%}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+    
+    # 추천 알고리즘 설명
+    st.markdown('<h3 class="section-title">🤖 AI 추천 알고리즘</h3>', unsafe_allow_html=True)
+    
+    algo_col1, algo_col2, algo_col3 = st.columns(3)
+    
+    with algo_col1:
+        st.markdown(f"""
+        <div class="filter-card" style="text-align: center;">
+            <h4 style="color: #2E7D32; margin-bottom: 15px;">🎯 1단계: 성향 분석</h4>
+            <p style="color: #2E7D32; font-weight: 600; font-size: 0.9em;">
+                8개 질문으로<br>
+                8가지 클러스터 중<br>
+                최적 성향 결정
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with algo_col2:
+        st.markdown(f"""
+        <div class="filter-card" style="text-align: center;">
+            <h4 style="color: #2E7D32; margin-bottom: 15px;">⚖️ 2단계: 점수 계산</h4>
+            <p style="color: #2E7D32; font-weight: 600; font-size: 0.9em;">
+                클러스터 선호도 +<br>
+                관광지 평점 +<br>
+                접근성 보정
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with algo_col3:
+        st.markdown(f"""
+        <div class="filter-card" style="text-align: center;">
+            <h4 style="color: #2E7D32; margin-bottom: 15px;">🏆 3단계: 최종 추천</h4>
+            <p style="color: #2E7D32; font-weight: 600; font-size: 0.9em;">
+                개인 맞춤형<br>
+                우선순위 기반<br>
+                상위 추천지 선별
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
     
     # 액션 버튼
     st.markdown('<h2 class="section-title">🚀 다음 단계</h2>', unsafe_allow_html=True)
@@ -719,11 +818,13 @@ def recommendations_page():
     with action_col2:
         if st.button("📝 설문 다시하기"):
             st.session_state.survey_completed = False
-            st.session_state.survey_results = {}
+            st.session_state.answers = {}
+            if 'score_breakdown' in st.session_state:
+                del st.session_state.score_breakdown
             st.switch_page("pages/01_questionnaire.py")
     
     with action_col3:
-        if st.button("📊 다른 통계 보기"):
+        if st.button("📊 통계 분석 보기"):
             st.switch_page("pages/06_statistics.py")
 
 # 메인 실행
