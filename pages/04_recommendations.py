@@ -363,7 +363,7 @@ st.markdown("""
         border-radius: 18px;
         padding: 25px 30px;
         margin: 25px 0;
-        min-height: 220px;
+        min-height: 300px;
         transition: all 0.3s ease;
     }
     
