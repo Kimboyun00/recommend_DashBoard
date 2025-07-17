@@ -36,7 +36,6 @@ def auth_css():
         [data-testid="stAppViewContainer"] > .main {
             background-image: linear-gradient(to top right, #0a192f, #1e3a5f, #4a6da7);
             background-size: cover;
-            position: relative;
         }
 
         /* st.columns를 포함하는 메인 블록을 Flexbox로 만들어 수직 중앙 정렬 */
@@ -80,7 +79,7 @@ def auth_css():
         /* 입력 필드 스타일 */
         div[data-testid="stTextInput"] input {
             background-color: rgba(255, 255, 255, 0.1); 
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 10px; 
             color: #000000 !important; /* 검정색으로 유지 */
             padding: 12px; 
@@ -92,9 +91,10 @@ def auth_css():
             width: 100%; 
             padding: 12px 0; 
             background: linear-gradient(45deg, #8BC34A, #4CAF50);
+            border: none;
+            border-radius: 10px;
             color: black; 
-            font-weight: bold; 
-            font-size: 18px;
+            font-weight: bold;
             transition: all 0.3s;
         }
     </style>
