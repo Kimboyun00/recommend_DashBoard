@@ -111,6 +111,7 @@ st.markdown("""
             color: #333;
             font-size: 1.05em;
             font-weight: 600;
+            margin-top: 20px;
             margin-bottom: 35px;
             line-height: 1.7;
             opacity: 0.9;
