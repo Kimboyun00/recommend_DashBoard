@@ -82,7 +82,7 @@ st.markdown("""
         border: 2px solid rgba(76, 175, 80, 0.5) !important;
         border-radius: 10px !important;
         padding: 8px 12px !important;
-        margin: 0 0 0 0 !important;
+        margin: 0 0 15px 0 !important;
         transition: all 0.3s ease !important;
         backdrop-filter: blur(10px) !important;
         display: flex !important;
@@ -148,6 +148,18 @@ st.markdown("""
         color: #d32f2f !important;
     }
     
+    /* 복수응답 안내 메시지 스타일 */
+    .multiple-choice-info {
+        background: rgba(76, 175, 80, 0.1);
+        border: 2px solid rgba(76, 175, 80, 0.3);
+        border-radius: 10px;
+        padding: 10px 15px;
+        margin: 10px 0;
+        color: #2E7D32;
+        font-weight: 600;
+        font-size: 0.95em;
+    }
+    
     /* 기본 UI 숨김 */
     [data-testid="stHeader"] { display: none; }
     [data-testid="stSidebarNav"] { display: none; }
@@ -184,13 +196,14 @@ def wellness_questionnaire_page():
         st.session_state.validation_errors = set()
 
     def update_answers():
-        """답변 업데이트 함수 - utils.py의 웰니스 설문 구조에 맞게 수정"""
-        for key in questions.keys():
-            # travel_purpose와 preferred_activities는 다중 선택
-            if key in ["travel_purpose", "preferred_activities"]:
-                selected_indices = [j for j, _ in enumerate(questions[key]['options']) 
+        """답변 업데이트 함수 - 복수응답 지원"""
+        for key, question_data in questions.items():
+            # 복수응답 문항 처리
+            if question_data.get('multiple', False):
+                selected_indices = [j for j, _ in enumerate(question_data['options']) 
                                  if st.session_state.get(f"checkbox_{key}_{j}", False)]
                 st.session_state.answers[key] = selected_indices
+            # 단일 선택 문항 처리
             elif f"radio_{key}" in st.session_state:
                 st.session_state.answers[key] = st.session_state[f"radio_{key}"]
 
@@ -229,9 +242,14 @@ def wellness_questionnaire_page():
         else:
             container.subheader(f"**{question['title']}**")
 
-        # 다중 선택 문항 (travel_purpose, preferred_activities)
-        if key in ["travel_purpose", "preferred_activities"]:
-            container.markdown("**여러 개를 선택할 수 있습니다:**")
+        # 복수 선택 문항 처리
+        if question.get('multiple', False):
+            container.markdown("""
+            <div class="multiple-choice-info">
+                ✅ <strong>복수 선택 가능:</strong> 해당하는 모든 항목을 선택해주세요
+            </div>
+            """, unsafe_allow_html=True)
+            
             for j, option in enumerate(question['options']):
                 is_checked = isinstance(current_answer, list) and j in current_answer
                 container.checkbox(
@@ -255,10 +273,19 @@ def wellness_questionnaire_page():
         
         st.markdown("---")
 
-    # 진행률 계산 및 표시
-    answered_count = sum(1 for key in questions if key in st.session_state.answers and 
-                        st.session_state.answers[key] is not None and 
-                        (st.session_state.answers[key] != [] if key in ["travel_purpose", "preferred_activities"] else True))
+    # 진행률 계산 및 표시 (복수응답 지원)
+    answered_count = 0
+    for key, question_data in questions.items():
+        if key in st.session_state.answers:
+            answer = st.session_state.answers[key]
+            # 복수응답 문항: 빈 리스트가 아닌지 확인
+            if question_data.get('multiple', False):
+                if isinstance(answer, list) and len(answer) > 0:
+                    answered_count += 1
+            # 단일응답 문항: None이 아닌지 확인
+            else:
+                if answer is not None:
+                    answered_count += 1
     
     progress_value = answered_count / len(questions) if questions else 0
     

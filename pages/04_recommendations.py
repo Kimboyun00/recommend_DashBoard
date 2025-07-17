@@ -617,11 +617,28 @@ def recommendations_page():
             for key, answer in st.session_state.answers.items():
                 if key in questions:
                     question_title = questions[key]['title']
-                    if answer is not None and answer < len(questions[key]['options']):
-                        answer_text = questions[key]['options'][answer]
+                    question_data = questions[key]
+                    
+                    # 복수응답 문항 처리
+                    if question_data.get('multiple', False):
+                        if isinstance(answer, list) and answer:
+                            answer_texts = []
+                            for idx in answer:
+                                if idx < len(question_data['options']):
+                                    answer_texts.append(f"• {question_data['options'][idx]}")
+                            answer_display = "\n".join(answer_texts) if answer_texts else "답변 없음"
+                        else:
+                            answer_display = "답변 없음"
+                    # 단일응답 문항 처리
                     else:
-                        answer_text = "답변 없음"
-                    st.markdown(f"**{question_title}**: {answer_text}")
+                        if answer is not None and answer < len(question_data['options']):
+                            answer_display = f"• {question_data['options'][answer]}"
+                        else:
+                            answer_display = "답변 없음"
+                    
+                    st.markdown(f"**{question_title}**")
+                    st.markdown(answer_display)
+                    st.markdown("---")
         else:
             st.markdown("설문 답변 데이터가 없습니다.")
     

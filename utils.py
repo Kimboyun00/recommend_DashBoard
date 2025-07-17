@@ -38,7 +38,7 @@ def check_access_permissions(page_type='default'):
                     st.switch_page("pages/03_home.py")
             st.stop()
 
-# --- 웰니스 관광 성향 진단 설문 관련 함수 및 데이터 ---
+# --- 웰니스 관광 성향 진단 설문 관련 함수 및 데이터 (수정됨) ---
 questions = {
     "q1": {
         "title": "1. 여행 시 가장 중요하게 생각하는 것은?",
@@ -50,13 +50,14 @@ questions = {
         ]
     },
     "q2": {
-        "title": "2. 선호하는 여행 스타일은?",
+        "title": "2. 선호하는 여행 스타일은? (복수 선택 가능)",
         "options": [
             "혼자서 자유롭게 (개인형)",
             "가족이나 친구와 함께 (사회형)",
             "소규모 그룹으로 (소그룹형)", 
             "대규모 단체로 (단체형)"
-        ]
+        ],
+        "multiple": True  # 복수 선택 표시
     },
     "q3": {
         "title": "3. 한국 여행에서 가장 하고 싶은 활동은?",
@@ -109,12 +110,13 @@ questions = {
             "안전하게 다녀왔다는 안도감",
             "새로운 경험에 대한 만족감",
             "쇼핑이나 구매에 대한 만족",
-            "문화적 학습과 성장"
+            "문화적 학습과 성장",
+            "일상에서 벗어난 충분한 휴식"  # 새로 추가된 휴식 관련 옵션
         ]
     }
 }
 
-# 클러스터별 점수 계산 함수들
+# 클러스터별 점수 계산 함수들 (수정됨)
 def calculate_cluster_0_score(answers):
     """클러스터 0: 안전추구 모험가형"""
     score = 0
@@ -123,9 +125,11 @@ def calculate_cluster_0_score(answers):
     if answers.get('q1') == 0: score += 3  # 안전 지향
     elif answers.get('q1') == 1: score += 2  # 모험 추구
     
-    # Q2: 사회적 여행
-    if answers.get('q2') == 1: score += 2  # 가족이나 친구와
-    elif answers.get('q2') == 2: score += 1  # 소그룹
+    # Q2: 사회적 여행 (복수응답 처리)
+    q2_answers = answers.get('q2', [])
+    if isinstance(q2_answers, list):
+        if 1 in q2_answers: score += 2  # 가족이나 친구와
+        if 2 in q2_answers: score += 1  # 소그룹
     
     # Q3: 다양한 활동
     if answers.get('q3') == 0: score += 1  # 쇼핑
@@ -134,9 +138,10 @@ def calculate_cluster_0_score(answers):
     if answers.get('q4') == 1: score += 2  # 스탠다드 호텔
     elif answers.get('q4') == 0: score += 1  # 프리미엄 호텔
     
-    # Q8: 안전 중시
+    # Q8: 안전 중시 (새 옵션 반영)
     if answers.get('q8') == 0: score += 3  # 안전감
     elif answers.get('q8') == 1: score += 1  # 새로운 경험
+    elif answers.get('q8') == 4: score += 1  # 휴식 (중립적 처리)
     
     return score
 
@@ -148,8 +153,10 @@ def calculate_cluster_1_score(answers):
     if answers.get('q1') == 0: score += 4  # 안전 지향
     elif answers.get('q1') == 2: score += 2  # 편의 중시
     
-    # Q2: 사회적 여행
-    if answers.get('q2') == 1: score += 2  # 가족이나 친구와
+    # Q2: 사회적 여행 (복수응답 처리)
+    q2_answers = answers.get('q2', [])
+    if isinstance(q2_answers, list):
+        if 1 in q2_answers: score += 2  # 가족이나 친구와
     
     # Q4: 편리한 호텔
     if answers.get('q4') == 1: score += 3  # 스탠다드 호텔
@@ -158,8 +165,9 @@ def calculate_cluster_1_score(answers):
     # Q7: 숙박 투자
     if answers.get('q7') == 0: score += 2  # 숙박
     
-    # Q8: 안전감
+    # Q8: 안전감과 휴식
     if answers.get('q8') == 0: score += 3  # 안전감
+    elif answers.get('q8') == 4: score += 2  # 휴식 (편의형에 적합)
     
     return score
 
@@ -177,9 +185,10 @@ def calculate_cluster_2_score(answers):
     # Q7: 체험활동 투자
     if answers.get('q7') == 3: score += 3  # 체험활동
     
-    # Q8: 문화적 성장
+    # Q8: 문화적 성장과 휴식
     if answers.get('q8') == 3: score += 3  # 문화적 학습과 성장
     elif answers.get('q8') == 1: score += 1  # 새로운 경험
+    elif answers.get('q8') == 4: score += 2  # 휴식 (힐링형에 적합)
     
     return score
 
@@ -187,9 +196,11 @@ def calculate_cluster_3_score(answers):
     """클러스터 3: 쇼핑마니아 사교형"""
     score = 0
     
-    # Q2: 사회적 여행
-    if answers.get('q2') == 1: score += 3  # 가족이나 친구와
-    elif answers.get('q2') == 2: score += 2  # 소그룹
+    # Q2: 사회적 여행 (복수응답 처리)
+    q2_answers = answers.get('q2', [])
+    if isinstance(q2_answers, list):
+        if 1 in q2_answers: score += 3  # 가족이나 친구와
+        if 2 in q2_answers: score += 2  # 소그룹
     
     # Q3: 쇼핑 중심
     if answers.get('q3') == 0: score += 4  # 쇼핑
@@ -203,6 +214,7 @@ def calculate_cluster_3_score(answers):
     
     # Q8: 쇼핑 만족
     if answers.get('q8') == 2: score += 3  # 쇼핑이나 구매에 대한 만족
+    elif answers.get('q8') == 4: score += 1  # 휴식 (중립적 처리)
     
     return score
 
@@ -226,6 +238,7 @@ def calculate_cluster_4_score(answers):
     
     # Q8: 새로운 경험
     if answers.get('q8') == 1: score += 3  # 새로운 경험에 대한 만족감
+    elif answers.get('q8') == 4: score += 1  # 휴식 (중립적 처리)
     
     return score
 
@@ -236,8 +249,10 @@ def calculate_cluster_5_score(answers):
     # Q1: 모험 추구
     if answers.get('q1') == 1: score += 3  # 모험 추구
     
-    # Q2: 사회적 여행
-    if answers.get('q2') == 1: score += 2  # 가족이나 친구와
+    # Q2: 사회적 여행 (복수응답 처리)
+    q2_answers = answers.get('q2', [])
+    if isinstance(q2_answers, list):
+        if 1 in q2_answers: score += 2  # 가족이나 친구와
     
     # Q3: 문화체험
     if answers.get('q3') == 1: score += 3  # 문화체험
@@ -249,6 +264,7 @@ def calculate_cluster_5_score(answers):
     # Q8: 새로운 경험과 성장
     if answers.get('q8') == 1: score += 2  # 새로운 경험
     elif answers.get('q8') == 3: score += 2  # 문화적 학습과 성장
+    elif answers.get('q8') == 4: score += 1  # 휴식 (중립적 처리)
     
     return score
 
@@ -268,8 +284,9 @@ def calculate_cluster_6_score(answers):
     if answers.get('q7') == 2: score += 2  # 음식
     elif answers.get('q7') == 3: score += 2  # 체험활동
     
-    # Q8: 문화적 성장
+    # Q8: 문화적 성장과 휴식
     if answers.get('q8') == 3: score += 2  # 문화적 학습과 성장
+    elif answers.get('q8') == 4: score += 2  # 휴식 (여성형에 적합)
     
     return score
 
@@ -280,8 +297,10 @@ def calculate_cluster_7_score(answers):
     # Q1: 안전 고려
     if answers.get('q1') == 0: score += 2  # 안전 지향
     
-    # Q2: 사회적 여행
-    if answers.get('q2') == 1: score += 2  # 가족이나 친구와
+    # Q2: 사회적 여행 (복수응답 처리)
+    q2_answers = answers.get('q2', [])
+    if isinstance(q2_answers, list):
+        if 1 in q2_answers: score += 2  # 가족이나 친구와
     
     # Q3: 문화체험과 미식
     if answers.get('q3') == 1: score += 3  # 문화체험
@@ -292,9 +311,10 @@ def calculate_cluster_7_score(answers):
     if answers.get('q7') == 2: score += 2  # 음식
     elif answers.get('q7') == 3: score += 2  # 체험활동
     
-    # Q8: 종합 만족
+    # Q8: 종합 만족과 휴식
     if answers.get('q8') == 3: score += 2  # 문화적 학습과 성장
     elif answers.get('q8') == 1: score += 1  # 새로운 경험
+    elif answers.get('q8') == 4: score += 2  # 휴식 (종합형에 적합)
     
     return score
 
@@ -396,12 +416,16 @@ def classify_wellness_type(score, cluster_id=None):
         return "프리미엄 모험형", "#F44336"
 
 def validate_wellness_answers():
-    """설문 답변 유효성 검사"""
+    """설문 답변 유효성 검사 (복수응답 지원)"""
     errors = set()
     
-    for key in questions.keys():
+    for key, question_data in questions.items():
         if key not in st.session_state.answers or st.session_state.answers[key] is None:
             errors.add(key)
+        elif question_data.get('multiple', False):  # 복수응답 문항 체크
+            # 복수응답 문항은 빈 리스트가 아닌지 확인
+            if st.session_state.answers[key] == []:
+                errors.add(key)
     
     st.session_state.validation_errors = errors
     return len(errors) == 0
@@ -674,8 +698,6 @@ def create_user_persona_analysis(answers, wellness_type):
 
 # --- 여행 데이터 분석을 위한 추가 함수들 ---
 
-# --- 여행 데이터 분석을 위한 추가 함수들 ---
-
 def analyze_travel_trends(df):
     """여행 트렌드 분석"""
     
@@ -704,7 +726,7 @@ def create_travel_insights_dashboard(df, user_type):
 
 # 설문 완료 후 survey_results 생성 함수 수정
 def convert_answers_to_survey_results(answers):
-    """answers를 survey_results 형태로 변환"""
+    """answers를 survey_results 형태로 변환 (복수응답 지원)"""
     survey_results = {}
     
     if not answers:
@@ -714,11 +736,19 @@ def convert_answers_to_survey_results(answers):
         if key in questions:
             question_title = questions[key]['title']
             
-            # 단일 선택 문항 처리
-            if answer is not None and answer < len(questions[key]['options']):
-                answer_text = questions[key]['options'][answer]
+            # 복수응답 문항 처리
+            if questions[key].get('multiple', False):
+                if isinstance(answer, list) and answer:
+                    answer_texts = [questions[key]['options'][idx] for idx in answer if idx < len(questions[key]['options'])]
+                    answer_text = " | ".join(answer_texts)
+                else:
+                    answer_text = "답변 없음"
             else:
-                answer_text = "답변 없음"
+                # 단일 선택 문항 처리
+                if answer is not None and answer < len(questions[key]['options']):
+                    answer_text = questions[key]['options'][answer]
+                else:
+                    answer_text = "답변 없음"
             
             survey_results[question_title] = answer_text
     
