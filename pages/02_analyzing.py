@@ -108,11 +108,12 @@ st.markdown("""
             animation: ellipsis 1.5s infinite;
             display: inline-block;
             width: 2em;
-            text-align: center;
+            text-align: left;
         }
 
         /* 제목 스타일 */
         .analyzing-title {
+            text-align: center;
             color: #2E7D32;
             font-size: 2.4em;
             font-weight: 800;
