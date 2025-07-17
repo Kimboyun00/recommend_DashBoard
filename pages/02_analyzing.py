@@ -40,7 +40,6 @@ st.markdown("""
             min-height: 100vh;
             width: 100%;
             padding: 0 !important;
-            flex-direction: column;
         }
         
         /* 분석 카드 스타일 */
