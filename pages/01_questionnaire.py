@@ -65,7 +65,7 @@ st.markdown("""
         border: 2px solid rgba(76, 175, 80, 0.5) !important;
         border-radius: 10px !important;
         padding: 8px 12px !important;
-        margin: 0 0 10px 0 !important;
+        margin: 0 0 0 0 !important;
         transition: all 0.3s ease !important;
         backdrop-filter: blur(10px) !important;
         width: 100% !important;
@@ -82,7 +82,7 @@ st.markdown("""
         border: 2px solid rgba(76, 175, 80, 0.5) !important;
         border-radius: 10px !important;
         padding: 8px 12px !important;
-        margin: 0 0 10px 0 !important;
+        margin: 0 0 0 0 !important;
         transition: all 0.3s ease !important;
         backdrop-filter: blur(10px) !important;
         display: flex !important;
