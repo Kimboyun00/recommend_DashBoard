@@ -108,8 +108,7 @@ st.markdown("""
             animation: ellipsis 1.5s infinite;
             display: inline-block;
             width: 2em;
-            text-align: center;
-            color: #4CAF50;
+            text-align: left;
         }
 
         /* 제목 스타일 */
@@ -179,12 +178,18 @@ st.markdown("""
         
         /* 진행률 텍스트 */
         .progress-text {
-            text-align: center;
+            text-align: left;
             color: #2E7D32;
             font-weight: 700;
             font-size: 1.1em;
             margin: 12px 0;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .status-wrapper {
+            max-width: 600px;
+            width: 90%;
+            margin: 0 auto;  /* 중앙 정렬 */
         }
         
         /* 상태 메시지 */
@@ -214,10 +219,6 @@ st.markdown("""
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.05); opacity: 0.8; }
             100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .pulse-animation {
-            animation: pulse 2s ease-in-out infinite;
         }
         
         /* 플로팅 애니메이션 */
@@ -314,19 +315,21 @@ def analyzing_page():
         with progress_placeholder.container():
             st.markdown(f"""
             <div class="progress-wrapper">
-                <div class="progress-container">
-                    <div class="progress-bar" style="width: {percentage}%;"></div>
-                </div>
                 <p class="progress-text">
                     분석 진행률: {percentage}% 🌿
                 </p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: {percentage}%;"></div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
         
         with status_placeholder.container():
             st.markdown(f"""
-            <div class="status-message pulse-animation">
-                <strong>진행 단계:</strong> {step_text}
+            <div class="status-wrapper">
+                <div class="status-message">
+                    <strong>진행 단계:</strong> {step_text}
+                </div>
             </div>
             """, unsafe_allow_html=True)
         
@@ -335,8 +338,10 @@ def analyzing_page():
     # 분석 완료
     with status_placeholder.container():
         st.markdown("""
-        <div class="status-message completed">
-            ✅ <strong>분석이 완료되었습니다!</strong> 잠시 후 결과 페이지로 이동합니다.
+        <div class="status-wrapper">
+            <div class="status-message completed">
+                ✅ <strong>분석이 완료되었습니다!</strong> 잠시 후 결과 페이지로 이동합니다.
+            </div>
         </div>
         """, unsafe_allow_html=True)
     
