@@ -169,7 +169,7 @@ st.markdown("""
         /* 상태 메시지 */
         .status-message {
             color: #2E7D32;
-            font-size: 1.1em;
+            font-size: 0.8em;
             font-weight: 600;
             margin: 20px 0;
             padding: 15px 20px;
@@ -320,7 +320,7 @@ def analyzing_page():
         st.markdown("""
         <div class="progress-wrapper">
             <p class="progress-text">
-                분석 완료! 100% 🎉
+                <br>분석 완료! 100% 🎉
             </p>
             <div class="progress-container">
                 <div class="progress-bar" style="width: 100%;"></div>
