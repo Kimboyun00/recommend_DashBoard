@@ -141,8 +141,8 @@ st.markdown("""
         /* 진행률 컨테이너 */
         .progress-container {
             background: rgba(76, 175, 80, 0.15);
-            border-radius: 8px;
-            padding: 8px;
+            border-radius: 15px;
+            padding: 0px;
             margin: 25px 0;
             box-shadow: inset 0 2px 8px rgba(76, 175, 80, 0.2);
         }
