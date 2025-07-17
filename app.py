@@ -112,7 +112,7 @@ def auth_page():
         st.markdown("""
         <style>
         .wellness-title {
-            font-size: 28px !important;
+            font-size: 33px !important;
             font-weight: bold;
         }
         </style>
