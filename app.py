@@ -60,7 +60,7 @@ def auth_css():
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
         
-        h1 { font-size: 2.2em; color: #ffffff; font-weight: 600; margin-bottom: 25px; letter-spacing: 2px; }
+        h1 { font-size: 1.7em; color: #ffffff; font-weight: 600; margin-bottom: 25px; letter-spacing: 2px; }
 
         /* 로그인/회원가입 선택 라디오 버튼 스타일 */
         div[data-testid="stRadio"] {
@@ -90,7 +90,7 @@ def auth_css():
         div[data-testid="stButton"] > button {
             width: 100%; 
             padding: 12px 0; 
-            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            background: linear-gradient(45deg, #4CAF50, #8BC34A);
                 border: none;
                 border-radius: 10px;
                 color: white;
@@ -109,8 +109,8 @@ def auth_page():
 
     with form_col:
         # 웰니스 투어 로고 및 제목
-        st.markdown('<h1 class="wellness-title">🌿 웰커밍 투어추천</h1>', unsafe_allow_html=True)
-        st.markdown('<p style="color: rgba(255,255,255,0.8); font-size: 1.2em; margin-bottom: 30px;">당신만의 맞춤형 힐링 여행을 찾아보세요</p>', unsafe_allow_html=True)
+        st.markdown('<h1 class="wellness-title">🌿 웰커밍 투어추천 시스템</h1>', unsafe_allow_html=True)
+        st.markdown('<p style="color: rgba(76,175,80,0.8); font-size: 1.2em; margin-bottom: 30px;">당신만의 맞춤형 힐링 여행을 찾아보세요</p>', unsafe_allow_html=True)
         
         choice = st.radio("choice", ["로그인", "회원가입"], horizontal=True, label_visibility="collapsed")
         
