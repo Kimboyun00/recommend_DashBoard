@@ -131,7 +131,14 @@ st.markdown("""
             line-height: 1.7;
             opacity: 0.9;
         }
-        
+            
+        /* 진행률 바 외부 컨테이너가 analyzing-card와 같은 폭을 갖도록 설정 */
+        .progress-wrapper {
+            max-width: 600px;
+            width: 90%;
+            margin: 0 auto;  /* 중앙 정렬 */
+        }
+            
         /* 진행률 컨테이너 */
         .progress-container {
             background: rgba(76, 175, 80, 0.15);
@@ -306,12 +313,14 @@ def analyzing_page():
     for step_text, percentage in analysis_steps:
         with progress_placeholder.container():
             st.markdown(f"""
-            <div class="progress-container">
-                <div class="progress-bar" style="width: {percentage}%;"></div>
+            <div class="progress-wrapper">
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: {percentage}%;"></div>
+                </div>
+                <p class="progress-text">
+                    분석 진행률: {percentage}% 🌿
+                </p>
             </div>
-            <p class="progress-text">
-                분석 진행률: {percentage}% 🌿
-            </p>
             """, unsafe_allow_html=True)
         
         with status_placeholder.container():
