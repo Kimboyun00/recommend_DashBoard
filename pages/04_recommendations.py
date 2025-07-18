@@ -731,7 +731,7 @@ def recommendations_page():
                     tickmode='array',
                     tickvals=list(range(len(names))),
                     ticktext=[name[:15] + '...' if len(name) > 15 else name for name in names],  # 긴 이름 줄임
-                    tickfont=dict(size=10)
+                    tickfont=dict(size=10, color="#000000", family='Arial Black')
                 )
             )
 
