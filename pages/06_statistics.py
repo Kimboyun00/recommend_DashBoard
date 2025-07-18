@@ -160,7 +160,19 @@ st.markdown("""
         background: linear-gradient(45deg, #4CAF50, #66BB6A);
         color: white;
         padding: 10px 20px;
-        border-radius: 30px;
+        border-radius: 10px;
+        font-weight: 700;
+        display: inline-block;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .confidence-display {
+        background: linear-gradient(45deg, #4CAF50, #66BB6A);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
         font-weight: 700;
         display: inline-block;
         margin: 15px 0;
@@ -755,18 +767,19 @@ def statistics_page():
                 
                 with user_col1:
                     st.markdown(f"""
-                    <div class="cluster-card" style="border-color: {cluster_data['color']}; height: 300px;">
-                        <h4 style="color: {cluster_data['color']}; margin-bottom: 15px;">
-                            🏆 내 클러스터
-                        </h4>
-                        <h5 style="color: #2E7D32; margin-bottom: 15px;">
-                            {cluster_data['name']}
-                        </h5>
-                        <p style="color: #2E7D32; font-size: 0.9em; margin: 0;">
-                            클러스터 {cluster_result['cluster']}<br>
-                            점수: {cluster_result['score']}/20<br>
-                            신뢰도: {cluster_result['confidence']:.1%}
-                        </p>
+                    <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
+                        <h3 style="color: {cluster_data['color']}; margin-left: 20px; margin-bottom: 15px;">
+                            🏆 {cluster_data['name']}
+                        </h3>
+                        <h3 style="color: #2E7D32; margin-left: 30px; margin-top: 15px;">
+                            클러스터 {cluster_result['cluster']}
+                        </h3>
+                        <div class="score-display">
+                            매칭 점수: {cluster_result['score']}/20
+                        </div>
+                        <div class="confidence-display">
+                            신뢰도: {cluster_result['confidence']}/20
+                        </div>
                     </div>
                     """, unsafe_allow_html=True)
                 
@@ -793,7 +806,7 @@ def statistics_page():
                     top_3_clusters = sorted(all_scores.items(), key=lambda x: x[1], reverse=True)[:3]
                     
                     st.markdown(f"""
-                    <div class="insight-card" style="max-height: 300px;">
+                    <div class="insight-card" style="height: 300px;">
                         <h4>📊 클러스터 매칭 순위</h4>
                         <p style="font-size: 0.9em; line-height: 1.6;">
                             <strong>1위:</strong> 클러스터 {top_3_clusters[0][0]} ({top_3_clusters[0][1]}점)<br>
