@@ -491,39 +491,10 @@ def create_travel_style_analysis():
     return fig
 
 # 사이드바 메뉴
-def sidebar_menu():
-    st.markdown("### 🧭 메뉴")
-    
-    menu_col1, menu_col2, menu_col3, menu_col4, menu_col5 = st.columns(5)
-    
-    with menu_col1:
-        if st.button("🏠 홈", key="home_btn"):
-            st.switch_page("pages/03_home.py")
-    
-    with menu_col2:
-        if st.button("📝 설문조사", key="survey_btn"):
-            st.switch_page("pages/01_questionnaire.py")
-    
-    with menu_col3:
-        if st.button("📊 추천 결과", key="results_btn"):
-            if 'survey_completed' in st.session_state and st.session_state.survey_completed:
-                st.switch_page("pages/04_recommendations.py")
-            else:
-                st.warning("설문을 먼저 완료해주세요!")
-    
-    with menu_col4:
-        if st.button("🗺️ 지도 보기", key="map_btn"):
-            if 'survey_completed' in st.session_state and st.session_state.survey_completed:
-                st.switch_page("pages/05_map_view.py")
-            else:
-                st.warning("설문을 먼저 완료해주세요!")
-    
-    with menu_col5:
-        if st.button("🚪 로그아웃", key="logout_btn"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.switch_page("app.py")
-    
+def stats_info():
+
+    # 제목
+    st.title('🌿 웰커밍 투어추천 시스템')
     st.markdown("---")
     
     # 분석 설정
@@ -610,7 +581,7 @@ def create_category_analysis():
 
 # 메인 통계 페이지
 def statistics_page():
-    analysis_type, show_advanced = sidebar_menu()
+    analysis_type, show_advanced = stats_info()
     
     # 제목
     st.markdown('<h1 class="page-title">📈 AI 클러스터 분석 & 통계</h1>', unsafe_allow_html=True)

@@ -569,8 +569,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 사이드바 메뉴
-def sidebar_menu():
+# 지도 관련 정보
+def map_info():
 
     # 제목
     st.title('🌿 웰커밍 투어추천 시스템')
@@ -681,7 +681,7 @@ def sidebar_menu():
 
 # 메인 지도 페이지
 def map_view_page():
-    num_places, map_center, show_categories = sidebar_menu()
+    num_places, map_center, show_categories = map_info()
     
     # 제목
     st.markdown("---")
