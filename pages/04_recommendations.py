@@ -979,6 +979,8 @@ def recommendations_page():
                 if st.button("💾 저장", key=f"save_{index}", use_container_width=True):
                     st.success(f"✅ {place['name']} 저장됨!")
 
+    st.markdown("<br><br>", unsafe_allow_html=True)
+
     for i, place in enumerate(filtered_places):
         create_recommendation_card_safe(place, i)
         st.markdown("---")
