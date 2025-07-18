@@ -442,7 +442,7 @@ def display_detailed_user_analysis(answers):
     analysis = analyze_user_survey_details(answers)
 
     st.markdown("---")
-    st.markdown('<h3 class="section-title">🔍 상세 성향 분석</h3>', unsafe_allow_html=True)
+    st.markdown('<h2 class="section-title">🔍 상세 성향 분석</h2>', unsafe_allow_html=True)
     
     detail_col1, detail_col2 = st.columns(2)
     
