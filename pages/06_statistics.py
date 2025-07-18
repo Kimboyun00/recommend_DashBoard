@@ -538,7 +538,7 @@ def stats_info():
     st.markdown("---")
     
     # 메인 제목
-    st.markdown('<h1 class="page-title">📈 AI 클러스터 분석 & 통계</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="page-title">📈 AI 클러스터링 분석 & 통계</h1>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -663,11 +663,6 @@ def create_category_analysis():
 def statistics_page():
     analysis_type, show_advanced = stats_info()
     
-    
-
-    # 제목
-    st.markdown('<h1 class="page-title">📈 AI 클러스터 분석 & 통계</h1>', unsafe_allow_html=True)
-    
     # 전체 데이터 준비
     all_places = get_all_places_data()
     total_destinations = len(all_places)
@@ -679,6 +674,7 @@ def statistics_page():
     avg_car_cost = np.mean([cost for cost in car_costs if cost > 0])
     
     # 시스템 KPI
+    st.markdown('---')
     st.markdown('<h2 class="section-title">🎯 시스템 핵심 지표</h2>', unsafe_allow_html=True)
     
     kpi_col1, kpi_col2, kpi_col3, kpi_col4 = st.columns(4)
