@@ -242,16 +242,12 @@ st.markdown("""
     
     .recommendations-title {
         color: #2E7D32 !important;
-        text-align: center;
+        text-align: left;
         background: rgba(255, 255, 255, 0.95);
         padding: 25px 30px;
-        border-radius: 20px;
         font-size: 2.8em !important;
         margin-bottom: 40px;
         font-weight: 800 !important;
-        border: 3px solid #4CAF50;
-        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.2);
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         letter-spacing: 1px;
     }
     
@@ -473,40 +469,12 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# 상단 메뉴
-def top_menu():
-    st.markdown('<h3 class="menu-title">🧭 빠른 메뉴</h3>', unsafe_allow_html=True)
-    
-    menu_col1, menu_col2, menu_col3, menu_col4, menu_col5 = st.columns(5)
-    
-    with menu_col1:
-        if st.button("🏠 홈", key="home_btn"):
-            st.switch_page("pages/03_home.py")
-    
-    with menu_col2:
-        if st.button("📝 설문조사", key="survey_btn"):
-            st.switch_page("pages/01_questionnaire.py")
-    
-    with menu_col3:
-        if st.button("🗺️ 지도 보기", key="map_btn"):
-            st.switch_page("pages/05_map_view.py")
-    
-    with menu_col4:
-        if st.button("📈 통계 정보", key="stats_btn"):
-            st.switch_page("pages/06_statistics.py")
-    
-    with menu_col5:
-        if st.button("🚪 로그아웃", key="logout_btn"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.switch_page("app.py")
-
 # 메인 추천 결과 페이지
 def recommendations_page():
-    top_menu()
     
     # 제목
-    st.markdown('<h1 class="recommendations-title">🎯 AI 클러스터 맞춤 추천</h1>', unsafe_allow_html=True)
+    st.title('🎯 AI 클러스터 맞춤 추천')
+    st.markdown("---")
     
     # 클러스터 분석 결과 표시
     if 'answers' in st.session_state and st.session_state.answers:
