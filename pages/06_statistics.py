@@ -544,19 +544,41 @@ def stats_info():
                 
                 st.markdown('<h2 class="section-title">🎭 당신의 여행 성향</h2>', unsafe_allow_html=True)
 
-                st.markdown(f"""
-                <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
-                    <h3 style="color: {cluster_data['color']}; margin-bottom: 15px;">
-                        🏆 {cluster_data['name']}
-                    </h3>
-                    <div class="score-display">
-                        매칭 점수: {cluster_result['score']}/20
+                analysis_col1, analysis_col2 = st.columns([1, 2])
+            
+                with analysis_col1:
+                    st.markdown(f"""
+                    <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
+                        <h3 style="color: {cluster_data['color']}; margin-bottom: 15px;">
+                            🏆 {cluster_data['name']}
+                        </h3>
+                        <div class="score-display">
+                            매칭 점수: {cluster_result['score']}/20
+                        </div>
+                        <p style="color: #2E7D32; font-weight: 600; margin-top: 15px; font-size: 0.9em;">
+                            신뢰도: {cluster_result['confidence']:.1%}
+                        </p>
                     </div>
-                    <p style="color: #2E7D32; font-weight: 600; margin-top: 15px; font-size: 0.9em;">
-                        신뢰도: {cluster_result['confidence']:.1%}
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
+                    """, unsafe_allow_html=True)
+                
+                with analysis_col2:
+                    # 페르소나 분석 표시
+                    persona_analysis = create_user_persona_analysis(st.session_state.answers, wellness_type)
+                    
+                    st.markdown(f"""
+                    <div class="filter-card">
+                        <h4 style="color: #2E7D32; margin-bottom: 15px;">📊 성향 분석 결과</h4>
+                        <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                            <strong>✨ 특징:</strong><br>{persona_analysis['특징']}
+                        </p>
+                        <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                            <strong>🎯 추천활동:</strong><br>{persona_analysis['추천활동']}
+                        </p>
+                        <p style="color: #2E7D32; font-weight: 600; margin: 0;">
+                            <strong>💡 여행팁:</strong><br>{persona_analysis['여행팁']}
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
     
     return analysis_type, show_advanced
 
