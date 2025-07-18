@@ -746,7 +746,7 @@ def recommendations_page():
                 max_score = max(scores)
                 fig.update_yaxes(range=[0, max_score + 2])  # 여백 증가
 
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
             
             # 차트 하단 통계 정보
             if scores:
