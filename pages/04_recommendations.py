@@ -473,7 +473,7 @@ st.markdown("""
 def recommendations_page():
     
     # 제목
-    st.title('🎯 AI 클러스터 맞춤 추천')
+    st.title('🌿 웰커밍 투어추천 시스템')
     st.markdown("---")
     
     # 클러스터 분석 결과 표시
@@ -486,7 +486,7 @@ def recommendations_page():
             cluster_data = cluster_info[cluster_id]
             wellness_type, wellness_color = classify_wellness_type(cluster_result['score'], cluster_id)
             
-            st.markdown('<h2 class="section-title">🎭 당신의 여행 성향 분석</h2>', unsafe_allow_html=True)
+            st.markdown('<h2 class="section-title">🎭 당신의 여행 성향</h2>', unsafe_allow_html=True)
             
             analysis_col1, analysis_col2 = st.columns([1, 2])
             
@@ -523,7 +523,38 @@ def recommendations_page():
                     </p>
                 </div>
                 """, unsafe_allow_html=True)
-    
+
+    # 설문 결과 요약
+    with st.expander("📋 설문 응답 내역", expanded=False):
+        if 'answers' in st.session_state and st.session_state.answers:
+            for key, answer in st.session_state.answers.items():
+                if key in questions:
+                    question_title = questions[key]['title']
+                    question_data = questions[key]
+                    
+                    # 복수응답 문항 처리
+                    if question_data.get('multiple', False):
+                        if isinstance(answer, list) and answer:
+                            answer_texts = []
+                            for idx in answer:
+                                if idx < len(question_data['options']):
+                                    answer_texts.append(f"• {question_data['options'][idx]}")
+                            answer_display = "\n".join(answer_texts) if answer_texts else "답변 없음"
+                        else:
+                            answer_display = "답변 없음"
+                    # 단일응답 문항 처리
+                    else:
+                        if answer is not None and answer < len(question_data['options']):
+                            answer_display = f"• {question_data['options'][answer]}"
+                        else:
+                            answer_display = "답변 없음"
+                    
+                    st.markdown(f"**{question_title}**")
+                    st.markdown(answer_display)
+                    st.markdown("---")
+        else:
+            st.markdown("설문 답변 데이터가 없습니다.")
+            
     # 필터 섹션
     st.markdown('<h2 class="section-title">🎛️ 추천 필터</h2>', unsafe_allow_html=True)
     
@@ -577,37 +608,6 @@ def recommendations_page():
         """, unsafe_allow_html=True)
     
     st.markdown('</div>', unsafe_allow_html=True)
-    
-    # 설문 결과 요약
-    with st.expander("📋 설문 응답 내역", expanded=False):
-        if 'answers' in st.session_state and st.session_state.answers:
-            for key, answer in st.session_state.answers.items():
-                if key in questions:
-                    question_title = questions[key]['title']
-                    question_data = questions[key]
-                    
-                    # 복수응답 문항 처리
-                    if question_data.get('multiple', False):
-                        if isinstance(answer, list) and answer:
-                            answer_texts = []
-                            for idx in answer:
-                                if idx < len(question_data['options']):
-                                    answer_texts.append(f"• {question_data['options'][idx]}")
-                            answer_display = "\n".join(answer_texts) if answer_texts else "답변 없음"
-                        else:
-                            answer_display = "답변 없음"
-                    # 단일응답 문항 처리
-                    else:
-                        if answer is not None and answer < len(question_data['options']):
-                            answer_display = f"• {question_data['options'][answer]}"
-                        else:
-                            answer_display = "답변 없음"
-                    
-                    st.markdown(f"**{question_title}**")
-                    st.markdown(answer_display)
-                    st.markdown("---")
-        else:
-            st.markdown("설문 답변 데이터가 없습니다.")
     
     # 추천 결과 계산
     recommended_places = calculate_cluster_recommendations(st.session_state.answers)
