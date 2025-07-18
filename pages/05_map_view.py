@@ -573,39 +573,49 @@ def sidebar_menu():
     
     st.markdown("---")
     
-    # 클러스터 정보 표시
+    # 클러스터 분석 결과 표시
     if 'answers' in st.session_state and st.session_state.answers:
         cluster_result = determine_cluster(st.session_state.answers)
+        cluster_id = cluster_result['cluster']
         cluster_info = get_cluster_info()
         
-        if cluster_result['cluster'] in cluster_info:
-            cluster_data = cluster_info[cluster_result['cluster']]
+        if cluster_id in cluster_info:
+            cluster_data = cluster_info[cluster_id]
+            wellness_type, wellness_color = classify_wellness_type(cluster_result['score'], cluster_id)
             
-            st.markdown("### 🎭 나의 여행 성향")
-            st.markdown(f"""
-            <div class="legend-card" style="border-color: {cluster_data['color']}; text-align: center;">
-                <h4 style="color: {cluster_data['color']}; margin-bottom: 10px;">
-                    {cluster_data['name']}
-                </h4>
-                <p style="color: #2E7D32; font-size: 0.9em; margin: 0;">
-                    클러스터 점수: {cluster_result['score']}/20
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-    
-    # 범례
-    st.markdown("### 🎨 지도 범례")
-    
-    legend_data = [
-        ("🔴", "인천공항 (출발지)"),
-        ("🔵", "온천/스파"),
-        ("🟢", "자연치유"),
-        ("🟣", "요가/명상"),
-        ("🟠", "웰니스 리조트")
-    ]
-    
-    for color, label in legend_data:
-        st.markdown(f"{color} {label}")
+            st.markdown('<h2 class="section-title">🎭 당신의 여행 성향</h2>', unsafe_allow_html=True)
+            
+            analysis_col1, analysis_col2 = st.columns([1, 2])
+            
+            with analysis_col1:
+                st.markdown(f"""
+                <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
+                    <h3 style="color: {cluster_data['color']}; margin-bottom: 15px;">
+                        🏆 {cluster_data['name']}
+                    </h3>
+                    <div class="score-display">
+                        매칭 점수: {cluster_result['score']}/20
+                    </div>
+                    <p style="color: #2E7D32; font-weight: 600; margin-top: 15px; font-size: 0.9em;">
+                        신뢰도: {cluster_result['confidence']:.1%}
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+
+            with analysis_col2:
+                # 범례
+                st.markdown("### 🎨 지도 범례")
+                
+                legend_data = [
+                    ("🔴", "인천공항 (출발지)"),
+                    ("🔵", "온천/스파"),
+                    ("🟢", "자연치유"),
+                    ("🟣", "요가/명상"),
+                    ("🟠", "웰니스 리조트")
+                ]
+                
+                for color, label in legend_data:
+                    st.markdown(f"{color} {label}")
     
     return num_places, map_center, show_categories
 
