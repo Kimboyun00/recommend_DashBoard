@@ -133,11 +133,29 @@ st.markdown("""
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 15px;
-        padding: 25px 30px;
+        padding: 20px 25px;
         margin: 15px 0;
-        border-left: 6px solid #4CAF50;
+        transition: all 0.3s ease;
         text-align: center;
         min-height: 337px;
+    }
+    
+    .cluster-result-card:hover {
+        border-color: #4CAF50;
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .cluster-result-card h4 {
+        color: #2E7D32;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .cluster-result-card p {
+        color: #2E7D32;
+        font-weight: 600;
+        margin: 0;
     }
     
     .filter-card {
@@ -271,11 +289,9 @@ st.markdown("""
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 15px;
-        padding: 25px 30px;
+        padding: 20px 25px;
         margin: 15px 0;
-        border-left: 6px solid #4CAF50;
-        text-align: center;
-        min-height: 337px;
+        transition: all 0.3s ease;
     }
     
     .insight-card:hover {
