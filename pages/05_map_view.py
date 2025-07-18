@@ -404,6 +404,17 @@ st.markdown("""
         transform: translateY(-2px);
     }
     
+    .score-display {
+        background: linear-gradient(45deg, #4CAF50, #66BB6A);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 700;
+        display: inline-block;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
     /* 통계 카드 */
     .stats-card, .metric-card {
         background: rgba(255, 255, 255, 0.95);
