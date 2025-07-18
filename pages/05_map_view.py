@@ -924,7 +924,7 @@ def map_view_page():
             st.switch_page("pages/01_questionnaire.py")
     
     with action_col2:
-        if st.button("📊 추천 결과", key="results_btn"):
+        if st.button("📊 추천 결과 보기", key="results_btn"):
             if 'survey_completed' in st.session_state and st.session_state.survey_completed:
                 st.switch_page("pages/04_recommendations.py")
             else:

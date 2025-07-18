@@ -504,7 +504,7 @@ def create_post_travel_values_chart():
 def create_relaxation_insights():
     """휴식 지향 사용자를 위한 인사이트"""
     
-    st.markdown('<h3 class="section-title">🧘‍♀️ 휴식 지향 여행 트렌드</h3>', unsafe_allow_html=True)
+    st.markdown('<h2 class="section-title">🧘‍♀️ 휴식 지향 여행 트렌드</h2>', unsafe_allow_html=True)
     
     relax_col1, relax_col2, relax_col3 = st.columns(3)
     
@@ -844,7 +844,7 @@ def statistics_page():
                 
                 # 개인 클러스터 점수 차트
                 st.markdown("---")
-                st.markdown('<h3 class="section-title">📊 나의 클러스터 매칭 점수</h3>', unsafe_allow_html=True)
+                st.markdown('<h2 class="section-title">📊 나의 클러스터 매칭 점수</h2>', unsafe_allow_html=True)
                 
                 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
                 
@@ -1239,35 +1239,26 @@ def statistics_page():
                     """)
     
     # 액션 버튼
-    st.markdown('<h2 class="section-title">🚀 다음 단계</h2>', unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    if 'survey_completed' not in st.session_state or not st.session_state.survey_completed:
-        action_col1, action_col2, action_col3 = st.columns([1, 2, 1])
-        
-        with action_col2:
-            if st.button("📝 AI 클러스터 분석 받기", type="primary"):
-                st.switch_page("pages/01_questionnaire.py")
-        
-        st.info("💡 8개 질문으로 당신의 여행 성향을 정확하게 분석하고 맞춤형 추천을 받아보세요!")
+    action_col1, action_col2, action_col3 = st.columns(3)
     
-    else:
-        action_col1, action_col2, action_col3 = st.columns(3)
-        
-        with action_col1:
-            if st.button("📊 내 추천 결과 보기"):
-                st.switch_page("pages/04_recommendations.py")
-        
-        with action_col2:
-            if st.button("🗺️ 지도에서 확인하기"):
-                st.switch_page("pages/05_map_view.py")
-        
-        with action_col3:
-            if st.button("🔄 재분석하기"):
-                st.session_state.survey_completed = False
-                st.session_state.answers = {}
-                if 'score_breakdown' in st.session_state:
-                    del st.session_state.score_breakdown
-                st.switch_page("pages/01_questionnaire.py")
+    with action_col1:
+        if st.button("📊 내 추천 결과 보기"):
+            st.switch_page("pages/04_recommendations.py")
+    
+    with action_col2:
+        if st.button("🗺️ 지도에서 확인하기"):
+            st.switch_page("pages/05_map_view.py")
+    
+    with action_col3:
+        if st.button("📝 설문 다시하기"):
+            st.session_state.survey_completed = False
+            st.session_state.answers = {}
+            if 'score_breakdown' in st.session_state:
+                del st.session_state.score_breakdown
+            st.switch_page("pages/01_questionnaire.py")
 
 # 메인 실행
 if __name__ == "__main__":
