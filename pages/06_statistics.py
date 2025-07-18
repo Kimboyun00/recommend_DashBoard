@@ -497,6 +497,11 @@ def stats_info():
     st.title('🌿 웰커밍 투어추천 시스템')
     st.markdown("---")
     
+    # 메인 제목
+    st.markdown('<h2 class="section-title">📈 AI 클러스터링 분석 & 통계</h2>', unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
     # 분석 설정
     st.markdown("### ⚙️ 분석 설정")
     
@@ -513,19 +518,31 @@ def stats_info():
     )
     
     st.markdown("---")
-    st.markdown(f"### 👤 {st.session_state.username}")
+    st.markdown(f"### 👤 {st.session_state.username} 님의 성향 분석")
     
     # 사용자 설문 상태 표시
     if 'survey_completed' in st.session_state and st.session_state.survey_completed:
         if 'answers' in st.session_state and st.session_state.answers:
             cluster_result = determine_cluster(st.session_state.answers)
+            cluster_id = cluster_result['cluster']
             cluster_info = get_cluster_info()
-            if cluster_result['cluster'] in cluster_info:
-                cluster_data = cluster_info[cluster_result['cluster']]
+            if cluster_id in cluster_info:
+                cluster_data = cluster_info[cluster_id]
+                wellness_type, wellness_color = classify_wellness_type(cluster_result['score'], cluster_id)
+                
+                st.markdown('<h2 class="section-title">🎭 당신의 여행 성향</h2>', unsafe_allow_html=True)
+
                 st.markdown(f"""
-                <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; border: 2px solid {cluster_data['color']}; text-align: center;">
-                    <h5 style="color: {cluster_data['color']}; margin: 0;">{cluster_data['name']}</h5>
-                    <p style="color: #2E7D32; font-size: 0.9em; margin: 5px 0;">클러스터 {cluster_result['cluster']}</p>
+                <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
+                    <h3 style="color: {cluster_data['color']}; margin-bottom: 15px;">
+                        🏆 {cluster_data['name']}
+                    </h3>
+                    <div class="score-display">
+                        매칭 점수: {cluster_result['score']}/20
+                    </div>
+                    <p style="color: #2E7D32; font-weight: 600; margin-top: 15px; font-size: 0.9em;">
+                        신뢰도: {cluster_result['confidence']:.1%}
+                    </p>
                 </div>
                 """, unsafe_allow_html=True)
     
