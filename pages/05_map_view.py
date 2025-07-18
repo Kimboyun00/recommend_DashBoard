@@ -359,6 +359,18 @@ st.markdown("""
         letter-spacing: 1px;
     }
     
+    .cluster-result-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(76, 175, 80, 0.4);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin: 25px 0;
+        border-left: 6px solid #4CAF50;
+        text-align: center;
+        min-height: 300px;
+    }
+    
     /* 범례/설정 카드 */
     .legend-card, .setting-card {
         background: rgba(255, 255, 255, 0.95);
@@ -604,18 +616,39 @@ def sidebar_menu():
 
             with analysis_col2:
                 # 범례
-                st.markdown("### 🎨 지도 범례")
+                st.markdown(f"""
+                <div class="filter-card">
+                    <h4 style="color: #2E7D32; margin-bottom: 15px;">🎨 지도 범례</h4>
+                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                        <strong>🔴 : 인천공항 (출발지)</strong>
+                    </p>
+                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                        <strong>🔵 : 온천/스파</strong>
+                    </p>
+                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                        <strong>🟢 : 자연치유</strong>
+                    </p>
+                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                        <strong>🟣 : 요가/명상</strong>
+                    </p>
+                    <p style="color: #2E7D32; font-weight: 600; margin: 0;">
+                        <strong>🟠 : 웰니스 리조트</strong>
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # st.markdown("### 🎨 지도 범례")
                 
-                legend_data = [
-                    ("🔴", "인천공항 (출발지)"),
-                    ("🔵", "온천/스파"),
-                    ("🟢", "자연치유"),
-                    ("🟣", "요가/명상"),
-                    ("🟠", "웰니스 리조트")
-                ]
+                # legend_data = [
+                #     ("🔴", "인천공항 (출발지)"),
+                #     ("🔵", "온천/스파"),
+                #     ("🟢", "자연치유"),
+                #     ("🟣", "요가/명상"),
+                #     ("🟠", "웰니스 리조트")
+                # ]
                 
-                for color, label in legend_data:
-                    st.markdown(f"{color} {label}")
+                # for color, label in legend_data:
+                #     st.markdown(f"{color} {label}")
     
     return num_places, map_center, show_categories
 
