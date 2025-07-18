@@ -336,52 +336,106 @@ def determine_cluster(answers):
     best_cluster = max(cluster_scores, key=cluster_scores.get)
     best_score = cluster_scores[best_cluster]
     
+    # 신뢰도 계산 (최고 점수 / 전체 점수 합계)
+    total_score = sum(cluster_scores.values())
+    confidence = best_score / max(total_score, 1) if total_score > 0 else 0.5
+    
     # 동점 처리 (상위 2개 클러스터가 비슷한 경우)
     sorted_clusters = sorted(cluster_scores.items(), 
                            key=lambda x: x[1], reverse=True)
     
     if len(sorted_clusters) > 1 and sorted_clusters[0][1] == sorted_clusters[1][1]:
         # 동점인 경우 추가 규칙 적용
-        return resolve_tie(answers, sorted_clusters[0][0], sorted_clusters[1][0])
+        resolved_result = resolve_tie(answers, sorted_clusters[0][0], sorted_clusters[1][0])
+        if isinstance(resolved_result, dict):
+            return resolved_result
+        else:
+            best_cluster = resolved_result
     
     return {
         'cluster': best_cluster,
         'score': best_score,
-        'confidence': best_score / max(sum(cluster_scores.values()), 1),
+        'confidence': confidence,
         'all_scores': cluster_scores
     }
 
 def resolve_tie(answers, cluster1, cluster2):
     """동점 시 추가 규칙으로 결정"""
     
+    # 기본 클러스터 점수 재계산
+    cluster_scores = {
+        0: calculate_cluster_0_score(answers),
+        1: calculate_cluster_1_score(answers),
+        2: calculate_cluster_2_score(answers),
+        3: calculate_cluster_3_score(answers),
+        4: calculate_cluster_4_score(answers),
+        5: calculate_cluster_5_score(answers),
+        6: calculate_cluster_6_score(answers),
+        7: calculate_cluster_7_score(answers)
+    }
+    
+    selected_cluster = cluster1  # 기본값
+    
     # 안전 vs 모험 성향으로 구분
     if answers.get('q1') == 0:  # 안전 중시
-        return cluster1 if cluster1 in [0, 1, 7] else cluster2
+        if cluster1 in [0, 1, 7]:
+            selected_cluster = cluster1
+        elif cluster2 in [0, 1, 7]:
+            selected_cluster = cluster2
     elif answers.get('q1') == 1:  # 모험 추구
-        return cluster1 if cluster1 in [0, 4, 5] else cluster2
+        if cluster1 in [0, 4, 5]:
+            selected_cluster = cluster1
+        elif cluster2 in [0, 4, 5]:
+            selected_cluster = cluster2
     
     # 쇼핑 성향으로 구분
     if answers.get('q3') == 0:  # 쇼핑 중심
-        return cluster1 if cluster1 == 3 else cluster2
+        if cluster1 == 3:
+            selected_cluster = cluster1
+        elif cluster2 == 3:
+            selected_cluster = cluster2
     
-    # 기본값
-    return cluster1
+    # 신뢰도 계산
+    best_score = cluster_scores[selected_cluster]
+    total_score = sum(cluster_scores.values())
+    confidence = best_score / max(total_score, 1) if total_score > 0 else 0.5
+    
+    return {
+        'cluster': selected_cluster,
+        'score': best_score,
+        'confidence': confidence,
+        'all_scores': cluster_scores
+    }
 
 def calculate_wellness_score(answers):
     """웰니스 관광 성향 점수 계산 (클러스터 기반)"""
     cluster_result = determine_cluster(answers)
     
-    # 클러스터 점수를 웰니스 점수로 변환 (0-100 스케일)
-    cluster_score = cluster_result['score']
+    # determine_cluster가 딕셔너리를 반환하는지 확인
+    if isinstance(cluster_result, dict):
+        # 클러스터 점수를 웰니스 점수로 변환 (0-100 스케일)
+        cluster_score = cluster_result['score']
+        cluster_id = cluster_result['cluster']
+        confidence = cluster_result['confidence']
+        all_scores = cluster_result['all_scores']
+    else:
+        # 이전 버전 호환성을 위해 정수 반환값 처리
+        cluster_id = cluster_result
+        
+        # 기본값 설정
+        cluster_score = 15  # 기본 점수
+        confidence = 0.8   # 기본 신뢰도
+        all_scores = {i: 10 if i == cluster_id else 5 for i in range(8)}  # 기본 점수 분포
+    
     max_possible_score = 20  # 각 클러스터의 최대 가능 점수
     
     wellness_score = min(100, (cluster_score / max_possible_score) * 100)
     
     score_breakdown = {
-        'cluster_id': cluster_result['cluster'],
+        'cluster_id': cluster_id,
         'cluster_score': cluster_score,
-        'confidence': cluster_result['confidence'],
-        'all_cluster_scores': cluster_result['all_scores']
+        'confidence': confidence,
+        'all_cluster_scores': all_scores
     }
     
     return wellness_score, score_breakdown
