@@ -644,7 +644,7 @@ def recommendations_page():
     
     # 필터 섹션 호출
     selected_categories, distance_max = create_filter_section()
-    
+
     # 추천 결과 계산
     recommended_places = calculate_cluster_recommendations(st.session_state.answers)
     
@@ -658,37 +658,124 @@ def recommendations_page():
         filtered_places.append(place)
     
     # 추천 결과 표시
-    st.markdown(f'<h2 class="section-title">🏆 AI 추천 결과 TOP {len(filtered_places)}</h2>', unsafe_allow_html=True)
+    def create_chart_section(filtered_places):
+        """개선된 차트 섹션"""
+        # 추천 결과 제목
+        st.markdown(f'<h2 class="section-title">🏆 AI 추천 결과 TOP {len(filtered_places)}</h2>', 
+                    unsafe_allow_html=True)
+        
+        if len(filtered_places) == 0:
+            st.warning("⚠️ 필터 조건에 맞는 관광지가 없습니다. 필터를 조정해주세요.")
+            return False
+        
+        # expander를 사용한 차트 섹션
+        with st.expander("", expanded=True):
+            # 차트 설정 옵션
+            chart_col1, chart_col2 = st.columns([3, 1])
+            
+            with chart_col2:
+                show_count = st.selectbox(
+                    "표시할 개수",
+                    options=[6, 8, min(12, len(filtered_places)), len(filtered_places)],
+                    index=1,  # 기본값: 8개
+                    help="차트에 표시할 관광지 개수를 선택하세요"
+                )
+            
+            with chart_col1:
+                st.markdown("### 📈 개인 맞춤 추천 점수")
+            
+            # 데이터 준비
+            display_count = min(show_count, len(filtered_places))
+            chart_places = filtered_places[:display_count]
+            
+            names = [place['name'] for place in chart_places]
+            scores = [place['recommendation_score'] for place in chart_places]
+            types = [place['type'] for place in chart_places]
+            
+            # 차트 생성
+            fig = px.bar(
+                x=names,
+                y=scores,
+                color=types,
+                title=f"상위 {display_count}개 관광지 추천 점수",
+                labels={'x': '관광지명', 'y': '추천 점수 (점)', 'color': '웰니스 카테고리'},
+                text=scores,
+                color_discrete_sequence=['#4CAF50', '#66BB6A', '#81C784', '#A5D6A7']
+            )
+            
+            # 차트 레이아웃 개선
+            fig.update_layout(
+                plot_bgcolor='rgba(0,0,0,0)',
+                paper_bgcolor='rgba(0,0,0,0)',
+                font_color='#2E7D32',
+                xaxis_tickangle=-45,
+                font_size=11,
+                height=450,
+                title_x=0.5,
+                title_font_size=14,
+                showlegend=True,
+                legend=dict(
+                    orientation="h",
+                    yanchor="bottom",
+                    y=-0.25,
+                    xanchor="center",
+                    x=0.5
+                ),
+                margin=dict(l=50, r=50, t=60, b=120)
+            )
+            
+            # 텍스트 표시 개선
+            fig.update_traces(
+                texttemplate='%{text:.1f}',
+                textposition='outside',
+                textfont_size=9,
+                textfont_color='#2E7D32'
+            )
+            
+            # y축 범위 조정
+            if scores:
+                max_score = max(scores)
+                fig.update_yaxes(range=[0, max_score + 1.5])
+            
+            st.plotly_chart(fig, use_container_width=True)
+            
+            # 차트 하단 통계 정보
+            if scores:
+                stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+                
+                with stat_col1:
+                    st.metric(
+                        label="🏆 최고 점수",
+                        value=f"{max(scores):.1f}점",
+                        help="가장 높은 추천 점수"
+                    )
+                
+                with stat_col2:
+                    st.metric(
+                        label="📊 평균 점수", 
+                        value=f"{sum(scores)/len(scores):.1f}점",
+                        help="표시된 관광지들의 평균 점수"
+                    )
+                
+                with stat_col3:
+                    st.metric(
+                        label="📍 표시 개수",
+                        value=f"{display_count}개",
+                        help="현재 차트에 표시된 관광지 수"
+                    )
+                
+                with stat_col4:
+                    st.metric(
+                        label="🎯 전체 결과", 
+                        value=f"{len(filtered_places)}개",
+                        help="필터 조건에 맞는 전체 관광지 수"
+                    )
+        
+        return True
     
-    if len(filtered_places) == 0:
-        st.warning("⚠️ 필터 조건에 맞는 관광지가 없습니다. 필터를 조정해주세요.")
-        return
-    
-    # 추천 점수 차트
-    st.markdown('<h3 class="section-title">📊 클러스터 매칭 점수</h3>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-    names = [place['name'] for place in filtered_places[:6]]
-    scores = [place['recommendation_score'] for place in filtered_places[:6]]
-    
-    fig = px.bar(
-        x=names,
-        y=scores,
-        title="",
-        labels={'x': '관광지', 'y': '추천 점수'},
-        color=scores,
-        color_continuous_scale=['#A5D6A7', '#4CAF50']
-    )
-    fig.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font_color='#2E7D32',
-        xaxis_tickangle=-45,
-        font_size=12,
-        height=400
-    )
-    st.plotly_chart(fig, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
+    # 차트 섹션 호출
+    if not create_chart_section(filtered_places):
+        return  # 결과가 없으면 여기서 종료
     
     # 상세 추천 결과
     st.markdown('<h3 class="section-title">🌿 상세 추천 정보</h3>', unsafe_allow_html=True)
