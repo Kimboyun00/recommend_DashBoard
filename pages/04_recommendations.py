@@ -695,6 +695,7 @@ def recommendations_page():
                 x=names,
                 y=scores,
                 color=types,
+                title="",
                 labels={'x': '관광지명', 'y': '추천 점수 (점)', 'color': '웰니스 카테고리'},
                 text=scores,
                 # 색상 대비 강화 - 더 구분되는 색상 사용
