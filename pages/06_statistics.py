@@ -538,7 +538,7 @@ def stats_info():
     st.markdown("---")
     
     # 메인 제목
-    st.markdown('<h2 class="section-title">📈 AI 클러스터링 분석 & 통계</h2>', unsafe_allow_html=True)
+    st.markdown('<h1 class="page-title">📈 AI 클러스터 분석 & 통계</h1>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
@@ -661,9 +661,6 @@ def create_category_analysis():
 
 # 메인 통계 페이지
 def statistics_page():
-    # 제목
-    st.title('🌿 웰커밍 투어추천 시스템')
-    st.markdown("---")
     analysis_type, show_advanced = stats_info()
     
     
