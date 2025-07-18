@@ -661,7 +661,7 @@ def recommendations_page():
     def create_chart_section(filtered_places):
         """개선된 차트 섹션"""
         # 추천 결과 제목
-        st.markdown(f'<h2 class="section-title">🏆 AI 추천 결과 TOP {len(filtered_places)}</h2>', 
+        st.markdown(f'<h2 class="section-title">🏆 AI 추천 결과</h2>', 
                     unsafe_allow_html=True)
         
         if len(filtered_places) == 0:
@@ -710,8 +710,9 @@ def recommendations_page():
                 xaxis_tickangle=0,  # 관광지명 수평으로 변경
                 font_size=11,
                 height=500,  # 높이 증가로 범례와 겹침 방지
-                title_x=0.5,
-                title_font_size=14,
+                title_x=0.5,  # 제목 중앙 정렬
+                title_xanchor='center',  # 제목 앵커 중앙으로 설정
+                title_font_size=16,  # 제목 크기 증가
                 showlegend=True,
                 legend=dict(
                     orientation="h",
