@@ -949,7 +949,7 @@ def recommendations_page():
                 st.markdown("""
                 <style>
                 [data-testid="metric-container"] [data-testid="stMetricValue"] {
-                    font-size: 0.8rem !important;
+                    font-size: 0.7rem !important;
                     font-weight: 600 !important;
                     line-height: 1.2 !important;
                 }
