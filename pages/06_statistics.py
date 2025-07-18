@@ -789,7 +789,7 @@ def statistics_page():
                     persona_analysis = create_user_persona_analysis(st.session_state.answers, wellness_type)
                     
                     st.markdown(f"""
-                    <div class="insight-card" style="height: 340px;">
+                    <div class="insight-card" style="height: 337px;">
                         <h4>✨ 성향 특징</h4>
                         <p style="font-size: 0.9em; line-height: 1.4;">
                             {persona_analysis['특징'][:80]}...
