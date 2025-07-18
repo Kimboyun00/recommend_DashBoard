@@ -352,6 +352,27 @@ st.markdown("""
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     
+    .filter-container {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(76, 175, 80, 0.4);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin: 25px 0;
+        min-height: 300px;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-container:hover {
+        border-color: #4CAF50;
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
+    }
+    
+    /* 필터 컨테이너 내부의 컬럼 스타일링 */
+    .filter-container div[data-testid="column"] {
+        padding: 10px;
+    }
+    
     .filter-card {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
@@ -556,58 +577,73 @@ def recommendations_page():
             st.markdown("설문 답변 데이터가 없습니다.")
             
     # 필터 섹션
-    st.markdown('<h2 class="section-title">🎛️ 추천 필터</h2>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="filter-card">', unsafe_allow_html=True)
-    filter_col1, filter_col2, filter_col3 = st.columns(3)
-    
-    # 세션 상태 초기화
-    if 'category_filter' not in st.session_state:
-        st.session_state.category_filter = list(wellness_destinations.keys())
-    if 'distance_filter' not in st.session_state:
-        st.session_state.distance_filter = 500
-    
-    with filter_col1:
-        # 카테고리 필터
-        selected_categories = st.multiselect(
-            "관심 카테고리",
-            list(wellness_destinations.keys()),
-            default=st.session_state.category_filter,
-            key="category_filter_new"
-        )
-        st.session_state.category_filter = selected_categories
-    
-    with filter_col2:
-        # 거리 필터
-        distance_max = st.slider(
-            "최대 거리 (km)",
-            min_value=50,
-            max_value=500,
-            value=st.session_state.distance_filter,
-            step=50,
-            key="distance_filter_new"
-        )
-        st.session_state.distance_filter = distance_max
-    
-    with filter_col3:
-        # 사용자 정보 표시
-        cluster_name = "미분석"
-        if 'answers' in st.session_state and st.session_state.answers:
-            cluster_result = determine_cluster(st.session_state.answers)
-            cluster_info = get_cluster_info()
-            if cluster_result['cluster'] in cluster_info:
-                cluster_name = cluster_info[cluster_result['cluster']]['name']
+    def create_filter_section():
+        """필터 섹션을 생성하고 선택된 값들을 반환합니다."""
+        st.markdown('<h2 class="section-title">🎛️ 추천 필터</h2>', unsafe_allow_html=True)
         
-        st.markdown(f"""
-        <div class="user-info">
-            <strong>👤 사용자:</strong> {st.session_state.username}<br>
-            <strong>🎭 성향:</strong> {cluster_name}<br>
-            <strong>📊 필터:</strong> {len(selected_categories)}개 카테고리<br>
-            <strong>📏 범위:</strong> {distance_max}km 이내
-        </div>
-        """, unsafe_allow_html=True)
+        # 세션 상태 초기화
+        if 'category_filter' not in st.session_state:
+            st.session_state.category_filter = list(wellness_destinations.keys())
+        if 'distance_filter' not in st.session_state:
+            st.session_state.distance_filter = 500
+        
+        # expander를 사용한 필터 섹션
+        with st.expander("🎛️ 필터 옵션 설정", expanded=True):
+            filter_col1, filter_col2, filter_col3 = st.columns(3)
+            
+            with filter_col1:
+                st.markdown("#### 🏷️ 관심 카테고리")
+                selected_categories = st.multiselect(
+                    "카테고리를 선택하세요",
+                    list(wellness_destinations.keys()),
+                    default=st.session_state.category_filter,
+                    key="category_filter_new",
+                    help="원하는 웰니스 관광 카테고리를 모두 선택하세요"
+                )
+                st.session_state.category_filter = selected_categories
+            
+            with filter_col2:
+                st.markdown("#### 📏 거리 설정")
+                distance_max = st.slider(
+                    "최대 거리 (km)",
+                    min_value=50,
+                    max_value=500,
+                    value=st.session_state.distance_filter,
+                    step=50,
+                    key="distance_filter_new",
+                    help="인천공항으로부터의 최대 허용 거리"
+                )
+                st.session_state.distance_filter = distance_max
+            
+            with filter_col3:
+                st.markdown("#### 👤 현재 설정")
+                
+                # 사용자 정보 계산
+                cluster_name = "미분석"
+                if 'answers' in st.session_state and st.session_state.answers:
+                    cluster_result = determine_cluster(st.session_state.answers)
+                    cluster_info = get_cluster_info()
+                    if cluster_result['cluster'] in cluster_info:
+                        cluster_name = cluster_info[cluster_result['cluster']]['name']
+                
+                # 현재 설정 요약 표시
+                st.info(f"""
+                **👤 사용자:** {st.session_state.username}  
+                **🎭 성향:** {cluster_name}  
+                **📊 선택된 카테고리:** {len(selected_categories)}개  
+                **📏 거리 범위:** {distance_max}km 이내
+                """)
+                
+                # 필터링 결과 미리보기
+                if selected_categories:
+                    st.success(f"✅ {', '.join(selected_categories)}")
+                else:
+                    st.warning("⚠️ 카테고리를 하나 이상 선택하세요")
+        
+        return selected_categories, distance_max
     
-    st.markdown('</div>', unsafe_allow_html=True)
+    # 필터 섹션 호출
+    selected_categories, distance_max = create_filter_section()
     
     # 추천 결과 계산
     recommended_places = calculate_cluster_recommendations(st.session_state.answers)
