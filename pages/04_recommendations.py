@@ -944,12 +944,27 @@ def recommendations_page():
             # 점수 표시
             st.success(f"🎯 추천 점수: {place['recommendation_score']:.0f}/100점")
             
+            def apply_metric_font_size():
+                """st.metric 값 글씨 크기 조정 적용"""
+                st.markdown("""
+                <style>
+                [data-testid="metric-container"] [data-testid="stMetricValue"] {
+                    font-size: 0.8rem !important;
+                    font-weight: 600 !important;
+                    line-height: 1.2 !important;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+            # 사용법: 정보 태그 섹션 전에 호출
+            apply_metric_font_size()
+
             # 정보 태그들
             info_col1, info_col2, info_col3, info_col4 = st.columns(4)
             with info_col1:
                 st.metric("⭐ 평점", f"{place['rating']}/5")
             with info_col2:
-                st.metric(f"💰 비용", f"{place['price_range']}원")
+                st.metric(f"💰 비용", f"{place['price_range']}")
             with info_col3:
                 st.metric(f"📍 거리", f"{place['distance_from_incheon']}km")
             with info_col4:
