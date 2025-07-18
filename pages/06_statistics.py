@@ -1101,7 +1101,10 @@ def statistics_page():
         st.markdown(f"""
         <div class="insight-card" style="text-align: center; min-height: 150px;">
             <h4>📊 데이터 기반</h4>
-            <p>2,591명의 실제 여행객 데이터를 머신러닝으로 분석하여 8개 클러스터를 도출</p>
+            <p>
+                2,591명의 실제 여행객 데이터를 머신러닝으로 분석하여<br>
+                8개 클러스터를 도출
+            </p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -1109,7 +1112,10 @@ def statistics_page():
         st.markdown(f"""
         <div class="insight-card" style="text-align: center;">
             <h4>🎯 정확한 매칭</h4>
-            <p>8개 질문만으로 98% 정확도의 개인 성향 분석 및 맞춤형 추천 제공</p>
+            <p>
+                8개 질문만으로<br>
+                98% 정확도의 개인 성향 분석 및 맞춤형 추천 제공
+            </p>
         </div>
         """, unsafe_allow_html=True)
     
@@ -1117,7 +1123,10 @@ def statistics_page():
         st.markdown(f"""
         <div class="insight-card" style="text-align: center;">
             <h4>⚡ 빠른 처리</h4>
-            <p>실시간 클러스터 매칭과 즉시 추천 결과 제공으로 최적화된 사용자 경험</p>
+            <p>
+                실시간 클러스터 매칭과 즉시 추천 결과 제공으로<br>
+                최적화된 사용자 경험
+            </p>
         </div>
         """, unsafe_allow_html=True)
     
