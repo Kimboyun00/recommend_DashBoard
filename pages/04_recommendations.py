@@ -925,7 +925,8 @@ def recommendations_page():
     # 상세 추천 결과
     st.markdown('<h3 class="section-title">🌿 상세 추천 정보</h3>', unsafe_allow_html=True)
     
-    for i, place in enumerate(filtered_places):
+    def create_recommendation_card_safe(place, index):
+        """더 안전한 추천 카드 생성"""
         col1, col2 = st.columns([1, 3])
         
         with col1:
@@ -936,43 +937,48 @@ def recommendations_page():
             """, unsafe_allow_html=True)
         
         with col2:
+            # Streamlit 네이티브 컴포넌트 사용
+            st.markdown(f"**#{index + 1} {place['name']}**")
+            st.write(place['description'])
+            
+            # 점수 표시
+            st.success(f"🎯 추천 점수: {place['recommendation_score']:.0f}/100점")
+            
+            # 정보 태그들
+            info_col1, info_col2, info_col3, info_col4 = st.columns(4)
+            with info_col1:
+                st.metric("⭐ 평점", f"{place['rating']}/5")
+            with info_col2:
+                st.write(f"💰 {place['price_range']}")
+            with info_col3:
+                st.write(f"📍 {place['distance_from_incheon']}km")
+            with info_col4:
+                st.write(f"🏷️ {place['type']}")
+            
+            # 교통 정보
             st.markdown(f"""
-            <div class="recommendation-card">
-                <div class="ranking-badge">#{i+1}</div>
-                <h3 class="place-name">{place['name']}</h3>
-                <p class="place-description">{place['description']}</p>
-                
-                <div class="score-display">
-                    🎯 추천 점수: {place['recommendation_score']:.0f}/100점
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <span class="info-tag">⭐ {place['rating']}/5</span>
-                    <span class="info-tag">💰 {place['price_range']}</span>
-                    <span class="info-tag">📍 {place['distance_from_incheon']}km</span>
-                    <span class="info-tag">🏷️ {place['type']}</span>
-                </div>
-                
-                <div class="place-details">
-                    <strong>🚗 자가용:</strong> {place['travel_time_car']} ({place['travel_cost_car']})<br>
-                    <strong>🚊 대중교통:</strong> {place['travel_time_train']} ({place['travel_cost_train']})<br>
-                    <strong>🤖 AI 신뢰도:</strong> {place['cluster_confidence']:.1%}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+            **🚗 자가용:** {place['travel_time_car']} ({place['travel_cost_car']})  
+            **🚊 대중교통:** {place['travel_time_train']} ({place['travel_cost_train']})  
+            **🤖 AI 신뢰도:** {place['cluster_confidence']:.1%}
+            """)
             
             # 버튼들
-            col_btn1, col_btn2, col_btn3 = st.columns(3)
-            with col_btn1:
-                st.markdown(f'<a href="{place["website"]}" target="_blank" style="text-decoration: none;"><button style="background: linear-gradient(45deg, #4CAF50, #66BB6A); border: none; border-radius: 12px; color: white; padding: 10px 18px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; text-transform: uppercase; width: 100%;">🌐 공식 사이트</button></a>', unsafe_allow_html=True)
-            with col_btn2:
-                if st.button(f"🗺️ 지도에서 보기", key=f"map_{i}"):
+            btn_col1, btn_col2, btn_col3 = st.columns(3)
+            
+            with btn_col1:
+                st.link_button("🌐 공식 사이트", place['website'])
+            
+            with btn_col2:
+                if st.button("🗺️ 지도에서 보기", key=f"map_{index}"):
                     st.session_state.selected_place = place
                     st.switch_page("pages/05_map_view.py")
-            with col_btn3:
-                if st.button(f"💾 저장", key=f"save_{i}"):
+            
+            with btn_col3:
+                if st.button("💾 저장", key=f"save_{index}"):
                     st.success(f"✅ {place['name']} 저장됨!")
-        
+
+    for i, place in enumerate(filtered_places):
+        create_recommendation_card_safe(place, i)
         st.markdown("---")
     
     # 클러스터 분석 인사이트
