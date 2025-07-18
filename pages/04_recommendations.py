@@ -938,7 +938,7 @@ def recommendations_page():
         
         with col2:
             # Streamlit 네이티브 컴포넌트 사용
-            st.markdown(f"**#{index + 1} {place['name']}**")
+            st.markdown(f"### #{index + 1} {place['name']}")
             st.write(place['description'])
             
             # 점수 표시
