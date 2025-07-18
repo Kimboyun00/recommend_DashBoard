@@ -966,15 +966,17 @@ def recommendations_page():
             btn_col1, btn_col2, btn_col3 = st.columns(3)
             
             with btn_col1:
-                st.link_button("🌐 공식 사이트", place['website'])
-            
+                if st.button("🌐 공식 사이트", key=f"website_{index}", use_container_width=True):
+                    st.markdown(f"🔗 **공식 사이트:** [{place['name']}]({place['website']})")
+                    st.info("위 링크를 클릭하여 공식 사이트로 이동하세요!")
+
             with btn_col2:
-                if st.button("🗺️ 지도에서 보기", key=f"map_{index}"):
+                if st.button("🗺️ 지도에서 보기", key=f"map_{index}", use_container_width=True):
                     st.session_state.selected_place = place
                     st.switch_page("pages/05_map_view.py")
-            
+
             with btn_col3:
-                if st.button("💾 저장", key=f"save_{index}"):
+                if st.button("💾 저장", key=f"save_{index}", use_container_width=True):
                     st.success(f"✅ {place['name']} 저장됨!")
 
     for i, place in enumerate(filtered_places):
