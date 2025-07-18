@@ -559,6 +559,7 @@ def stats_info():
     
     st.markdown("---")
     st.markdown(f"### 👤 {st.session_state.username} 님의 성향 분석")
+    st.markdown("<br>", unsafe_allow_html=True)
     
     # 사용자 설문 상태 표시
     if 'survey_completed' in st.session_state and st.session_state.survey_completed:
