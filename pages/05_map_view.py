@@ -538,7 +538,7 @@ def sidebar_menu():
     st.markdown("---")
 
     # 메인 제목
-    st.markdown('<h2 class="section-title">🎭 당신의 여행 성향</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="section-title">🗺️ 지도로 관광지 보기</h2>', unsafe_allow_html=True)
 
     # 지도 설정
     st.markdown("### 🗺️ 지도 설정")
