@@ -536,7 +536,10 @@ def sidebar_menu():
     # 제목
     st.title('🌿 웰커밍 투어추천 시스템')
     st.markdown("---")
-    
+
+    # 메인 제목
+    st.markdown('<h2 class="section-title">🎭 당신의 여행 성향</h2>', unsafe_allow_html=True)
+
     # 지도 설정
     st.markdown("### 🗺️ 지도 설정")
     
