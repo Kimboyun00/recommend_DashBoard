@@ -794,7 +794,6 @@ def statistics_page():
                         </h3>
                         <div class="score-display">
                             매칭 점수: {cluster_result['score']}/20
-                            
                         </div>
                         </br>
                         <div class="confidence-display">
