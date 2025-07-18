@@ -601,7 +601,9 @@ def recommendations_page():
                     st.markdown("---")
         else:
             st.markdown("설문 답변 데이터가 없습니다.")
-            
+    
+    st.markdown("---")
+
     # 필터 섹션
     def create_filter_section():
         """필터 섹션을 생성하고 선택된 값들을 반환합니다."""
@@ -687,7 +689,7 @@ def recommendations_page():
     def create_chart_section(filtered_places):
         """개선된 차트 섹션"""
         # 추천 결과 제목
-        st.markdown(f'<h2 class="section-title">🏆 AI 추천 결과</h2>', 
+        st.markdown(f'<h2 class="section-title">🏆 웰니스 관광지 추천 결과</h2>', 
                     unsafe_allow_html=True)
         
         if len(filtered_places) == 0:
@@ -807,6 +809,8 @@ def recommendations_page():
                     )
         
         return True
+    
+    st.markdown("---")
     
     def create_score_system_explanation():
         """점수 시스템 설명을 위한 별도 섹션"""
@@ -1034,6 +1038,7 @@ def recommendations_page():
                 """, unsafe_allow_html=True)
     
     # 추천 알고리즘 설명
+    st.markdown("---")
     st.markdown('<h3 class="section-title">🤖 AI 추천 알고리즘</h3>', unsafe_allow_html=True)
     
     algo_col1, algo_col2, algo_col3 = st.columns(3)
@@ -1077,7 +1082,7 @@ def recommendations_page():
     # 액션 버튼
     st.markdown("---")
     st.markdown("<br>", unsafe_allow_html=True)
-    
+
     action_col1, action_col2, action_col3 = st.columns(3)
     
     with action_col1:
