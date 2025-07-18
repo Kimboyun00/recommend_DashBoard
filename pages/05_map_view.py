@@ -629,7 +629,7 @@ def sidebar_menu():
             with analysis_col1:
                 st.markdown(f"""
                 <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
-                    <h3 style="color: {cluster_data['color']}; margin-bottom: 15px;">
+                    <h3 style="color: {cluster_data['color']}; margin-bottom: 15px; text-align: center;">
                         🏆 {cluster_data['name']}
                     </h3>
                     <div class="score-display">
