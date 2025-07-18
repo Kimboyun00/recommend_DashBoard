@@ -840,7 +840,7 @@ def map_view_page():
     
     # 여행 통계
     st.markdown("---")
-    st.markdown('<h3 class="section-title">📊 여행 통계</h3>', unsafe_allow_html=True)
+    st.markdown('<h3 class="section-title">📊 관광지 통계</h3>', unsafe_allow_html=True)
     
     stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
     

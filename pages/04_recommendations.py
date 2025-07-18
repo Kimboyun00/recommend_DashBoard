@@ -1075,7 +1075,8 @@ def recommendations_page():
         """, unsafe_allow_html=True)
     
     # 액션 버튼
-    st.markdown('<h2 class="section-title">🚀 다음 단계</h2>', unsafe_allow_html=True)
+    st.markdown("---")
+    st.markdown("<br>", unsafe_allow_html=True)
     
     action_col1, action_col2, action_col3 = st.columns(3)
     
