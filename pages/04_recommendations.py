@@ -949,11 +949,11 @@ def recommendations_page():
             with info_col1:
                 st.metric("⭐ 평점", f"{place['rating']}/5")
             with info_col2:
-                st.write(f"💰 {place['price_range']}")
+                st.write(f"💰 비용", f"{place['price_range']}원")
             with info_col3:
-                st.write(f"📍 {place['distance_from_incheon']}km")
+                st.write(f"📍 거리", f"{place['distance_from_incheon']}km")
             with info_col4:
-                st.write(f"🏷️ {place['type']}")
+                st.write(f"🏷️ 카테고리", f"{place['type']}")
             
             # 교통 정보
             st.markdown(f"""
