@@ -767,7 +767,7 @@ def statistics_page():
                 
                 with user_col1:
                     st.markdown(f"""
-                    <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
+                    <div class="insight-card" style="height: 337px; border-color: {cluster_data['color']};">
                         <h3 style="color: {cluster_data['color']}; margin-left: 20px; margin-bottom: 15px;">
                             🏆 {cluster_data['name']}
                         </h3>
@@ -807,7 +807,7 @@ def statistics_page():
                     top_3_clusters = sorted(all_scores.items(), key=lambda x: x[1], reverse=True)[:3]
                     
                     st.markdown(f"""
-                    <div class="insight-card" style="height: 300px;">
+                    <div class="insight-card" style="height: 337px;">
                         <h4>📊 클러스터 매칭 순위</h4>
                         <p style="font-size: 0.9em; line-height: 1.6;">
                             <strong>1위:</strong> 클러스터 {top_3_clusters[0][0]} ({top_3_clusters[0][1]}점)<br>
