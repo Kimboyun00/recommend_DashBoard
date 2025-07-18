@@ -411,6 +411,7 @@ def display_detailed_user_analysis(answers):
     """상세 사용자 분석 표시"""
     analysis = analyze_user_survey_details(answers)
     
+    st.markdown("---")
     st.markdown('<h3 class="section-title">🔍 상세 성향 분석</h3>', unsafe_allow_html=True)
     
     detail_col1, detail_col2 = st.columns(2)
@@ -675,7 +676,7 @@ def statistics_page():
     avg_car_cost = np.mean([cost for cost in car_costs if cost > 0])
     
     # 시스템 KPI
-    st.markdown('---')
+    st.markdown("---")
     st.markdown('<h2 class="section-title">🎯 시스템 핵심 지표</h2>', unsafe_allow_html=True)
     
     kpi_col1, kpi_col2, kpi_col3, kpi_col4 = st.columns(4)
@@ -713,6 +714,7 @@ def statistics_page():
         """, unsafe_allow_html=True)
     
     # 8개 클러스터 시스템 소개
+    st.markdown("---")
     st.markdown('<h2 class="section-title">🎭 8가지 여행 성향 클러스터</h2>', unsafe_allow_html=True)
     
     cluster_info = get_cluster_info()
@@ -746,6 +748,7 @@ def statistics_page():
                 cluster_data = cluster_info[cluster_result['cluster']]
                 wellness_type, wellness_color = classify_wellness_type(cluster_result['score'], cluster_result['cluster'])
                 
+                st.markdown("---")
                 st.markdown('<h2 class="section-title">👤 나의 개인 분석 결과</h2>', unsafe_allow_html=True)
                 
                 user_col1, user_col2, user_col3 = st.columns(3)
@@ -808,6 +811,7 @@ def statistics_page():
                 display_detailed_user_analysis(st.session_state.answers)
                 
                 # 개인 클러스터 점수 차트
+                st.markdown("---")
                 st.markdown('<h3 class="section-title">📊 나의 클러스터 매칭 점수</h3>', unsafe_allow_html=True)
                 
                 st.markdown('<div class="chart-container">', unsafe_allow_html=True)
@@ -837,6 +841,7 @@ def statistics_page():
                 st.markdown('</div>', unsafe_allow_html=True)
     
     # 새로운 설문 구조 분석 차트들
+    st.markdown("---")
     st.markdown('<h2 class="section-title">📈 새로운 설문 구조 분석</h2>', unsafe_allow_html=True)
     
     chart_row1_col1, chart_row1_col2 = st.columns(2)
