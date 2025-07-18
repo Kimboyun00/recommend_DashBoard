@@ -777,6 +777,7 @@ def statistics_page():
                         <div class="score-display">
                             매칭 점수: {cluster_result['score']}/20
                         </div>
+                        </br>
                         <div class="confidence-display">
                             신뢰도: {cluster_result['confidence']:.1%}
                         </div>
