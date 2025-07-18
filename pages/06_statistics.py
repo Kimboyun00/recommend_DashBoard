@@ -577,7 +577,7 @@ def stats_info():
                 with analysis_col1:
                     st.markdown(f"""
                     <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
-                        <h3 style="color: {cluster_data['color']}; margin-left 1px; margin-bottom: 15px;">
+                        <h3 style="color: {cluster_data['color']}; margin-left 50px; margin-bottom: 15px;">
                             🏆 {cluster_data['name']}
                         </h3>
                         <h3 style="color: #2E7D32; margin-top: 15px;">
