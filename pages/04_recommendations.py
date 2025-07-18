@@ -928,6 +928,7 @@ def recommendations_page():
     create_score_system_explanation()
     
     # 상세 추천 결과
+    st.markdown("---")
     st.markdown('<h3 class="section-title">🌿 상세 추천 정보</h3>', unsafe_allow_html=True)
     
     def create_recommendation_card_safe(place, index):
