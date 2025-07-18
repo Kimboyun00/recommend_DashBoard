@@ -127,6 +127,46 @@ st.markdown("""
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         letter-spacing: 1px;
     }
+            
+    .cluster-result-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(76, 175, 80, 0.4);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin: 25px 0;
+        border-left: 6px solid #4CAF50;
+        text-align: center;
+        min-height: 300px;
+    }
+    
+    .filter-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(76, 175, 80, 0.4);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin: 25px 0;
+        min-height: 300px;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-card:hover {
+        border-color: #4CAF50;
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
+    }
+    
+    .score-display {
+        background: linear-gradient(45deg, #4CAF50, #66BB6A);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 30px;
+        font-weight: 700;
+        display: inline-block;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
     
     .stats-card, .metric-card {
         background: rgba(255, 255, 255, 0.95);
