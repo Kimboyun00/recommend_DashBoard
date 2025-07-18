@@ -948,16 +948,16 @@ def recommendations_page():
             st.markdown(f"""
             <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
                 <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
-                    ⭐ {place['rating']}/5
+                    ⭐ 평점 : {place['rating']}/5
                 </div>
                 <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
-                    💰 {place['price_range']}
+                    💰 비용 : {place['price_range']}
                 </div>
                 <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
-                    📍 {place['distance_from_incheon']}km
+                    📍 거리 : {place['distance_from_incheon']}km
                 </div>
                 <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
-                    🏷️ {place['type']}
+                    🏷️ 카테고리 : {place['type']}
                 </div>
             </div>
             """, unsafe_allow_html=True)
