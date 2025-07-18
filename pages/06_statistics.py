@@ -530,76 +530,6 @@ def create_travel_style_analysis():
     )
     return fig
 
-# # 사이드바 메뉴
-# def sidebar_menu():
-#     st.markdown("### 🧭 메뉴")
-    
-#     menu_col1, menu_col2, menu_col3, menu_col4, menu_col5 = st.columns(5)
-    
-#     with menu_col1:
-#         if st.button("🏠 홈", key="home_btn"):
-#             st.switch_page("pages/03_home.py")
-    
-#     with menu_col2:
-#         if st.button("📝 설문조사", key="survey_btn"):
-#             st.switch_page("pages/01_questionnaire.py")
-    
-#     with menu_col3:
-#         if st.button("📊 추천 결과", key="results_btn"):
-#             if 'survey_completed' in st.session_state and st.session_state.survey_completed:
-#                 st.switch_page("pages/04_recommendations.py")
-#             else:
-#                 st.warning("설문을 먼저 완료해주세요!")
-    
-#     with menu_col4:
-#         if st.button("🗺️ 지도 보기", key="map_btn"):
-#             if 'survey_completed' in st.session_state and st.session_state.survey_completed:
-#                 st.switch_page("pages/05_map_view.py")
-#             else:
-#                 st.warning("설문을 먼저 완료해주세요!")
-    
-#     with menu_col5:
-#         if st.button("🚪 로그아웃", key="logout_btn"):
-#             for key in list(st.session_state.keys()):
-#                 del st.session_state[key]
-#             st.switch_page("app.py")
-    
-#     st.markdown("---")
-    
-#     # 분석 설정
-#     st.markdown("### ⚙️ 분석 설정")
-    
-#     analysis_type = st.selectbox(
-#         "분석 유형",
-#         ["종합 분석", "클러스터 분석", "관광지 분석", "개인 분석"],
-#         key="analysis_type"
-#     )
-    
-#     show_advanced = st.checkbox(
-#         "고급 통계 포함",
-#         value=True,
-#         key="show_advanced"
-#     )
-    
-#     st.markdown("---")
-#     st.markdown(f"### 👤 {st.session_state.username}")
-    
-#     # 사용자 설문 상태 표시
-#     if 'survey_completed' in st.session_state and st.session_state.survey_completed:
-#         if 'answers' in st.session_state and st.session_state.answers:
-#             cluster_result = determine_cluster(st.session_state.answers)
-#             cluster_info = get_cluster_info()
-#             if cluster_result['cluster'] in cluster_info:
-#                 cluster_data = cluster_info[cluster_result['cluster']]
-#                 st.markdown(f"""
-#                 <div style="background: rgba(255,255,255,0.9); padding: 15px; border-radius: 10px; border: 2px solid {cluster_data['color']}; text-align: center;">
-#                     <h5 style="color: {cluster_data['color']}; margin: 0;">{cluster_data['name']}</h5>
-#                     <p style="color: #2E7D32; font-size: 0.9em; margin: 5px 0;">클러스터 {cluster_result['cluster']}</p>
-#                 </div>
-#                 """, unsafe_allow_html=True)
-    
-#     return analysis_type, show_advanced
-
 # 사이드바 메뉴
 def stats_info():
 
@@ -647,7 +577,7 @@ def stats_info():
                 with analysis_col1:
                     st.markdown(f"""
                     <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
-                        <h3 style="color: {cluster_data['color']}; margin-bottom: 15px;">
+                        <h3 style="color: {cluster_data['color']}; margin-left 1px; margin-bottom: 15px;">
                             🏆 {cluster_data['name']}
                         </h3>
                         <h3 style="color: #2E7D32; margin-top: 15px;">
