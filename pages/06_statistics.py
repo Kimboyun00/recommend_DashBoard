@@ -1099,7 +1099,7 @@ def statistics_page():
     
     with system_col1:
         st.markdown(f"""
-        <div class="insight-card" style="text-align: center; min-height: 150px;">
+        <div class="insight-card" style="text-align: center;">
             <h4>📊 데이터 기반</h4>
             <p>
                 2,591명의 실제 여행객 데이터를 머신러닝으로 분석하여<br>
