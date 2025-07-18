@@ -682,9 +682,6 @@ def recommendations_page():
                     help="차트에 표시할 관광지 개수를 선택하세요"
                 )
             
-            with chart_col1:
-                st.markdown("### 📈 개인 맞춤 추천 점수")
-            
             # 데이터 준비
             display_count = min(show_count, len(filtered_places))
             chart_places = filtered_places[:display_count]
@@ -698,7 +695,6 @@ def recommendations_page():
                 x=names,
                 y=scores,
                 color=types,
-                title=f"상위 {display_count}개 관광지 추천 점수",
                 labels={'x': '관광지명', 'y': '추천 점수 (점)', 'color': '웰니스 카테고리'},
                 text=scores,
                 # 색상 대비 강화 - 더 구분되는 색상 사용
@@ -731,7 +727,7 @@ def recommendations_page():
                     tickmode='array',
                     tickvals=list(range(len(names))),
                     ticktext=[name[:15] + '...' if len(name) > 15 else name for name in names],  # 긴 이름 줄임
-                    tickfont=dict(size=10, color="#000000", family='Arial Black')
+                    tickfont=dict(size=10, color="#000000")
                 )
             )
 
