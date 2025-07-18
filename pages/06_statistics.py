@@ -580,7 +580,7 @@ def stats_info():
                         <h3 style="color: {cluster_data['color']}; margin-left: 20px; margin-bottom: 15px;">
                             🏆 {cluster_data['name']}
                         </h3>
-                        <h3 style="color: #2E7D32; margin-left: 20px; margin-top: 15px;">
+                        <h3 style="color: #2E7D32; margin-left: 23px; margin-top: 15px;">
                             클러스터 {cluster_result['cluster']}
                         </h3>
                         <div class="score-display">
