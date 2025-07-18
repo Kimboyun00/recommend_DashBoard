@@ -132,12 +132,12 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 18px;
+        border-radius: 15px;
         padding: 25px 30px;
-        margin: 25px 0;
+        margin: 15px 0;
         border-left: 6px solid #4CAF50;
         text-align: center;
-        min-height: 300px;
+        min-height: 337px;
     }
     
     .filter-card {
@@ -271,9 +271,11 @@ st.markdown("""
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 15px;
-        padding: 20px 25px;
+        padding: 25px 30px;
         margin: 15px 0;
-        transition: all 0.3s ease;
+        border-left: 6px solid #4CAF50;
+        text-align: center;
+        min-height: 337px;
     }
     
     .insight-card:hover {
@@ -767,7 +769,7 @@ def statistics_page():
                 
                 with user_col1:
                     st.markdown(f"""
-                    <div class="insight-card" style="height: 337px; border-color: {cluster_data['color']};">
+                    <div class="cluster-result-card" style="border-color: {cluster_data['color']};">
                         <h3 style="color: {cluster_data['color']}; margin-left: 20px; margin-bottom: 15px;">
                             🏆 {cluster_data['name']}
                         </h3>
