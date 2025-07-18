@@ -674,10 +674,11 @@ def recommendations_page():
             chart_col1, chart_col2 = st.columns([3, 1])
             
             with chart_col2:
+                max_places = len(filtered_places)
                 show_count = st.selectbox(
                     "표시할 개수",
-                    options=[6, 8, min(12, len(filtered_places)), len(filtered_places)],
-                    index=1,  # 기본값: 8개
+                    options=list(range(1, max_places + 1)),
+                    index=min(7, max_places - 1),  # 기본값: 8개 (인덱스는 7)
                     help="차트에 표시할 관광지 개수를 선택하세요"
                 )
             
@@ -700,43 +701,54 @@ def recommendations_page():
                 title=f"상위 {display_count}개 관광지 추천 점수",
                 labels={'x': '관광지명', 'y': '추천 점수 (점)', 'color': '웰니스 카테고리'},
                 text=scores,
-                color_discrete_sequence=['#4CAF50', '#66BB6A', '#81C784', '#A5D6A7']
+                # 색상 대비 강화 - 더 구분되는 색상 사용
+                color_discrete_sequence=['#2E7D32', '#FF6B35', '#6B73FF', '#FFD23F']
             )
-            
+
             # 차트 레이아웃 개선
             fig.update_layout(
                 plot_bgcolor='rgba(0,0,0,0)',
                 paper_bgcolor='rgba(0,0,0,0)',
                 font_color='#2E7D32',
-                xaxis_tickangle=-45,
+                xaxis_tickangle=0,  # 관광지명 수평으로 변경
                 font_size=11,
-                height=450,
+                height=500,  # 높이 증가로 범례와 겹침 방지
                 title_x=0.5,
                 title_font_size=14,
                 showlegend=True,
                 legend=dict(
                     orientation="h",
                     yanchor="bottom",
-                    y=-0.25,
+                    y=-0.35,  # 범례 위치를 더 아래로 이동
                     xanchor="center",
-                    x=0.5
+                    x=0.5,
+                    bgcolor='rgba(255,255,255,0.8)',  # 범례 배경 추가
+                    bordercolor='rgba(76, 175, 80, 0.3)',
+                    borderwidth=1
                 ),
-                margin=dict(l=50, r=50, t=60, b=120)
+                margin=dict(l=50, r=50, t=60, b=150),  # 하단 여백 증가
+                xaxis=dict(
+                    tickmode='array',
+                    tickvals=list(range(len(names))),
+                    ticktext=[name[:15] + '...' if len(name) > 15 else name for name in names],  # 긴 이름 줄임
+                    tickfont=dict(size=10)
+                )
             )
-            
+
             # 텍스트 표시 개선
             fig.update_traces(
                 texttemplate='%{text:.1f}',
                 textposition='outside',
-                textfont_size=9,
-                textfont_color='#2E7D32'
+                textfont_size=10,  # 텍스트 크기 증가
+                textfont_color='#2E7D32',
+                textfont_weight='bold'  # 텍스트 굵게
             )
-            
+
             # y축 범위 조정
             if scores:
                 max_score = max(scores)
-                fig.update_yaxes(range=[0, max_score + 1.5])
-            
+                fig.update_yaxes(range=[0, max_score + 2])  # 여백 증가
+
             st.plotly_chart(fig, use_container_width=True)
             
             # 차트 하단 통계 정보
