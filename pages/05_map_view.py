@@ -532,33 +532,9 @@ st.markdown("""
 
 # 사이드바 메뉴
 def sidebar_menu():
-    # 세로 메뉴를 화면 좌측에 표시
-    st.markdown("### 🧭 메뉴")
-    
-    menu_col1, menu_col2, menu_col3, menu_col4, menu_col5 = st.columns(5)
-    
-    with menu_col1:
-        if st.button("🏠 홈", key="home_btn"):
-            st.switch_page("pages/03_home.py")
-    
-    with menu_col2:
-        if st.button("📝 설문조사", key="survey_btn"):
-            st.switch_page("pages/01_questionnaire.py")
-    
-    with menu_col3:
-        if st.button("📊 추천 결과", key="results_btn"):
-            st.switch_page("pages/04_recommendations.py")
-    
-    with menu_col4:
-        if st.button("📈 통계 정보", key="stats_btn"):
-            st.switch_page("pages/06_statistics.py")
-    
-    with menu_col5:
-        if st.button("🚪 로그아웃", key="logout_btn"):
-            for key in list(st.session_state.keys()):
-                del st.session_state[key]
-            st.switch_page("app.py")
-    
+
+    # 제목
+    st.title('🌿 웰커밍 투어추천 시스템')
     st.markdown("---")
     
     # 지도 설정
