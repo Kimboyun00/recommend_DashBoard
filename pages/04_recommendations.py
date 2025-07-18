@@ -172,7 +172,7 @@ wellness_destinations = {
 
 # 클러스터 기반 추천 알고리즘
 def calculate_cluster_recommendations(survey_answers):
-    """클러스터 기반 추천 계산"""
+    """클러스터 기반 추천 계산 - 100점 만점 표준화"""
     if not survey_answers:
         return []
     
@@ -195,30 +195,56 @@ def calculate_cluster_recommendations(survey_answers):
     preferred_categories = cluster_preferences.get(cluster_id, ["온천/스파"])
     recommendations = []
     
+    # 점수 비중 설정 (총 100점)
+    MAX_CATEGORY_SCORE = 40  # 카테고리 선호도 (40점)
+    MAX_RATING_SCORE = 30    # 평점 점수 (30점)
+    MAX_CLUSTER_SCORE = 20   # 클러스터 점수 (20점)
+    MAX_DISTANCE_SCORE = 10  # 거리 보정 (10점)
+    
     # 모든 관광지에 대해 점수 계산
     for category, places in wellness_destinations.items():
         for place in places:
-            score = 0
-            
-            # 클러스터 선호 카테고리 보너스
+            # 1. 클러스터 선호 카테고리 점수 (40점 만점)
+            category_score = 0
             if category in preferred_categories:
-                bonus_index = preferred_categories.index(category)
-                score += (10 - bonus_index * 2)  # 첫 번째 선호: 10점, 두 번째: 8점
+                preference_rank = preferred_categories.index(category)
+                if preference_rank == 0:
+                    category_score = 40  # 1순위 선호
+                elif preference_rank == 1:
+                    category_score = 30  # 2순위 선호
+                elif preference_rank == 2:
+                    category_score = 20  # 3순위 선호 (클러스터 7만 해당)
             
-            # 기본 평점 반영 (0-10점)
-            score += place["rating"] * 2
+            # 2. 관광지 평점 점수 (30점 만점)
+            # 5점 만점 평점을 30점 만점으로 변환
+            rating_score = (place["rating"] / 5.0) * MAX_RATING_SCORE
             
-            # 클러스터 점수 반영 (0-2점)
-            score += cluster_result['score'] * 0.1
+            # 3. 개인 클러스터 매칭 점수 (20점 만점)
+            # 20점 만점 클러스터 점수를 그대로 사용
+            cluster_score = (cluster_result['score'] / 20.0) * MAX_CLUSTER_SCORE
             
-            # 거리 보정 (가까울수록 약간의 보너스)
-            distance_bonus = max(0, (500 - place['distance_from_incheon']) / 100)
-            score += distance_bonus
+            # 4. 접근성 보정 점수 (10점 만점)
+            # 거리가 가까울수록 높은 점수
+            min_distance = 60   # 최단거리 (에버랜드)
+            max_distance = 500  # 최장거리 기준
+            distance_score = max(0, (max_distance - place['distance_from_incheon']) / (max_distance - min_distance)) * MAX_DISTANCE_SCORE
+            
+            # 총점 계산 (100점 만점)
+            total_score = category_score + rating_score + cluster_score + distance_score
             
             place_with_score = place.copy()
-            place_with_score["recommendation_score"] = round(score, 1)
+            place_with_score["recommendation_score"] = round(total_score, 1)
             place_with_score["cluster_id"] = cluster_id
             place_with_score["cluster_confidence"] = cluster_result['confidence']
+            
+            # 점수 세부사항 추가 (선택사항)
+            place_with_score["score_breakdown"] = {
+                "category": round(category_score, 1),
+                "rating": round(rating_score, 1),
+                "cluster": round(cluster_score, 1),
+                "distance": round(distance_score, 1)
+            }
+            
             recommendations.append(place_with_score)
     
     # 점수 순으로 정렬
@@ -695,7 +721,7 @@ def recommendations_page():
                 x=names,
                 y=scores,
                 color=types,
-                title=f"카테고리별 관광지 추천 점수",
+                title=f"카테고리별 관광지 추천 점수 (100점 만점)",
                 labels={'x': '관광지명', 'y': '추천 점수 (점)', 'color': '웰니스 카테고리'},
                 text=scores,
                 # 색상 대비 강화 - 더 구분되는 색상 사용
@@ -735,7 +761,7 @@ def recommendations_page():
 
             # 텍스트 표시 개선
             fig.update_traces(
-                texttemplate='%{text:.1f}',
+                texttemplate='%{text:.0f}점',
                 textposition='outside',
                 textfont_size=10,  # 텍스트 크기 증가
                 textfont_color='#2E7D32',
@@ -744,8 +770,7 @@ def recommendations_page():
 
             # y축 범위 조정
             if scores:
-                max_score = max(scores)
-                fig.update_yaxes(range=[0, max_score + 2])  # 여백 증가
+                fig.update_yaxes(range=[0, 100])  # 여백 증가
 
             st.plotly_chart(fig, use_container_width=True, config={'displayModeBar': False})
             
@@ -756,14 +781,14 @@ def recommendations_page():
                 with stat_col1:
                     st.metric(
                         label="🏆 최고 점수",
-                        value=f"{max(scores):.1f}점",
+                        value=f"{max(scores):.0f}점",
                         help="가장 높은 추천 점수"
                     )
                 
                 with stat_col2:
                     st.metric(
                         label="📊 평균 점수", 
-                        value=f"{sum(scores)/len(scores):.1f}점",
+                        value=f"{sum(scores)/len(scores):.0f}점",
                         help="표시된 관광지들의 평균 점수"
                     )
                 
@@ -783,9 +808,119 @@ def recommendations_page():
         
         return True
     
+    def create_score_system_explanation():
+        """점수 시스템 설명을 위한 별도 섹션"""
+        
+        # 점수 시스템 설명 박스
+        with st.expander("📊 점수 시스템 이해하기", expanded=False):
+            # 설명 섹션을 두 개 컬럼으로 나누기
+            explain_col1, explain_col2 = st.columns([2, 1])
+            
+            with explain_col1:
+                st.markdown("""
+                ### 🎯 100점 만점 점수 구성
+                
+                **1. 카테고리 선호도 (40점) 🏆**
+                - 🥇 1순위 선호 카테고리: **40점**
+                - 🥈 2순위 선호 카테고리: **30점**  
+                - 🥉 3순위 선호 카테고리: **20점**
+                - ❌ 비선호 카테고리: **0점**
+                
+                **2. 관광지 평점 (30점) ⭐**
+                - 관광지 평점(1-5점)을 30점으로 변환
+                - 예시: 4.8점 → 28.8점, 4.0점 → 24점
+                
+                **3. 개인 클러스터 매칭 (20점) 🎭**
+                - 설문 기반 개인 성향 점수 반영
+                - 클러스터 점수(0-20점) 그대로 적용
+                
+                **4. 접근성 보정 (10점) 📍**
+                - 인천공항으로부터의 거리 기반
+                - 가까울수록 높은 점수 (60km=10점, 500km=0점)
+                
+                ---
+                **💡 점수가 높을수록 당신에게 더 적합한 관광지입니다!**
+                """)
+            
+            with explain_col2:
+                # 점수 구성 비율 파이 차트
+                score_components = {
+                    "카테고리 선호도\n(40점)": 40,
+                    "관광지 평점\n(30점)": 30,
+                    "클러스터 매칭\n(20점)": 20,
+                    "접근성\n(10점)": 10
+                }
+                
+                fig_pie = px.pie(
+                    values=list(score_components.values()),
+                    names=list(score_components.keys()),
+                    title="점수 구성 비율",
+                    color_discrete_sequence=['#2E7D32', '#FF6B35', '#6B73FF', '#FFD23F']
+                )
+                
+                fig_pie.update_layout(
+                    plot_bgcolor='rgba(0,0,0,0)',
+                    paper_bgcolor='rgba(0,0,0,0)',
+                    font_color='#2E7D32',
+                    title_font_size=14,
+                    title_x=0.5,
+                    height=350,
+                    showlegend=True,
+                    legend=dict(
+                        orientation="v",
+                        yanchor="middle",
+                        y=0.5,
+                        xanchor="left",
+                        x=1.05,
+                        font=dict(size=10)
+                    ),
+                    margin=dict(l=10, r=80, t=40, b=10)
+                )
+                
+                fig_pie.update_traces(
+                    textposition='inside',
+                    textinfo='percent',
+                    textfont_size=12,
+                    textfont_color='white'
+                )
+                
+                st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
+            
+            # 하단에 점수 해석 가이드 추가
+            st.markdown("---")
+            
+            guide_col1, guide_col2, guide_col3 = st.columns(3)
+            
+            with guide_col1:
+                st.markdown("""
+                #### 🟢 높은 점수 (80-100점)
+                - 당신의 성향에 **매우 적합**
+                - 우선적으로 고려할 관광지
+                - 만족도가 높을 것으로 예상
+                """)
+            
+            with guide_col2:
+                st.markdown("""
+                #### 🟡 중간 점수 (60-79점)
+                - 당신의 성향에 **적합**
+                - 고려해볼 만한 관광지
+                - 개인 취향에 따라 만족도 차이
+                """)
+            
+            with guide_col3:
+                st.markdown("""
+                #### 🔴 낮은 점수 (0-59점)
+                - 당신의 성향과 **다소 맞지 않음**
+                - 신중한 고려 필요
+                - 다른 대안 검토 권장
+                """)
+
     # 차트 섹션 호출
     if not create_chart_section(filtered_places):
         return  # 결과가 없으면 여기서 종료
+    
+    # 점수 시스템 설명 박스
+    create_score_system_explanation()
     
     # 상세 추천 결과
     st.markdown('<h3 class="section-title">🌿 상세 추천 정보</h3>', unsafe_allow_html=True)
@@ -808,7 +943,7 @@ def recommendations_page():
                 <p class="place-description">{place['description']}</p>
                 
                 <div class="score-display">
-                    🎯 추천 점수: {place['recommendation_score']}/20
+                    🎯 추천 점수: {place['recommendation_score']:.0f}/100점
                 </div>
                 
                 <div style="margin: 20px 0;">
