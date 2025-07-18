@@ -906,6 +906,31 @@ def map_view_page():
             </div>
             """, unsafe_allow_html=True)
 
+    # 액션 버튼
+    st.markdown('<h2 class="section-title">🚀 다음 단계</h2>', unsafe_allow_html=True)
+    
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    action_col1, action_col2, action_col3 = st.columns(3)
+    
+    with action_col1:
+        if st.button("📝 설문 다시하기"):
+            st.session_state.survey_completed = False
+            st.session_state.answers = {}
+            if 'score_breakdown' in st.session_state:
+                del st.session_state.score_breakdown
+            st.switch_page("pages/01_questionnaire.py")
+    
+    with action_col2:
+        if st.button("📊 추천 결과", key="results_btn"):
+            if 'survey_completed' in st.session_state and st.session_state.survey_completed:
+                st.switch_page("pages/04_recommendations.py")
+            else:
+                st.warning("설문을 먼저 완료해주세요!")
+    
+    with action_col3:
+        if st.button("📊 통계 분석 보기"):
+            st.switch_page("pages/06_statistics.py")
 # 메인 실행
 if __name__ == "__main__":
     map_view_page()
