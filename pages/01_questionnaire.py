@@ -294,23 +294,25 @@ def wellness_questionnaire_page():
         )
 
     # 완료 버튼
-    if st.button("🎯 웰니스 성향 분석하기", type="primary", use_container_width=True):
-        if validate_wellness_answers():
-            st.session_state.survey_completed = True
-            
-            # 웰니스 점수 계산 및 저장
-            total_score, score_breakdown = calculate_wellness_score(st.session_state.answers)
-            st.session_state.total_score = total_score
-            st.session_state.score_breakdown = score_breakdown
-            
-            # survey_results 생성 (추천 페이지에서 사용)
-            from utils import convert_answers_to_survey_results
-            st.session_state.survey_results = convert_answers_to_survey_results(st.session_state.answers)
-            
-            st.switch_page("pages/02_analyzing.py")
-        else:
-            st.error(f"⚠️ {len(st.session_state.validation_errors)}개의 문항에 답변이 필요합니다!")
-            st.rerun()
+    col1, col2, col3 = st.columns([1, 1, 1])
+    with col2:
+        if st.button("🎯 웰니스 성향 분석하기", type="primary", use_container_width=True):
+            if validate_wellness_answers():
+                st.session_state.survey_completed = True
+                
+                # 웰니스 점수 계산 및 저장
+                total_score, score_breakdown = calculate_wellness_score(st.session_state.answers)
+                st.session_state.total_score = total_score
+                st.session_state.score_breakdown = score_breakdown
+                
+                # survey_results 생성 (추천 페이지에서 사용)
+                from utils import convert_answers_to_survey_results
+                st.session_state.survey_results = convert_answers_to_survey_results(st.session_state.answers)
+                
+                st.switch_page("pages/02_analyzing.py")
+            else:
+                st.error(f"⚠️ {len(st.session_state.validation_errors)}개의 문항에 답변이 필요합니다!")
+                st.rerun()
 
     show_footer()
 
