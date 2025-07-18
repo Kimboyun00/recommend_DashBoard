@@ -538,93 +538,40 @@ def sidebar_menu():
     st.markdown("---")
 
     # 메인 제목
-    st.markdown('<h2 class="section-title">🔭 지도로 관광지 보기</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="section-title">🗺️ 지도로 관광지 보기</h2>', unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-        # 지도필터 섹션
-    def create_filter_section():
-        """지도필터 섹션을 생성하고 선택된 값들을 반환합니다."""
-        st.markdown('<h2 class="section-title">🗺️ 지도 설정</h2>', unsafe_allow_html=True)
-        
-        # 세션 상태 초기화
-        if 'category_filter' not in st.session_state:
-            st.session_state.category_filter = list(wellness_destinations.keys())
-        if 'distance_filter' not in st.session_state:
-            st.session_state.distance_filter = 500
-        
-        # expander를 사용한 필터 섹션
-        with st.expander("🎛️ 지도 설정", expanded=True):
-            map_col1, map_col2, map_col3 = st.columns(3)
-            
-            with map_col1:
-                st.markdown("#### 🔎 표시할 추천지 수")
-                num_places = st.slider(
-                    "표시할 추천지 수",
-                    min_value=1,
-                    max_value=8,
-                    value=st.session_state.num_filter,
-                    step=1,
-                    key="num_places_slider",
-                    help="지도에 표시할 추천지의 개수를 선택하세요"
-                )
-                st.session_state.num_filter = num_places
-
-            with map_col2:
-                st.markdown("#### 🎯 지도 중심점")
-                map_center = st.selectbox(
-                    "지도 중심점",
-                    ["전체 보기", "인천공항", "서울 중심", "부산 중심", "제주 중심"],
-                    value=st.session_state.center_filter,
-                    key="map_center_select",
-                    help="지도의 중심점을 선택하세요"
-                )
-                st.session_state.center_filter = map_center
-
-            with map_col3:
-                st.markdown("### 🎨 카테고리 표시")
-
-                show_categories = {}
-                for category in wellness_destinations.keys():
-                    show_categories[category] = st.checkbox(
-                        category,
-                        value=True,
-                        key=f"show_{category}"
-                    )
-
-        return num_places, map_center, show_categories
+    # 지도 설정
+    st.markdown("### 🗺️ 지도 설정")
     
-    num_places, map_center, show_categories = create_filter_section()
-    # # 지도 설정
-    # st.markdown("### 🗺️ 지도 설정")
+    # 표시할 관광지 수
+    num_places = st.slider(
+        "표시할 추천지 수",
+        min_value=1,
+        max_value=8,
+        value=6,
+        key="num_places_slider"
+    )
     
-    # # 표시할 관광지 수
-    # num_places = st.slider(
-    #     "표시할 추천지 수",
-    #     min_value=1,
-    #     max_value=8,
-    #     value=6,
-    #     key="num_places_slider"
-    # )
+    # 지도 중심점 설정
+    map_center = st.selectbox(
+        "지도 중심점",
+        ["전체 보기", "인천공항", "서울 중심", "부산 중심", "제주 중심"],
+        key="map_center_select"
+    )
     
-    # # 지도 중심점 설정
-    # map_center = st.selectbox(
-    #     "지도 중심점",
-    #     ["전체 보기", "인천공항", "서울 중심", "부산 중심", "제주 중심"],
-    #     key="map_center_select"
-    # )
+    # 카테고리 표시 설정
+    st.markdown("### 🎨 카테고리 표시")
+    show_categories = {}
+    for category in wellness_destinations.keys():
+        show_categories[category] = st.checkbox(
+            category,
+            value=True,
+            key=f"show_{category}"
+        )
     
-    # # 카테고리 표시 설정
-    # st.markdown("### 🎨 카테고리 표시")
-    # show_categories = {}
-    # for category in wellness_destinations.keys():
-    #     show_categories[category] = st.checkbox(
-    #         category,
-    #         value=True,
-    #         key=f"show_{category}"
-    #     )
-    
-    # st.markdown("---")
+    st.markdown("---")
     
     # 클러스터 정보 표시
     if 'answers' in st.session_state and st.session_state.answers:
