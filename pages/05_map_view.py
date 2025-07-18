@@ -684,6 +684,7 @@ def map_view_page():
     num_places, map_center, show_categories = sidebar_menu()
     
     # 제목
+    st.markdown("---")
     st.markdown('<h1 class="page-title">🗺️ 맞춤형 여행지 지도</h1>', unsafe_allow_html=True)
     
     # 추천 결과 가져오기 (클러스터 기반)
@@ -810,6 +811,7 @@ def map_view_page():
                     st.markdown(f"🌐 [공식 웹사이트 방문]({selected_place['website']})")
     
     # 추천 관광지 목록
+    st.markdown("---")
     st.markdown('<h3 class="section-title">📋 추천 관광지 목록</h3>', unsafe_allow_html=True)
     
     # 간단한 카드 형태로 표시
@@ -837,6 +839,7 @@ def map_view_page():
             """, unsafe_allow_html=True)
     
     # 여행 통계
+    st.markdown("---")
     st.markdown('<h3 class="section-title">📊 여행 통계</h3>', unsafe_allow_html=True)
     
     stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
@@ -907,6 +910,7 @@ def map_view_page():
             """, unsafe_allow_html=True)
 
     # 액션 버튼
+    st.markdown("---")
     st.markdown("<br>", unsafe_allow_html=True)
 
     action_col1, action_col2, action_col3 = st.columns(3)
