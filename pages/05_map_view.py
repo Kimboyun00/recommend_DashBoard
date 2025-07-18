@@ -371,6 +371,22 @@ st.markdown("""
         min-height: 300px;
     }
     
+    .filter-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(76, 175, 80, 0.4);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin: 25px 0;
+        min-height: 300px;
+        transition: all 0.3s ease;
+    }
+    
+    .filter-card:hover {
+        border-color: #4CAF50;
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.2);
+    }
+    
     /* 범례/설정 카드 */
     .legend-card, .setting-card {
         background: rgba(255, 255, 255, 0.95);
