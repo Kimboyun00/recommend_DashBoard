@@ -164,6 +164,18 @@ st.markdown("""
         letter-spacing: 0.5px;
     }
     
+    .cluster-result-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(76, 175, 80, 0.4);
+        border-radius: 18px;
+        padding: 25px 30px;
+        margin: 25px 0;
+        border-left: 6px solid #4CAF50;
+        text-align: center;
+        min-height: 300px;
+    }
+    
     .cluster-card {
         background: rgba(255, 255, 255, 0.95);
         backdrop-filter: blur(20px);
