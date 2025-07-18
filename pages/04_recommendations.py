@@ -475,6 +475,7 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        width: 100% !important;
     }
     
     div[data-testid="stButton"] > button:hover {
@@ -811,7 +812,7 @@ def recommendations_page():
         return True
     
     st.markdown("---")
-    
+
     def create_score_system_explanation():
         """점수 시스템 설명을 위한 별도 섹션"""
         
