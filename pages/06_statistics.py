@@ -410,7 +410,7 @@ def analyze_user_survey_details(answers):
 def display_detailed_user_analysis(answers):
     """상세 사용자 분석 표시"""
     analysis = analyze_user_survey_details(answers)
-    
+
     st.markdown("---")
     st.markdown('<h3 class="section-title">🔍 상세 성향 분석</h3>', unsafe_allow_html=True)
     
@@ -755,7 +755,7 @@ def statistics_page():
                 
                 with user_col1:
                     st.markdown(f"""
-                    <div class="cluster-card" style="border-color: {cluster_data['color']}; height: 200px;">
+                    <div class="cluster-card" style="border-color: {cluster_data['color']}; height: 300px;">
                         <h4 style="color: {cluster_data['color']}; margin-bottom: 15px;">
                             🏆 내 클러스터
                         </h4>
