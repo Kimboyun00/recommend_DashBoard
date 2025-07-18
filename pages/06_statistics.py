@@ -794,11 +794,11 @@ def statistics_page():
                         </h3>
                         <div class="score-display">
                             매칭 점수: {cluster_result['score']}/20
+                            </br>
                         </div>
-                        </br>
-                        <p class="confidence-display">
+                        <div class="confidence-display">
                             신뢰도: {cluster_result['confidence']:.1%}
-                        </p>
+                        </div>
                     </div>
                     """, unsafe_allow_html=True)
                 
