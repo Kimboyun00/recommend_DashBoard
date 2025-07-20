@@ -41,280 +41,303 @@ def check_access_permissions(page_type='default'):
 # --- 웰니스 관광 성향 진단 설문 관련 함수 및 데이터 (수정됨) ---
 questions = {
     "q1": {
-        "title": "1. 여행 시 가장 중요하게 생각하는 것은?",
+        "title": "1. 한국 여행의 주된 목적은 무엇인가요?",
         "options": [
-            "안전하고 치안이 좋은 곳 (안전 지향)",
-            "새로운 경험과 모험 (모험 추구)", 
-            "편리하고 쾌적한 시설 (편의 중시)",
-            "비용 대비 효율성 (경제성 중시)"
+            "한류 콘텐츠 관련 (K-pop, 드라마, 영화)",
+            "전통문화 체험 (고궁, 한옥, 전통예술)",
+            "자연경관 감상 및 힐링",
+            "쇼핑 및 미식 체험",
+            "특별한 행사나 축제 참여"
         ]
     },
     "q2": {
-        "title": "2. 선호하는 여행 스타일은? (복수 선택 가능)",
+        "title": "2. 여행 정보를 주로 어디서 얻나요? (복수 선택 가능)",
         "options": [
-            "혼자서 자유롭게 (개인형)",
-            "가족이나 친구와 함께 (사회형)",
-            "소규모 그룹으로 (소그룹형)", 
-            "대규모 단체로 (단체형)"
+            "소셜미디어 (인스타그램, 페이스북)",
+            "동영상 사이트 (유튜브, 틱톡)",
+            "글로벌 포털사이트 (구글 등)",
+            "블로그 및 개인 후기",
+            "여행사 또는 가이드북",
+            "지인 추천"
         ],
-        "multiple": True  # 복수 선택 표시
+        "multiple": True
     },
     "q3": {
-        "title": "3. 한국 여행에서 가장 하고 싶은 활동은?",
+        "title": "3. 한국에서 가장 관심 있는 쇼핑 품목은?",
         "options": [
-            "쇼핑 (명동, 강남 등)",
-            "문화체험 (고궁, 한옥마을 등)",
-            "미식탐방 (전통음식, 맛집 등)",
-            "자연관광 (제주도, 설악산 등)"
+            "화장품 및 뷰티용품",
+            "의류 및 패션아이템",
+            "전통 기념품 및 특산품",
+            "식료품 및 간식",
+            "전자제품",
+            "쇼핑에 관심 없음"
         ]
     },
     "q4": {
-        "title": "4. 숙박시설 선택 기준은?",
+        "title": "4. 선호하는 여행 스타일은?",
         "options": [
-            "최고급 호텔 (프리미엄)",
-            "깨끗하고 편리한 호텔 (스탠다드)",
-            "현지 특색있는 숙소 (게스트하우스 등)",
-            "가성비 좋은 숙소 (경제형)"
+            "혼자서 자유롭게",
+            "가족이나 친구와 함께",
+            "소규모 그룹 투어",
+            "대규모 단체 투어"
         ]
     },
     "q5": {
-        "title": "5. 여행 정보는 주로 어디서 얻나요?",
+        "title": "5. 한국 여행에서 가장 중요하게 생각하는 것은?",
         "options": [
-            "소셜미디어 (인스타그램, 페이스북 등)",
-            "검색엔진 (구글, 네이버 등)",
-            "여행 전문 사이트/앱",
-            "지인 추천이나 여행 가이드북"
+            "편리한 교통 및 언어소통",
+            "다양한 체험 활동",
+            "경제적인 여행비용",
+            "고품질 숙박 및 서비스",
+            "안전하고 깨끗한 환경"
         ]
     },
     "q6": {
-        "title": "6. 쇼핑할 때 주로 구매하는 것은?",
+        "title": "6. 한국에서 가장 하고 싶은 활동은? (복수 선택 가능)",
         "options": [
-            "화장품, 뷰티용품",
-            "의류, 패션아이템",
-            "전통 기념품, 특산품",
-            "전자제품, 브랜드 제품"
-        ]
+            "쇼핑 (면세점, 시장 등)",
+            "음식/미식 체험",
+            "전통문화 체험",
+            "자연경관 감상",
+            "한류 관련 장소 방문",
+            "행사/축제 참여"
+        ],
+        "multiple": True
     },
     "q7": {
-        "title": "7. 여행 예산 중 가장 많이 투자하고 싶은 분야는?",
+        "title": "7. 선호하는 숙박 시설은?",
         "options": [
-            "숙박 (좋은 호텔)",
-            "쇼핑 (기념품, 선물)",
-            "음식 (고급 레스토랑, 특별한 음식)",
-            "체험활동 (문화체험, 투어)"
+            "고급 호텔",
+            "비즈니스 호텔",
+            "게스트하우스/호스텔",
+            "한옥 스테이",
+            "펜션/리조트"
         ]
     },
     "q8": {
         "title": "8. 여행 후 가장 중요하게 생각하는 것은?",
         "options": [
-            "안전하게 다녀왔다는 안도감",
-            "새로운 경험에 대한 만족감",
-            "쇼핑이나 구매에 대한 만족",
-            "문화적 학습과 성장",
-            "일상에서 벗어난 충분한 휴식"  # 새로 추가된 휴식 관련 옵션
+            "새로운 경험과 추억",
+            "다양한 정보와 지식 습득",
+            "충분한 휴식과 힐링",
+            "SNS에 공유할 만한 콘텐츠",
+            "경제적 만족감 (가성비)"
         ]
     }
 }
 
-# 클러스터별 점수 계산 함수들 (수정됨)
+# 실제 데이터 기반 클러스터 점수 계산 함수들
 def calculate_cluster_0_score(answers):
-    """클러스터 0: 안전추구 모험가형"""
+    """클러스터 0: 한류 트렌디형"""
     score = 0
     
-    # Q1: 안전 중시
-    if answers.get('q1') == 0: score += 3  # 안전 지향
-    elif answers.get('q1') == 1: score += 2  # 모험 추구
+    # Q1: 한류 콘텐츠 관심도
+    if answers.get('q1') == 0: score += 4  # 한류 콘텐츠
     
-    # Q2: 사회적 여행 (복수응답 처리)
+    # Q2: SNS/동영상 사이트 이용 (복수응답)
     q2_answers = answers.get('q2', [])
     if isinstance(q2_answers, list):
-        if 1 in q2_answers: score += 2  # 가족이나 친구와
-        if 2 in q2_answers: score += 1  # 소그룹
+        if 0 in q2_answers: score += 3  # 소셜미디어
+        if 1 in q2_answers: score += 3  # 동영상 사이트
     
-    # Q3: 다양한 활동
-    if answers.get('q3') == 0: score += 1  # 쇼핑
+    # Q3: 쇼핑 선호
+    if answers.get('q3') in [0, 1]: score += 3  # 화장품, 의류
     
-    # Q4: 호텔 선호
-    if answers.get('q4') == 1: score += 2  # 스탠다드 호텔
-    elif answers.get('q4') == 0: score += 1  # 프리미엄 호텔
+    # Q4: 동행자와 함께
+    if answers.get('q4') == 1: score += 2  # 가족/친구와
     
-    # Q8: 안전 중시 (새 옵션 반영)
-    if answers.get('q8') == 0: score += 3  # 안전감
-    elif answers.get('q8') == 1: score += 1  # 새로운 경험
-    elif answers.get('q8') == 4: score += 1  # 휴식 (중립적 처리)
+    # Q6: 쇼핑 및 한류 관련 활동 (복수응답)
+    q6_answers = answers.get('q6', [])
+    if isinstance(q6_answers, list):
+        if 0 in q6_answers: score += 2  # 쇼핑
+        if 4 in q6_answers: score += 3  # 한류 관련 장소
+    
+    # Q8: SNS 콘텐츠 중시
+    if answers.get('q8') == 3: score += 2  # SNS 공유 콘텐츠
     
     return score
 
 def calculate_cluster_1_score(answers):
-    """클러스터 1: 안전우선 편의형"""
+    """클러스터 1: 종합형 실속파"""
     score = 0
     
-    # Q1: 안전 최우선
-    if answers.get('q1') == 0: score += 4  # 안전 지향
-    elif answers.get('q1') == 2: score += 2  # 편의 중시
+    # Q1: 다양한 동기 (한류 외의 모든 옵션)
+    if answers.get('q1') in [1, 2, 3, 4]: score += 2
     
-    # Q2: 사회적 여행 (복수응답 처리)
+    # Q2: 다양한 정보 채널 이용 (복수응답 개수)
     q2_answers = answers.get('q2', [])
     if isinstance(q2_answers, list):
-        if 1 in q2_answers: score += 2  # 가족이나 친구와
+        if len(q2_answers) >= 3: score += 4  # 3개 이상 정보 채널
+        elif len(q2_answers) >= 2: score += 2
     
-    # Q4: 편리한 호텔
-    if answers.get('q4') == 1: score += 3  # 스탠다드 호텔
-    elif answers.get('q4') == 0: score += 2  # 프리미엄 호텔
+    # Q3: 다양한 쇼핑 품목
+    if answers.get('q3') in [0, 1, 2, 3]: score += 2  # 쇼핑에 관심
     
-    # Q7: 숙박 투자
-    if answers.get('q7') == 0: score += 2  # 숙박
+    # Q5: 실용성 중시
+    if answers.get('q5') in [0, 2]: score += 3  # 편리함, 경제성
     
-    # Q8: 안전감과 휴식
-    if answers.get('q8') == 0: score += 3  # 안전감
-    elif answers.get('q8') == 4: score += 2  # 휴식 (편의형에 적합)
+    # Q6: 다양한 활동 관심 (복수응답)
+    q6_answers = answers.get('q6', [])
+    if isinstance(q6_answers, list):
+        if len(q6_answers) >= 3: score += 3  # 다양한 활동
+    
+    # Q8: 경제적 만족
+    if answers.get('q8') == 4: score += 2  # 가성비
     
     return score
 
 def calculate_cluster_2_score(answers):
-    """클러스터 2: 문화체험 힐링형"""
+    """클러스터 2: 수동형 관광객"""
     score = 0
     
-    # Q3: 문화체험
-    if answers.get('q3') == 1: score += 4  # 문화체험
-    elif answers.get('q3') == 3: score += 2  # 자연관광
+    # Q2: 정보탐색 소극적 (적은 정보 채널)
+    q2_answers = answers.get('q2', [])
+    if isinstance(q2_answers, list):
+        if len(q2_answers) <= 1: score += 4  # 1개 이하 정보 채널
     
-    # Q4: 호텔 선호
-    if answers.get('q4') == 1: score += 2  # 스탠다드 호텔
+    # Q3: 쇼핑 무관심
+    if answers.get('q3') == 5: score += 3  # 쇼핑에 관심 없음
     
-    # Q7: 체험활동 투자
-    if answers.get('q7') == 3: score += 3  # 체험활동
+    # Q6: 활동 참여도 낮음 (복수응답)
+    q6_answers = answers.get('q6', [])
+    if isinstance(q6_answers, list):
+        if len(q6_answers) <= 1: score += 4  # 1개 이하 활동
     
-    # Q8: 문화적 성장과 휴식
-    if answers.get('q8') == 3: score += 3  # 문화적 학습과 성장
-    elif answers.get('q8') == 1: score += 1  # 새로운 경험
-    elif answers.get('q8') == 4: score += 2  # 휴식 (힐링형에 적합)
+    # 기본적으로 모든 관심도가 낮은 경우
+    total_interests = 0
+    if answers.get('q1') is not None: total_interests += 1
+    if len(answers.get('q6', [])) > 0: total_interests += len(answers.get('q6', []))
+    
+    if total_interests <= 2: score += 3
     
     return score
 
 def calculate_cluster_3_score(answers):
-    """클러스터 3: 쇼핑마니아 사교형"""
+    """클러스터 3: 체험중심 실용형"""
     score = 0
     
-    # Q2: 사회적 여행 (복수응답 처리)
-    q2_answers = answers.get('q2', [])
-    if isinstance(q2_answers, list):
-        if 1 in q2_answers: score += 3  # 가족이나 친구와
-        if 2 in q2_answers: score += 2  # 소그룹
+    # Q1: 쇼핑 및 미식 체험
+    if answers.get('q1') == 3: score += 4  # 쇼핑/미식
     
-    # Q3: 쇼핑 중심
-    if answers.get('q3') == 0: score += 4  # 쇼핑
+    # Q3: 쇼핑 관심
+    if answers.get('q3') in [0, 1, 3]: score += 3  # 화장품, 의류, 식료품
     
-    # Q6: 의류/패션
-    if answers.get('q6') == 1: score += 3  # 의류, 패션아이템
-    elif answers.get('q6') == 0: score += 2  # 화장품, 뷰티용품
+    # Q5: 편의성 중시
+    if answers.get('q5') == 0: score += 3  # 편리한 교통/언어소통
     
-    # Q7: 쇼핑 투자
-    if answers.get('q7') == 1: score += 4  # 쇼핑
+    # Q6: 쇼핑, 음식 체험 (복수응답)
+    q6_answers = answers.get('q6', [])
+    if isinstance(q6_answers, list):
+        if 0 in q6_answers: score += 3  # 쇼핑
+        if 1 in q6_answers: score += 3  # 음식/미식
     
-    # Q8: 쇼핑 만족
-    if answers.get('q8') == 2: score += 3  # 쇼핑이나 구매에 대한 만족
-    elif answers.get('q8') == 4: score += 1  # 휴식 (중립적 처리)
+    # Q8: 새로운 경험
+    if answers.get('q8') == 0: score += 2  # 새로운 경험
     
     return score
 
 def calculate_cluster_4_score(answers):
-    """클러스터 4: 프리미엄 모험형"""
+    """클러스터 4: 고소득 전통형"""
     score = 0
     
-    # Q1: 모험 추구
-    if answers.get('q1') == 1: score += 3  # 모험 추구
-    elif answers.get('q1') == 2: score += 2  # 편의 중시
+    # Q1: 전통문화 체험
+    if answers.get('q1') == 1: score += 4  # 전통문화
     
-    # Q4: 최고급 호텔
-    if answers.get('q4') == 0: score += 4  # 프리미엄 호텔
-    elif answers.get('q4') == 1: score += 2  # 스탠다드 호텔
+    # Q2: 글로벌 포털사이트 이용 (복수응답)
+    q2_answers = answers.get('q2', [])
+    if isinstance(q2_answers, list):
+        if 2 in q2_answers: score += 3  # 글로벌 포털사이트
     
-    # Q5: 검색엔진 활용
-    if answers.get('q5') == 1: score += 2  # 검색엔진
+    # Q4: 동행자와 함께
+    if answers.get('q4') == 1: score += 2  # 가족/친구와
     
-    # Q7: 숙박 투자
-    if answers.get('q7') == 0: score += 3  # 숙박
+    # Q5: 고품질 서비스
+    if answers.get('q5') == 3: score += 3  # 고품질 숙박/서비스
     
-    # Q8: 새로운 경험
-    if answers.get('q8') == 1: score += 3  # 새로운 경험에 대한 만족감
-    elif answers.get('q8') == 4: score += 1  # 휴식 (중립적 처리)
+    # Q6: 전통문화 체험 (복수응답)
+    q6_answers = answers.get('q6', [])
+    if isinstance(q6_answers, list):
+        if 2 in q6_answers: score += 3  # 전통문화 체험
+    
+    # Q7: 고급 호텔
+    if answers.get('q7') == 0: score += 2  # 고급 호텔
     
     return score
 
 def calculate_cluster_5_score(answers):
-    """클러스터 5: 탐험형 문화애호가"""
+    """클러스터 5: 행사 관심형"""
     score = 0
     
-    # Q1: 모험 추구
-    if answers.get('q1') == 1: score += 3  # 모험 추구
+    # Q1: 행사/축제 참여
+    if answers.get('q1') == 4: score += 4  # 행사/축제
+    elif answers.get('q1') == 1: score += 2  # 전통문화
     
-    # Q2: 사회적 여행 (복수응답 처리)
-    q2_answers = answers.get('q2', [])
-    if isinstance(q2_answers, list):
-        if 1 in q2_answers: score += 2  # 가족이나 친구와
+    # Q5: 경제적 여행
+    if answers.get('q5') == 2: score += 3  # 경제적 비용
     
-    # Q3: 문화체험
-    if answers.get('q3') == 1: score += 3  # 문화체험
-    elif answers.get('q3') == 3: score += 2  # 자연관광
+    # Q6: 행사/축제 및 전통문화 (복수응답)
+    q6_answers = answers.get('q6', [])
+    if isinstance(q6_answers, list):
+        if 5 in q6_answers: score += 4  # 행사/축제
+        if 2 in q6_answers: score += 2  # 전통문화
     
-    # Q4: 호텔 선호
-    if answers.get('q4') == 1: score += 2  # 스탠다드 호텔
-    
-    # Q8: 새로운 경험과 성장
-    if answers.get('q8') == 1: score += 2  # 새로운 경험
-    elif answers.get('q8') == 3: score += 2  # 문화적 학습과 성장
-    elif answers.get('q8') == 4: score += 1  # 휴식 (중립적 처리)
+    # Q8: 가성비
+    if answers.get('q8') == 4: score += 3  # 경제적 만족감
     
     return score
 
 def calculate_cluster_6_score(answers):
-    """클러스터 6: 문화미식 여성형"""
+    """클러스터 6: 자연 힐링형"""
     score = 0
     
-    # Q3: 문화체험과 미식
-    if answers.get('q3') == 1: score += 3  # 문화체험
-    elif answers.get('q3') == 2: score += 3  # 미식탐방
+    # Q1: 자연경관 감상
+    if answers.get('q1') == 2: score += 4  # 자연경관/힐링
     
-    # Q6: 화장품/뷰티
-    if answers.get('q6') == 0: score += 3  # 화장품, 뷰티용품
-    elif answers.get('q6') == 1: score += 2  # 의류, 패션아이템
+    # Q3: 쇼핑 적당한 관심
+    if answers.get('q3') in [2, 3]: score += 2  # 전통 기념품, 식료품
     
-    # Q7: 음식과 체험
-    if answers.get('q7') == 2: score += 2  # 음식
-    elif answers.get('q7') == 3: score += 2  # 체험활동
+    # Q5: 안전하고 깨끗한 환경
+    if answers.get('q5') == 4: score += 3  # 안전/깨끗함
     
-    # Q8: 문화적 성장과 휴식
-    if answers.get('q8') == 3: score += 2  # 문화적 학습과 성장
-    elif answers.get('q8') == 4: score += 2  # 휴식 (여성형에 적합)
+    # Q6: 자연경관 감상 (복수응답)
+    q6_answers = answers.get('q6', [])
+    if isinstance(q6_answers, list):
+        if 3 in q6_answers: score += 4  # 자연경관 감상
+    
+    # Q7: 고급 호텔이나 펜션
+    if answers.get('q7') in [0, 4]: score += 2  # 고급 호텔, 펜션/리조트
+    
+    # Q8: 휴식과 힐링
+    if answers.get('q8') == 2: score += 4  # 충분한 휴식/힐링
     
     return score
 
 def calculate_cluster_7_score(answers):
-    """클러스터 7: 종합체험 활동형"""
+    """클러스터 7: 소외형 여행객"""
     score = 0
     
-    # Q1: 안전 고려
-    if answers.get('q1') == 0: score += 2  # 안전 지향
-    
-    # Q2: 사회적 여행 (복수응답 처리)
+    # Q2: 정보탐색 매우 소극적
     q2_answers = answers.get('q2', [])
     if isinstance(q2_answers, list):
-        if 1 in q2_answers: score += 2  # 가족이나 친구와
+        if len(q2_answers) == 0: score += 4  # 정보 채널 없음
+        elif len(q2_answers) == 1: score += 2
     
-    # Q3: 문화체험과 미식
-    if answers.get('q3') == 1: score += 3  # 문화체험
-    elif answers.get('q3') == 2: score += 3  # 미식탐방
-    elif answers.get('q3') == 0: score += 2  # 쇼핑
+    # Q4: 혼자 여행
+    if answers.get('q4') == 0: score += 4  # 혼자서
     
-    # Q7: 다양한 투자
-    if answers.get('q7') == 2: score += 2  # 음식
-    elif answers.get('q7') == 3: score += 2  # 체험활동
+    # Q6: 활동 참여도 매우 낮음
+    q6_answers = answers.get('q6', [])
+    if isinstance(q6_answers, list):
+        if len(q6_answers) == 0: score += 4  # 활동 없음
+        elif len(q6_answers) == 1: score += 2
     
-    # Q8: 종합 만족과 휴식
-    if answers.get('q8') == 3: score += 2  # 문화적 학습과 성장
-    elif answers.get('q8') == 1: score += 1  # 새로운 경험
-    elif answers.get('q8') == 4: score += 2  # 휴식 (종합형에 적합)
+    # 전반적으로 소극적인 패턴
+    passive_indicators = 0
+    if answers.get('q3') == 5: passive_indicators += 1  # 쇼핑 무관심
+    if len(answers.get('q2', [])) <= 1: passive_indicators += 1  # 정보탐색 소극적
+    if len(answers.get('q6', [])) <= 1: passive_indicators += 1  # 활동 소극적
+    
+    score += passive_indicators * 2
     
     return score
 
@@ -336,16 +359,15 @@ def determine_cluster(answers):
     best_cluster = max(cluster_scores, key=cluster_scores.get)
     best_score = cluster_scores[best_cluster]
     
-    # 신뢰도 계산 (최고 점수 / 전체 점수 합계)
+    # 신뢰도 계산
     total_score = sum(cluster_scores.values())
     confidence = best_score / max(total_score, 1) if total_score > 0 else 0.5
     
-    # 동점 처리 (상위 2개 클러스터가 비슷한 경우)
+    # 동점 처리
     sorted_clusters = sorted(cluster_scores.items(), 
                            key=lambda x: x[1], reverse=True)
     
     if len(sorted_clusters) > 1 and sorted_clusters[0][1] == sorted_clusters[1][1]:
-        # 동점인 경우 추가 규칙 적용
         resolved_result = resolve_tie(answers, sorted_clusters[0][0], sorted_clusters[1][0])
         if isinstance(resolved_result, dict):
             return resolved_result
@@ -376,24 +398,27 @@ def resolve_tie(answers, cluster1, cluster2):
     
     selected_cluster = cluster1  # 기본값
     
-    # 안전 vs 모험 성향으로 구분
-    if answers.get('q1') == 0:  # 안전 중시
-        if cluster1 in [0, 1, 7]:
-            selected_cluster = cluster1
-        elif cluster2 in [0, 1, 7]:
-            selected_cluster = cluster2
-    elif answers.get('q1') == 1:  # 모험 추구
-        if cluster1 in [0, 4, 5]:
-            selected_cluster = cluster1
-        elif cluster2 in [0, 4, 5]:
-            selected_cluster = cluster2
+    # 여행 목적으로 구분
+    q1_answer = answers.get('q1')
+    if q1_answer == 0:  # 한류
+        if cluster1 == 0 or cluster2 == 0:
+            selected_cluster = 0
+    elif q1_answer == 1:  # 전통문화
+        if cluster1 == 4 or cluster2 == 4:
+            selected_cluster = 4
+        elif cluster1 == 5 or cluster2 == 5:
+            selected_cluster = 5
+    elif q1_answer == 2:  # 자연경관
+        if cluster1 == 6 or cluster2 == 6:
+            selected_cluster = 6
+    elif q1_answer == 3:  # 쇼핑/미식
+        if cluster1 == 3 or cluster2 == 3:
+            selected_cluster = 3
     
-    # 쇼핑 성향으로 구분
-    if answers.get('q3') == 0:  # 쇼핑 중심
-        if cluster1 == 3:
-            selected_cluster = cluster1
-        elif cluster2 == 3:
-            selected_cluster = cluster2
+    # 여행 스타일로 구분
+    if answers.get('q4') == 0:  # 혼자 여행
+        if cluster1 == 7 or cluster2 == 7:
+            selected_cluster = 7
     
     # 신뢰도 계산
     best_score = cluster_scores[selected_cluster]
@@ -411,24 +436,18 @@ def calculate_wellness_score(answers):
     """웰니스 관광 성향 점수 계산 (클러스터 기반)"""
     cluster_result = determine_cluster(answers)
     
-    # determine_cluster가 딕셔너리를 반환하는지 확인
     if isinstance(cluster_result, dict):
-        # 클러스터 점수를 웰니스 점수로 변환 (0-100 스케일)
         cluster_score = cluster_result['score']
         cluster_id = cluster_result['cluster']
         confidence = cluster_result['confidence']
         all_scores = cluster_result['all_scores']
     else:
-        # 이전 버전 호환성을 위해 정수 반환값 처리
         cluster_id = cluster_result
-        
-        # 기본값 설정
-        cluster_score = 15  # 기본 점수
-        confidence = 0.8   # 기본 신뢰도
-        all_scores = {i: 10 if i == cluster_id else 5 for i in range(8)}  # 기본 점수 분포
+        cluster_score = 15
+        confidence = 0.8
+        all_scores = {i: 10 if i == cluster_id else 5 for i in range(8)}
     
-    max_possible_score = 20  # 각 클러스터의 최대 가능 점수
-    
+    max_possible_score = 25  # 최대 가능 점수 증가
     wellness_score = min(100, (cluster_score / max_possible_score) * 100)
     
     score_breakdown = {
@@ -441,33 +460,31 @@ def calculate_wellness_score(answers):
     return wellness_score, score_breakdown
 
 def classify_wellness_type(score, cluster_id=None):
-    """웰니스 관광 성향 분류 (클러스터 기반)"""
+    """웰니스 관광 성향 분류 (실제 클러스터 기반)"""
     
     cluster_types = {
-        0: ("안전추구 모험가형", "#4CAF50"),
-        1: ("안전우선 편의형", "#8BC34A"), 
-        2: ("문화체험 힐링형", "#FFC107"),
-        3: ("쇼핑마니아 사교형", "#FF9800"),
-        4: ("프리미엄 모험형", "#F44336"),
-        5: ("탐험형 문화애호가", "#9C27B0"),
-        6: ("문화미식 여성형", "#E91E63"),
-        7: ("종합체험 활동형", "#2196F3")
+        0: ("한류 트렌디형", "#4CAF50"),
+        1: ("종합형 실속파", "#8BC34A"),
+        2: ("수동형 관광객", "#FFC107"),
+        3: ("체험중심 실용형", "#FF9800"),
+        4: ("고소득 전통형", "#F44336"),
+        5: ("행사 관심형", "#9C27B0"),
+        6: ("자연 힐링형", "#E91E63"),
+        7: ("소외형 여행객", "#2196F3")
     }
     
     if cluster_id is not None and cluster_id in cluster_types:
         return cluster_types[cluster_id]
     
-    # 기존 점수 기반 분류 (호환성 유지)
+    # 점수 기반 분류 (호환성 유지)
     if score <= 30:
-        return "안전우선 편의형", "#4CAF50"
+        return "수동형 관광객", "#FFC107"
     elif score <= 50:
-        return "문화체험 힐링형", "#8BC34A"
+        return "종합형 실속파", "#8BC34A"
     elif score <= 70:
-        return "종합체험 활동형", "#FFC107"
-    elif score <= 85:
-        return "쇼핑마니아 사교형", "#FF9800"
+        return "체험중심 실용형", "#FF9800"
     else:
-        return "프리미엄 모험형", "#F44336"
+        return "한류 트렌디형", "#4CAF50"
 
 def validate_wellness_answers():
     """설문 답변 유효성 검사 (복수응답 지원)"""
@@ -706,45 +723,61 @@ def create_user_persona_analysis(answers, wellness_type):
     """사용자 페르소나 분석 결과 생성"""
     
     persona_analysis = {
-        "안전추구 모험가형": {
-            "특징": "안전을 우선시하면서도 새로운 경험을 추구하는 균형잡힌 여행객",
-            "추천활동": "안전한 환경에서의 모험적 체험, 가이드 투어, 그룹 활동",
-            "여행팁": "신뢰할 수 있는 여행사를 통해 안전한 모험 프로그램을 선택하세요"
+        "한류 트렌디형": {
+            "특징": "한류 콘텐츠와 SNS를 중심으로 하는 트렌디하고 활발한 여행객",
+            "추천활동": "K-pop 관련 명소, 트렌디한 쇼핑몰, SNS 핫플레이스 탐방",
+            "여행팁": "최신 트렌드 정보를 SNS로 확인하고 동행자와 함께 즐거운 쇼핑을 계획하세요",
+            "선호지역": "강남, 홍대, 명동, 성수동",
+            "예산대": "중상급 (쇼핑과 체험 중심)"
         },
-        "안전우선 편의형": {
-            "특징": "안전하고 편리한 여행을 최우선으로 하는 신중한 여행객", 
-            "추천활동": "호텔 내 시설 이용, 가이드 투어, 유명 관광지 방문",
-            "여행팁": "검증된 숙소와 안전한 교통수단을 이용하여 여행 계획을 세우세요"
+        "종합형 실속파": {
+            "특징": "다양한 관심사를 가지고 정보를 적극적으로 탐색하는 실용적인 여행객",
+            "추천활동": "문화체험과 쇼핑, 미식을 균형있게 조합한 종합 투어",
+            "여행팁": "다양한 정보 채널을 활용하여 알찬 일정을 계획하고 가성비를 고려하세요",
+            "선호지역": "시내 전역, 전통시장, 복합쇼핑몰",
+            "예산대": "중급 (효율적 예산 운용)"
         },
-        "문화체험 힐링형": {
-            "특징": "문화적 체험과 정신적 힐링을 추구하는 성찰적 여행객",
-            "추천활동": "문화유적 탐방, 명상 프로그램, 전통 체험, 자연 속 힐링",
-            "여행팁": "현지 문화를 깊이 체험할 수 있는 프로그램과 충분한 휴식 시간을 확보하세요"
+        "수동형 관광객": {
+            "특징": "관광활동에 소극적이며 동행자의 계획에 의존하는 수동적인 여행객",
+            "추천활동": "편안한 카페, 간단한 시내 관광, 가이드 투어",
+            "여행팁": "무리하지 않는 선에서 편안하게 즐길 수 있는 일정을 추천합니다",
+            "선호지역": "접근성 좋은 시내 중심가",
+            "예산대": "하급 (최소한의 비용)"
         },
-        "쇼핑마니아 사교형": {
-            "특징": "쇼핑과 사교 활동을 즐기는 활발하고 사교적인 여행객",
-            "추천활동": "쇼핑몰 탐방, 현지 시장 구경, 그룹 투어, SNS 핫플레이스 방문",
-            "여행팁": "쇼핑 예산을 미리 계획하고 현지인이나 다른 여행객과의 교류를 즐기세요"
+        "체험중심 실용형": {
+            "특징": "음식과 쇼핑 중심의 체험을 중시하며 편의성을 추구하는 실용적 여행객",
+            "추천활동": "맛집 투어, 시장 체험, 쇼핑몰 탐방, 요리 클래스",
+            "여행팁": "교통이 편리한 곳을 중심으로 미식과 쇼핑을 즐기는 일정을 짜세요",
+            "선호지역": "명동, 인사동, 동대문, 남대문시장",
+            "예산대": "중급 (체험과 쇼핑 중심)"
         },
-        "프리미엄 모험형": {
-            "특징": "고급스러운 서비스와 특별한 경험을 추구하는 모험적 여행객",
-            "추천활동": "프리미엄 투어, 특별 체험 프로그램, 고급 레스토랑, 럭셔리 숙소",
-            "여행팁": "품질 높은 서비스와 독특한 경험을 제공하는 프리미엄 옵션을 선택하세요"
+        "고소득 전통형": {
+            "특징": "전통과 현대 문화에 모두 관심이 있는 고소득층 성향의 여행객",
+            "추천활동": "고궁 투어, 전통문화 체험, 고급 쇼핑, 프리미엄 한식",
+            "여행팁": "품질 높은 서비스와 깊이 있는 문화 체험을 중심으로 계획하세요",
+            "선호지역": "경복궁, 창덕궁, 인사동, 강남 고급 쇼핑가",
+            "예산대": "상급 (프리미엄 경험 중심)"
         },
-        "탐험형 문화애호가": {
-            "특징": "새로운 문화를 깊이 탐험하고 학습하려는 적극적인 여행객",
-            "추천활동": "문화 유적 탐방, 현지인과의 교류, 전통 예술 체험, 역사 투어",
-            "여행팁": "사전에 문화와 역사를 공부하고 현지 가이드와 함께하는 심층 투어를 선택하세요"
+        "행사 관심형": {
+            "특징": "전통문화와 특별한 행사에 관심이 있는 계획적이고 경제적인 여행객",
+            "추천활동": "문화 축제, 전통 공연, 계절별 특별 행사 참여",
+            "여행팁": "사전에 행사 일정을 확인하고 경제적인 패키지를 활용하세요",
+            "선호지역": "문화유적지, 축제 개최지, 전통 공연장",
+            "예산대": "중하급 (가성비 중심)"
         },
-        "문화미식 여성형": {
-            "특징": "문화적 체험과 미식을 동시에 즐기는 세련된 여성 여행객",
-            "추천활동": "현지 요리 클래스, 전통 시장 투어, 문화 공연 관람, 뷰티 체험",
-            "여행팁": "현지 음식 문화를 깊이 체험하고 아름다운 사진을 남길 수 있는 장소를 방문하세요"
+        "자연 힐링형": {
+            "특징": "자연경관과 휴식을 중시하는 여유롭고 힐링을 추구하는 여행객",
+            "추천활동": "자연공원 산책, 한강 유람, 온천, 스파, 조용한 카페",
+            "여행팁": "충분한 휴식과 자연을 즐길 수 있는 여유로운 일정을 계획하세요",
+            "선호지역": "한강공원, 남산, 북한산, 온천 리조트",
+            "예산대": "중상급 (편안한 숙박과 힐링 중심)"
         },
-        "종합체험 활동형": {
-            "특징": "다양한 활동을 골고루 체험하고 싶어하는 에너지 넘치는 여행객",
-            "추천활동": "다양한 액티비티, 문화 체험, 맛집 투어, 자연 관광, 쇼핑",
-            "여행팁": "알찬 일정으로 다양한 경험을 쌓되, 적절한 휴식시간도 확보하세요"
+        "소외형 여행객": {
+            "특징": "혼자 여행하며 정보탐색과 참여도가 낮은 소극적인 여행객",
+            "추천활동": "혼자서도 편안한 박물관, 조용한 카페, 간단한 시내 관광",
+            "여행팁": "혼자서도 안전하고 편안하게 즐길 수 있는 장소를 중심으로 하세요",
+            "선호지역": "안전한 시내 중심가, 대중교통 접근성 좋은 곳",
+            "예산대": "하급 (최소 비용으로 안전 중심)"
         }
     }
     
@@ -810,56 +843,64 @@ def convert_answers_to_survey_results(answers):
 
 # 클러스터 정보를 제공하는 함수 추가
 def get_cluster_info():
-    """8개 클러스터의 상세 정보 제공"""
+    """실제 분석된 8개 클러스터의 상세 정보"""
     
     cluster_info = {
         0: {
-            "name": "안전추구 모험가형",
-            "description": "안전을 우선시하면서도 새로운 경험을 추구하는 균형잡힌 성향",
-            "characteristics": ["안전 중시", "사회적 여행 선호", "호텔 선호", "적당한 모험 추구"],
-            "color": "#4CAF50"
+            "name": "한류 트렌디형",
+            "description": "한류 콘텐츠와 SNS를 중심으로 하는 트렌디한 쇼핑 선호 여행객",
+            "characteristics": ["한류 콘텐츠 높은 관심", "SNS/동영상 활발 이용", "쇼핑 선호", "주로 여성", "동행자와 함께"],
+            "color": "#4CAF50",
+            "keywords": ["한류", "SNS", "쇼핑", "트렌드", "동행"]
         },
         1: {
-            "name": "안전우선 편의형", 
-            "description": "안전과 편의성을 최우선으로 하는 신중한 여행 성향",
-            "characteristics": ["안전 최우선", "편리한 숙박", "가족/친구와 여행", "숙박비 투자"],
-            "color": "#8BC34A"
+            "name": "종합형 실속파",
+            "description": "다양한 동기와 정보 채널을 활용하는 종합적이고 실용적인 여행객",
+            "characteristics": ["다양한 여행 동기", "정보수집 적극적", "쇼핑품목 다양", "실용성 중시", "고른 관심사"],
+            "color": "#8BC34A",
+            "keywords": ["종합", "실속", "다양성", "정보탐색", "실용"]
         },
         2: {
-            "name": "문화체험 힐링형",
-            "description": "문화적 체험과 정신적 성장을 추구하는 성향",
-            "characteristics": ["문화체험 중시", "체험활동 투자", "학습과 성장 지향", "자연관광 선호"],
-            "color": "#FFC107"
+            "name": "수동형 관광객",
+            "description": "관광활동에 낮은 참여도를 보이는 수동적인 여행객",
+            "characteristics": ["낮은 참여도", "무관심", "낮은 만족도", "정보탐색 소극적", "동행자 의존"],
+            "color": "#FFC107",
+            "keywords": ["수동", "무관심", "의존", "소극적", "저만족"]
         },
         3: {
-            "name": "쇼핑마니아 사교형",
-            "description": "쇼핑과 사교활동을 중심으로 하는 활발한 여행 성향",
-            "characteristics": ["쇼핑 중심", "사회적 여행", "패션/뷰티 관심", "쇼핑 예산 투자"],
-            "color": "#FF9800"
+            "name": "체험중심 실용형",
+            "description": "음식과 쇼핑 중심의 체험을 중시하며 편의성을 추구하는 실용적 여행객",
+            "characteristics": ["음식/미식 중심", "쇼핑 활발", "편의성 중시", "교통정보 중요", "체험 위주"],
+            "color": "#FF9800",
+            "keywords": ["미식", "쇼핑", "편의", "체험", "실용"]
         },
         4: {
-            "name": "프리미엄 모험형",
-            "description": "고급스러운 서비스와 모험적 경험을 추구하는 성향",
-            "characteristics": ["모험 추구", "프리미엄 호텔", "새로운 경험 중시", "숙박비 투자"],
-            "color": "#F44336"
+            "name": "고소득 전통형",
+            "description": "전통과 현대에 모두 관심이 있는 고소득층 성향의 정보탐색 능력이 뛰어난 여행객",
+            "characteristics": ["높은 정보탐색 능력", "면세점 이용", "전통문화 관심", "고궁 방문", "동행 여행"],
+            "color": "#F44336",
+            "keywords": ["전통", "고소득", "면세점", "정보능력", "문화"]
         },
         5: {
-            "name": "탐험형 문화애호가",
-            "description": "문화 탐험과 새로운 경험을 동시에 추구하는 성향",
-            "characteristics": ["모험적 성향", "문화체험 선호", "사회적 여행", "경험과 성장 추구"],
-            "color": "#9C27B0"
+            "name": "행사 관심형",
+            "description": "전통문화와 행사에 관심이 있는 경제적이고 계획적인 여행객",
+            "characteristics": ["전통문화 관심", "행사/축제 참여", "경제적 여행", "가성비 고려", "계획적"],
+            "color": "#9C27B0",
+            "keywords": ["전통", "행사", "축제", "가성비", "계획"]
         },
         6: {
-            "name": "문화미식 여성형",
-            "description": "문화체험과 미식을 함께 즐기는 세련된 여행 성향",
-            "characteristics": ["문화/미식 관심", "뷰티/패션 선호", "음식/체험 투자", "문화적 성장"],
-            "color": "#E91E63"
+            "name": "자연 힐링형",
+            "description": "자연경관과 휴식을 중시하는 여유롭고 힐링을 추구하는 여행객",
+            "characteristics": ["자연경관 중시", "충분한 사전준비", "호텔 선호", "휴식 중심", "힐링 추구"],
+            "color": "#E91E63",
+            "keywords": ["자연", "힐링", "휴식", "호텔", "경관"]
         },
         7: {
-            "name": "종합체험 활동형",
-            "description": "다양한 활동을 골고루 체험하려는 적극적인 성향",
-            "characteristics": ["종합적 체험", "다양한 활동", "안전 고려", "문화/미식 관심"],
-            "color": "#2196F3"
+            "name": "소외형 여행객",
+            "description": "정보탐색과 참여도가 모두 낮은 소외형 혼자 여행객",
+            "characteristics": ["혼자 여행", "낮은 정보탐색", "낮은 참여도", "낮은 만족도", "소극적 태도"],
+            "color": "#2196F3",
+            "keywords": ["혼자", "소극적", "저만족", "소외", "정보부족"]
         }
     }
     
