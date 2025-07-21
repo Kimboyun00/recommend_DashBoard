@@ -844,7 +844,15 @@ def create_user_persona_analysis(answers, wellness_type):
         }
     }
     
-    return persona_analysis.get(wellness_type, persona_analysis["수동형 관광객"])
+    # 기본값 설정
+    default_persona = {
+        "특징": "개인의 고유한 여행 성향을 가진 여행객",
+        "추천활동": "다양한 한국 문화 체험과 관광지 방문",
+        "여행팁": "자신의 관심사와 체력에 맞는 여행 일정을 계획하세요"
+    }
+    
+    # wellness_type이 딕셔너리에 있는지 확인하고 반환
+    return persona_analysis.get(wellness_type, default_persona)
 
 # --- 여행 데이터 분석을 위한 추가 함수들 ---
 

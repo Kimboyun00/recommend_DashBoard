@@ -551,23 +551,50 @@ def recommendations_page():
                 """, unsafe_allow_html=True)
             
             with analysis_col2:
-                # 페르소나 분석 표시
-                persona_analysis = create_user_persona_analysis(st.session_state.answers, wellness_type)
-                
-                st.markdown(f"""
-                <div class="filter-card">
-                    <h4 style="color: #2E7D32; margin-bottom: 15px;">📊 성향 분석 결과</h4>
-                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
-                        <strong>✨ 특징:</strong><br>{persona_analysis['특징']}
-                    </p>
-                    <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
-                        <strong>🎯 추천활동:</strong><br>{persona_analysis['추천활동']}
-                    </p>
-                    <p style="color: #2E7D32; font-weight: 600; margin: 0;">
-                        <strong>💡 여행팁:</strong><br>{persona_analysis['여행팁']}
-                    </p>
-                </div>
-                """, unsafe_allow_html=True)
+                # 페르소나 분석 표시 - 수정된 부분
+                try:
+                    # wellness_type이 tuple인 경우 첫 번째 요소만 사용
+                    if isinstance(wellness_type, tuple):
+                        persona_type = wellness_type[0]
+                    else:
+                        persona_type = wellness_type
+                    
+                    # cluster_data의 name을 직접 사용 (더 안전함)
+                    persona_type = cluster_data['name']
+                    
+                    persona_analysis = create_user_persona_analysis(st.session_state.answers, persona_type)
+                    
+                    st.markdown(f"""
+                    <div class="filter-card">
+                        <h4 style="color: #2E7D32; margin-bottom: 15px;">📊 성향 분석 결과</h4>
+                        <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                            <strong>✨ 특징:</strong><br>{persona_analysis['특징']}
+                        </p>
+                        <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                            <strong>🎯 추천활동:</strong><br>{persona_analysis['추천활동']}
+                        </p>
+                        <p style="color: #2E7D32; font-weight: 600; margin: 0;">
+                            <strong>💡 여행팁:</strong><br>{persona_analysis['여행팁']}
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                except Exception as e:
+                    # 에러 발생 시 기본 정보 표시
+                    st.markdown(f"""
+                    <div class="filter-card">
+                        <h4 style="color: #2E7D32; margin-bottom: 15px;">📊 성향 분석 결과</h4>
+                        <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                            <strong>✨ 클러스터:</strong><br>{cluster_data['name']}
+                        </p>
+                        <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                            <strong>🎯 설명:</strong><br>{cluster_data['description']}
+                        </p>
+                        <p style="color: #2E7D32; font-weight: 600; margin: 0;">
+                            <strong>💡 특성:</strong><br>{', '.join(cluster_data['characteristics'])}
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
 
     # 설문 결과 요약
     with st.expander("📋 설문 응답 내역", expanded=False):
