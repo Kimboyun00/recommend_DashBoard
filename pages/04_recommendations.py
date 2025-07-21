@@ -30,48 +30,82 @@ st.set_page_config(
 # 접근 권한 확인
 check_access_permissions()
 
-# 웰니스 관광지 데이터
+# 한국 관광지 데이터 (실제 클러스터 분석에 맞게 수정)
 wellness_destinations = {
-    "온천/스파": [
+    "한류/쇼핑": [
         {
-            "name": "부산 해운대 스파랜드",
-            "lat": 35.1584,
-            "lon": 129.1604,
-            "type": "온천/스파",
-            "description": "천연 온천수와 다양한 스파 시설을 갖춘 복합 웰니스 센터",
-            "website": "https://www.spaland.co.kr",
-            "rating": 4.5,
-            "price_range": "20,000-40,000원",
-            "distance_from_incheon": 325,
-            "travel_time_car": "3시간 30분",
-            "travel_time_train": "2시간 50분",
-            "travel_cost_car": "60,000원",
-            "travel_cost_train": "45,000원",
-            "image_url": "🏖️"
+            "name": "명동 쇼핑거리",
+            "lat": 37.5636,
+            "lon": 126.9826,
+            "type": "한류/쇼핑",
+            "description": "한류 스타 굿즈와 최신 뷰티 제품을 만날 수 있는 핫플레이스",
+            "website": "https://www.visitseoul.net",
+            "rating": 4.3,
+            "price_range": "10,000-50,000원",
+            "distance_from_incheon": 45,
+            "travel_time_car": "1시간",
+            "travel_time_train": "1시간 10분",
+            "travel_cost_car": "15,000원",
+            "travel_cost_train": "2,150원",
+            "image_url": "🛍️"
         },
         {
-            "name": "충남 아산 온양온천",
-            "lat": 36.7894,
-            "lon": 127.0042,
-            "type": "온천/스파",
-            "description": "600년 역사의 전통 온천으로 유명한 천연 온천지",
-            "website": "https://www.onyanghotspring.or.kr",
-            "rating": 4.2,
-            "price_range": "15,000-30,000원",
-            "distance_from_incheon": 120,
-            "travel_time_car": "1시간 30분",
-            "travel_time_train": "1시간 20분",
-            "travel_cost_car": "25,000원",
-            "travel_cost_train": "18,000원",
-            "image_url": "♨️"
+            "name": "강남 K-STAR ROAD",
+            "lat": 37.5175,
+            "lon": 127.0473,
+            "type": "한류/쇼핑",
+            "description": "K-POP 스타들의 손도장과 포토존이 있는 한류 성지",
+            "website": "https://www.gangnam.go.kr",
+            "rating": 4.5,
+            "price_range": "무료-30,000원",
+            "distance_from_incheon": 50,
+            "travel_time_car": "1시간 20분",
+            "travel_time_train": "1시간 30분",
+            "travel_cost_car": "18,000원",
+            "travel_cost_train": "2,150원",
+            "image_url": "🌟"
         }
     ],
-    "자연치유": [
+    "전통문화": [
         {
-            "name": "제주 한라산 국립공원",
+            "name": "경복궁",
+            "lat": 37.5796,
+            "lon": 126.9770,
+            "type": "전통문화",
+            "description": "조선왕조의 정궁으로 전통 문화와 역사를 체험할 수 있는 곳",
+            "website": "https://www.royalpalace.go.kr",
+            "rating": 4.6,
+            "price_range": "3,000원",
+            "distance_from_incheon": 42,
+            "travel_time_car": "1시간",
+            "travel_time_train": "1시간 15분",
+            "travel_cost_car": "15,000원",
+            "travel_cost_train": "2,150원",
+            "image_url": "🏛️"
+        },
+        {
+            "name": "인사동 문화거리",
+            "lat": 37.5744,
+            "lon": 126.9851,
+            "type": "전통문화",
+            "description": "전통 찻집과 갤러리, 전통 공예품을 만날 수 있는 문화의 거리",
+            "website": "https://www.insa-dong.net",
+            "rating": 4.4,
+            "price_range": "5,000-30,000원",
+            "distance_from_incheon": 43,
+            "travel_time_car": "1시간",
+            "travel_time_train": "1시간 10분",
+            "travel_cost_car": "15,000원",
+            "travel_cost_train": "2,150원",
+            "image_url": "🎨"
+        }
+    ],
+    "자연/힐링": [
+        {
+            "name": "제주 한라산",
             "lat": 33.3617,
             "lon": 126.5292,
-            "type": "자연치유",
+            "type": "자연/힐링",
             "description": "한국 최고봉으로 산림욕과 트레킹이 가능한 자연 치유 공간",
             "website": "https://www.hallasan.go.kr",
             "rating": 4.7,
@@ -84,95 +118,61 @@ wellness_destinations = {
             "image_url": "🏔️"
         },
         {
-            "name": "강원 설악산 국립공원",
-            "lat": 38.1197,
-            "lon": 128.4655,
-            "type": "자연치유",
-            "description": "아름다운 자연경관과 맑은 공기로 유명한 산악 치유 공간",
-            "website": "https://www.knps.or.kr",
-            "rating": 4.6,
-            "price_range": "3,500원",
-            "distance_from_incheon": 200,
-            "travel_time_car": "2시간 30분",
-            "travel_time_train": "3시간",
-            "travel_cost_car": "40,000원",
-            "travel_cost_train": "35,000원",
-            "image_url": "🏞️"
-        }
-    ],
-    "요가/명상": [
-        {
-            "name": "경주 불국사",
-            "lat": 35.7904,
-            "lon": 129.3320,
-            "type": "요가/명상",
-            "description": "천년 고찰에서 체험하는 명상과 템플스테이 프로그램",
-            "website": "https://www.bulguksa.or.kr",
-            "rating": 4.8,
-            "price_range": "50,000-100,000원 (템플스테이)",
-            "distance_from_incheon": 370,
-            "travel_time_car": "4시간",
-            "travel_time_train": "3시간 30분",
-            "travel_cost_car": "70,000원",
-            "travel_cost_train": "50,000원",
-            "image_url": "🏛️"
-        },
-        {
-            "name": "전남 순천만 국가정원",
-            "lat": 34.8853,
-            "lon": 127.5086,
-            "type": "요가/명상",
-            "description": "자연과 함께하는 힐링 요가 프로그램과 명상 공간",
-            "website": "https://www.suncheonbay.go.kr",
-            "rating": 4.4,
-            "price_range": "8,000원",
-            "distance_from_incheon": 350,
-            "travel_time_car": "3시간 50분",
-            "travel_time_train": "3시간 20분",
-            "travel_cost_car": "65,000원",
-            "travel_cost_train": "42,000원",
+            "name": "남한산성",
+            "lat": 37.4741,
+            "lon": 127.1838,
+            "type": "자연/힐링",
+            "description": "유네스코 세계문화유산으로 등재된 산성과 아름다운 자연경관",
+            "website": "https://www.gg.go.kr/namhansansung",
+            "rating": 4.3,
+            "price_range": "무료",
+            "distance_from_incheon": 75,
+            "travel_time_car": "1시간 30분",
+            "travel_time_train": "2시간",
+            "travel_cost_car": "25,000원",
+            "travel_cost_train": "3,200원",
             "image_url": "🌿"
         }
     ],
-    "웰니스 리조트": [
+    "음식/체험": [
         {
-            "name": "강원 평창 알펜시아 리조트",
-            "lat": 37.6565,
-            "lon": 128.6719,
-            "type": "웰니스 리조트",
-            "description": "산악 경관과 함께하는 프리미엄 스파 & 웰니스 리조트",
-            "website": "https://www.alpensia.com",
-            "rating": 4.3,
-            "price_range": "150,000-300,000원",
-            "distance_from_incheon": 180,
-            "travel_time_car": "2시간 20분",
-            "travel_time_train": "1시간 30분 (KTX)",
-            "travel_cost_car": "35,000원",
-            "travel_cost_train": "28,000원",
-            "image_url": "🏔️"
+            "name": "광장시장",
+            "lat": 37.5700,
+            "lon": 126.9996,
+            "type": "음식/체험",
+            "description": "전통 한식과 길거리 음식을 맛볼 수 있는 대표 전통시장",
+            "website": "https://www.kwangjangmarket.co.kr",
+            "rating": 4.4,
+            "price_range": "3,000-15,000원",
+            "distance_from_incheon": 45,
+            "travel_time_car": "1시간 10분",
+            "travel_time_train": "1시간 20분",
+            "travel_cost_car": "18,000원",
+            "travel_cost_train": "2,150원",
+            "image_url": "🍜"
         },
         {
-            "name": "경기 용인 에버랜드 스파",
-            "lat": 37.2946,
-            "lon": 127.2018,
-            "type": "웰니스 리조트",
-            "description": "테마파크와 연계된 대형 스파 & 웰니스 시설",
-            "website": "https://www.everland.com",
-            "rating": 4.1,
-            "price_range": "30,000-60,000원",
-            "distance_from_incheon": 60,
-            "travel_time_car": "1시간",
-            "travel_time_train": "1시간 30분",
-            "travel_cost_car": "15,000원",
-            "travel_cost_train": "12,000원",
-            "image_url": "🎢"
+            "name": "홍대 맛집거리",
+            "lat": 37.5563,
+            "lon": 126.9244,
+            "type": "음식/체험",
+            "description": "트렌디한 카페와 레스토랑이 모인 젊은이들의 거리",
+            "website": "https://www.visitseoul.net",
+            "rating": 4.2,
+            "price_range": "8,000-25,000원",
+            "distance_from_incheon": 35,
+            "travel_time_car": "50분",
+            "travel_time_train": "1시간",
+            "travel_cost_car": "12,000원",
+            "travel_cost_train": "1,950원",
+            "image_url": "🍽️"
         }
     ]
 }
 
-# 클러스터 기반 추천 알고리즘
+# 실제 클러스터 분석 결과 기반 추천 알고리즘 (수정됨)
 def calculate_cluster_recommendations(survey_answers):
-    """클러스터 기반 추천 계산 - 100점 만점 표준화"""
+    """실제 클러스터 분석 결과 기반 추천 계산 - 100점 만점 표준화"""
     if not survey_answers:
         return []
     
@@ -180,19 +180,19 @@ def calculate_cluster_recommendations(survey_answers):
     cluster_result = determine_cluster(survey_answers)
     cluster_id = cluster_result['cluster']
     
-    # 클러스터별 추천 카테고리
+    # 실제 클러스터 분석 결과 기반 추천 카테고리
     cluster_preferences = {
-        0: ["온천/스파", "자연치유"],          # 안전추구 모험가형
-        1: ["온천/스파", "웰니스 리조트"],      # 안전우선 편의형  
-        2: ["요가/명상", "자연치유"],          # 문화체험 힐링형
-        3: ["웰니스 리조트", "온천/스파"],      # 쇼핑마니아 사교형
-        4: ["웰니스 리조트", "자연치유"],      # 프리미엄 모험형
-        5: ["요가/명상", "자연치유"],          # 탐험형 문화애호가
-        6: ["요가/명상", "온천/스파"],         # 문화미식 여성형
-        7: ["자연치유", "요가/명상", "온천/스파"]  # 종합체험 활동형
+        0: ["한류/쇼핑", "음식/체험"],          # 한류 트렌디형 - 한류 콘텐츠, 쇼핑 선호
+        1: ["한류/쇼핑", "음식/체험", "전통문화"],  # 종합형 실속파 - 다양한 관심사
+        2: ["자연/힐링"],                      # 수동형 관광객 - 소극적 관광
+        3: ["음식/체험", "한류/쇼핑"],          # 체험중심 실용형 - 음식/쇼핑 중심
+        4: ["전통문화", "한류/쇼핑"],          # 고소득 전통형 - 전통문화 + 면세점
+        5: ["전통문화"],                      # 행사 관심형 - 전통문화/행사 중심
+        6: ["자연/힐링", "전통문화"],          # 자연 힐링형 - 자연경관 중시
+        7: ["자연/힐링"]                      # 소외형 여행객 - 소극적 참여
     }
     
-    preferred_categories = cluster_preferences.get(cluster_id, ["온천/스파"])
+    preferred_categories = cluster_preferences.get(cluster_id, ["음식/체험"])
     recommendations = []
     
     # 점수 비중 설정 (총 100점)
@@ -213,19 +213,16 @@ def calculate_cluster_recommendations(survey_answers):
                 elif preference_rank == 1:
                     category_score = 30  # 2순위 선호
                 elif preference_rank == 2:
-                    category_score = 20  # 3순위 선호 (클러스터 7만 해당)
+                    category_score = 20  # 3순위 선호
             
             # 2. 관광지 평점 점수 (30점 만점)
-            # 5점 만점 평점을 30점 만점으로 변환
             rating_score = (place["rating"] / 5.0) * MAX_RATING_SCORE
             
             # 3. 개인 클러스터 매칭 점수 (20점 만점)
-            # 20점 만점 클러스터 점수를 그대로 사용
-            cluster_score = (cluster_result['score'] / 20.0) * MAX_CLUSTER_SCORE
+            cluster_score = (cluster_result['score'] / 30.0) * MAX_CLUSTER_SCORE
             
             # 4. 접근성 보정 점수 (10점 만점)
-            # 거리가 가까울수록 높은 점수
-            min_distance = 60   # 최단거리 (에버랜드)
+            min_distance = 35   # 최단거리 (홍대)
             max_distance = 500  # 최장거리 기준
             distance_score = max(0, (max_distance - place['distance_from_incheon']) / (max_distance - min_distance)) * MAX_DISTANCE_SCORE
             
@@ -237,7 +234,7 @@ def calculate_cluster_recommendations(survey_answers):
             place_with_score["cluster_id"] = cluster_id
             place_with_score["cluster_confidence"] = cluster_result['confidence']
             
-            # 점수 세부사항 추가 (선택사항)
+            # 점수 세부사항 추가
             place_with_score["score_breakdown"] = {
                 "category": round(category_score, 1),
                 "rating": round(rating_score, 1),
@@ -534,7 +531,7 @@ def recommendations_page():
             cluster_data = cluster_info[cluster_id]
             wellness_type, wellness_color = classify_wellness_type(cluster_result['score'], cluster_id)
             
-            st.markdown('<h2 class="section-title">🎭 당신의 여행 성향</h2>', unsafe_allow_html=True)
+            st.markdown('<h2 class="section-title">🎭 당신의 한국 여행 성향</h2>', unsafe_allow_html=True)
             
             analysis_col1, analysis_col2 = st.columns([1, 2])
             
@@ -545,7 +542,7 @@ def recommendations_page():
                         🏆 {cluster_data['name']}
                     </h3>
                     <div class="score-display">
-                        매칭 점수: {cluster_result['score']}/20
+                        매칭 점수: {cluster_result['score']}/30
                     </div>
                     <p style="color: #2E7D32; font-weight: 600; margin-top: 15px; font-size: 0.9em;">
                         신뢰도: {cluster_result['confidence']:.1%}
@@ -627,7 +624,7 @@ def recommendations_page():
                     list(wellness_destinations.keys()),
                     default=st.session_state.category_filter,
                     key="category_filter_new",
-                    help="원하는 웰니스 관광 카테고리를 모두 선택하세요"
+                    help="원하는 관광 카테고리를 모두 선택하세요"
                 )
                 st.session_state.category_filter = selected_categories
             
@@ -635,7 +632,7 @@ def recommendations_page():
                 st.markdown("#### 📏 거리 설정")
                 distance_max = st.slider(
                     "최대 거리 (km)",
-                    min_value=50,
+                    min_value=30,
                     max_value=500,
                     value=st.session_state.distance_filter,
                     step=50,

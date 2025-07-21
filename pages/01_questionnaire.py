@@ -204,7 +204,7 @@ def wellness_questionnaire_page():
                 st.session_state.answers[key] = st.session_state[f"radio_{key}"]
 
     # 메인 제목
-    st.title("🌿 웰니스 관광 성향 설문조사")
+    st.title("🌿 한국 웰니스 관광 성향 설문조사")
     
     # 소개 메시지
     st.markdown("""
