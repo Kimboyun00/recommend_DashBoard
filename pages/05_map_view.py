@@ -593,15 +593,6 @@ def map_info():
         key="num_places_slider"
     )
     
-    # 표시할 관광지 수
-    num_places = st.slider(
-        "표시할 추천지 수",
-        min_value=1,
-        max_value=8,
-        value=6,
-        key="num_places_slider"
-    )
-    
     # 지도 중심점 설정
     map_center = st.selectbox(
         "지도 중심점",
