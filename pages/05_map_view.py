@@ -590,14 +590,14 @@ def map_info():
         min_value=1,
         max_value=8,
         value=6,
-        key="num_places_slider"
+        key="map_num_places_slider"
     )
     
     # 지도 중심점 설정
     map_center = st.selectbox(
         "지도 중심점",
         ["전체 보기", "인천공항", "서울 중심", "부산 중심", "제주 중심"],
-        key="map_center_select"
+        key="map_center_selectbox"
     )
     
     # 카테고리 표시 설정
@@ -607,7 +607,7 @@ def map_info():
         show_categories[category] = st.checkbox(
             category,
             value=True,
-            key=f"show_{category}"
+            key=f"map_show_{category.replace('/', '_')}"
         )
     
     st.markdown("---")
