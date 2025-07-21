@@ -25,27 +25,45 @@ check_access_permissions('home')
 
 # 웰니스 관광지 데이터
 wellness_destinations = {
-    "온천/스파": [
+    "한류/쇼핑": [
         {
-            "name": "부산 해운대 스파랜드",
-            "rating": 4.5,
-            "price_range": "20,000-40,000원",
-            "distance_from_incheon": 325,
-            "travel_cost_car": "60,000원",
-            "travel_cost_train": "45,000원"
+            "name": "명동 쇼핑거리",
+            "rating": 4.3,
+            "price_range": "10,000-50,000원",
+            "distance_from_incheon": 45,
+            "travel_cost_car": "15,000원",
+            "travel_cost_train": "2,150원"
         },
         {
-            "name": "충남 아산 온양온천",
-            "rating": 4.2,
-            "price_range": "15,000-30,000원",
-            "distance_from_incheon": 120,
-            "travel_cost_car": "25,000원",
-            "travel_cost_train": "18,000원"
+            "name": "강남 K-STAR ROAD",
+            "rating": 4.5,
+            "price_range": "무료-30,000원",
+            "distance_from_incheon": 50,
+            "travel_cost_car": "18,000원",
+            "travel_cost_train": "2,150원"
         }
     ],
-    "자연치유": [
+    "전통문화": [
         {
-            "name": "제주 한라산 국립공원",
+            "name": "경복궁",
+            "rating": 4.6,
+            "price_range": "3,000원",
+            "distance_from_incheon": 42,
+            "travel_cost_car": "15,000원",
+            "travel_cost_train": "2,150원"
+        },
+        {
+            "name": "인사동 문화거리",
+            "rating": 4.4,
+            "price_range": "5,000-30,000원",
+            "distance_from_incheon": 43,
+            "travel_cost_car": "15,000원",
+            "travel_cost_train": "2,150원"
+        }
+    ],
+    "자연/힐링": [
+        {
+            "name": "제주 한라산",
             "rating": 4.7,
             "price_range": "무료",
             "distance_from_incheon": 460,
@@ -53,48 +71,30 @@ wellness_destinations = {
             "travel_cost_train": "120,000원 (항공료 포함)"
         },
         {
-            "name": "강원 설악산 국립공원",
-            "rating": 4.6,
-            "price_range": "3,500원",
-            "distance_from_incheon": 200,
-            "travel_cost_car": "40,000원",
-            "travel_cost_train": "35,000원"
-        }
-    ],
-    "요가/명상": [
-        {
-            "name": "경주 불국사",
-            "rating": 4.8,
-            "price_range": "50,000-100,000원 (템플스테이)",
-            "distance_from_incheon": 370,
-            "travel_cost_car": "70,000원",
-            "travel_cost_train": "50,000원"
-        },
-        {
-            "name": "전남 순천만 국가정원",
-            "rating": 4.4,
-            "price_range": "8,000원",
-            "distance_from_incheon": 350,
-            "travel_cost_car": "65,000원",
-            "travel_cost_train": "42,000원"
-        }
-    ],
-    "웰니스 리조트": [
-        {
-            "name": "강원 평창 알펜시아 리조트",
+            "name": "남한산성",
             "rating": 4.3,
-            "price_range": "150,000-300,000원",
-            "distance_from_incheon": 180,
-            "travel_cost_car": "35,000원",
-            "travel_cost_train": "28,000원"
+            "price_range": "무료",
+            "distance_from_incheon": 75,
+            "travel_cost_car": "25,000원",
+            "travel_cost_train": "3,200원"
+        }
+    ],
+    "음식/체험": [
+        {
+            "name": "광장시장",
+            "rating": 4.4,
+            "price_range": "3,000-15,000원",
+            "distance_from_incheon": 45,
+            "travel_cost_car": "18,000원",
+            "travel_cost_train": "2,150원"
         },
         {
-            "name": "경기 용인 에버랜드 스파",
-            "rating": 4.1,
-            "price_range": "30,000-60,000원",
-            "distance_from_incheon": 60,
-            "travel_cost_car": "15,000원",
-            "travel_cost_train": "12,000원"
+            "name": "홍대 맛집거리",
+            "rating": 4.2,
+            "price_range": "8,000-25,000원",
+            "distance_from_incheon": 35,
+            "travel_cost_car": "12,000원",
+            "travel_cost_train": "1,950원"
         }
     ]
 }
@@ -386,111 +386,76 @@ st.markdown("""
 
 # 새로운 분석 함수들 추가
 def analyze_user_survey_details(answers):
-    """사용자 설문 응답 상세 분석"""
+    """사용자 설문 응답 상세 분석 (한국 관광 맞춤)"""
     analysis = {
-        "travel_priorities": [],
-        "travel_styles": [],
-        "wellness_preferences": [],
-        "budget_focus": "",
-        "post_travel_values": ""
+        "travel_motivation": "",
+        "info_channels": [],
+        "shopping_interests": [],
+        "travel_style": "",
+        "priorities": "",
+        "satisfaction_factors": ""
     }
     
-    # Q1: 여행 우선순위
-    if answers.get('q1') == 0:
-        analysis["travel_priorities"].append("안전 중시형")
-    elif answers.get('q1') == 1:
-        analysis["travel_priorities"].append("모험 추구형")
-    elif answers.get('q1') == 2:
-        analysis["travel_priorities"].append("편의 중시형")
-    elif answers.get('q1') == 3:
-        analysis["travel_priorities"].append("경제성 중시형")
+    # Q1: 한국 여행 동기
+    motivations = ["한류 콘텐츠", "전통문화 체험", "자연경관/힐링", "쇼핑/미식", "행사/축제", "목적 없음"]
+    if answers.get('q1') is not None and answers.get('q1') < len(motivations):
+        analysis["travel_motivation"] = motivations[answers.get('q1')]
     
-    # Q2: 여행 스타일 (복수응답)
+    # Q2: 정보 탐색 채널 (복수응답)
     q2_answers = answers.get('q2', [])
     if isinstance(q2_answers, list):
-        styles = []
-        if 0 in q2_answers: styles.append("개인 여행")
-        if 1 in q2_answers: styles.append("사회적 여행") 
-        if 2 in q2_answers: styles.append("소그룹 여행")
-        if 3 in q2_answers: styles.append("단체 여행")
-        analysis["travel_styles"] = styles
+        channels = []
+        channel_names = ["소셜미디어", "동영상사이트", "글로벌포털", "블로그", "여행사", "지인추천", "정보탐색안함"]
+        for idx in q2_answers:
+            if idx < len(channel_names):
+                channels.append(channel_names[idx])
+        analysis["info_channels"] = channels
     
-    # Q3: 활동 선호도
-    if answers.get('q3') == 0:
-        analysis["wellness_preferences"].append("쇼핑 중심")
-    elif answers.get('q3') == 1:
-        analysis["wellness_preferences"].append("문화체험 중심")
-    elif answers.get('q3') == 2:
-        analysis["wellness_preferences"].append("미식 중심")
-    elif answers.get('q3') == 3:
-        analysis["wellness_preferences"].append("자연관광 중심")
+    # Q3: 쇼핑 관심사 (복수응답)
+    q3_answers = answers.get('q3', [])
+    if isinstance(q3_answers, list):
+        shopping = []
+        shopping_names = ["화장품", "의류", "전통기념품", "식료품", "향수", "전자제품", "쇼핑무관심"]
+        for idx in q3_answers:
+            if idx < len(shopping_names):
+                shopping.append(shopping_names[idx])
+        analysis["shopping_interests"] = shopping
     
-    # Q7: 예산 투자 우선순위
-    budget_priorities = ["숙박", "쇼핑", "음식", "체험활동"]
-    if answers.get('q7') is not None and answers.get('q7') < len(budget_priorities):
-        analysis["budget_focus"] = budget_priorities[answers.get('q7')]
+    # Q4: 여행 스타일
+    styles = ["혼자여행", "가족동행", "친구/연인", "소그룹", "단체투어"]
+    if answers.get('q4') is not None and answers.get('q4') < len(styles):
+        analysis["travel_style"] = styles[answers.get('q4')]
     
-    # Q8: 여행 후 중요 가치 (새로운 휴식 옵션 포함)
-    post_values = ["안전감", "새로운 경험", "쇼핑 만족", "문화적 성장", "휴식과 힐링"]
-    if answers.get('q8') is not None and answers.get('q8') < len(post_values):
-        analysis["post_travel_values"] = post_values[answers.get('q8')]
+    # Q5: 여행 우선순위
+    priorities = ["편리한교통", "다양한체험", "경제적비용", "고품질서비스", "안전환경"]
+    if answers.get('q5') is not None and answers.get('q5') < len(priorities):
+        analysis["priorities"] = priorities[answers.get('q5')]
+    
+    # Q8: 만족도 요인
+    factors = ["체험완성도", "가성비", "충분한휴식", "문화정보습득", "SNS공유경험"]
+    if answers.get('q8') is not None and answers.get('q8') < len(factors):
+        analysis["satisfaction_factors"] = factors[answers.get('q8')]
     
     return analysis
 
-def display_detailed_user_analysis(answers):
-    """상세 사용자 분석 표시"""
-    analysis = analyze_user_survey_details(answers)
-
-    st.markdown("---")
-    st.markdown('<h2 class="section-title">🔍 상세 성향 분석</h2>', unsafe_allow_html=True)
+def create_korea_travel_motivation_chart():
+    """한국 여행 동기 분포 차트"""
     
-    detail_col1, detail_col2 = st.columns(2)
-    
-    with detail_col1:
-        st.markdown(f"""
-        <div class="insight-card">
-            <h4>🎯 여행 우선순위</h4>
-            <p>{' | '.join(analysis['travel_priorities']) if analysis['travel_priorities'] else '미분석'}</p>
-            
-            <h4 style="margin-top: 15px;">👥 선호 여행 스타일</h4>
-            <p>{' | '.join(analysis['travel_styles']) if analysis['travel_styles'] else '미분석'}</p>
-            
-            <h4 style="margin-top: 15px;">🏃‍♀️ 활동 선호도</h4>
-            <p>{' | '.join(analysis['wellness_preferences']) if analysis['wellness_preferences'] else '미분석'}</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with detail_col2:
-        st.markdown(f"""
-        <div class="insight-card">
-            <h4>💰 예산 투자 우선순위</h4>
-            <p>{analysis['budget_focus'] if analysis['budget_focus'] else '미분석'}</p>
-            
-            <h4 style="margin-top: 15px;">✨ 여행 후 중요 가치</h4>
-            <p>{analysis['post_travel_values'] if analysis['post_travel_values'] else '미분석'}</p>
-            
-            <h4 style="margin-top: 15px;">🧘‍♀️ 휴식 지향도</h4>
-            <p>{'높음 - 힐링과 휴식을 중요시' if analysis['post_travel_values'] == '휴식과 힐링' else '보통 - 활동과 휴식의 균형'}</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-def create_post_travel_values_chart():
-    """여행 후 중요 가치 분포 차트 (새로운 휴식 옵션 포함)"""
-    
-    # 샘플 데이터 (실제로는 사용자 데이터베이스에서 가져와야 함)
-    values_data = {
-        "안전감": 25,
-        "새로운 경험": 30, 
-        "쇼핑 만족": 15,
-        "문화적 성장": 20,
-        "휴식과 힐링": 10  # 새로 추가된 옵션
+    # 실제 클러스터 분석 결과 기반 샘플 데이터
+    motivation_data = {
+        "한류 콘텐츠": 30,      # 클러스터 0 중심
+        "전통문화 체험": 20,     # 클러스터 4, 5 중심
+        "자연경관/힐링": 15,     # 클러스터 6 중심
+        "쇼핑/미식": 25,        # 클러스터 1, 3 중심
+        "행사/축제": 5,         # 클러스터 5 일부
+        "목적 없음": 5          # 클러스터 2, 7 중심
     }
     
     fig = px.pie(
-        values=list(values_data.values()),
-        names=list(values_data.keys()),
-        title="여행 후 중요하게 생각하는 가치 분포",
-        color_discrete_sequence=['#4CAF50', '#81C784', '#66BB6A', '#A5D6A7', '#C8E6C9']
+        values=list(motivation_data.values()),
+        names=list(motivation_data.keys()),
+        title="한국 여행 동기 분포",
+        color_discrete_sequence=['#4CAF50', '#81C784', '#66BB6A', '#A5D6A7', '#C8E6C9', '#E8F5E8']
     )
     fig.update_layout(
         plot_bgcolor='rgba(0,0,0,0)',
@@ -501,55 +466,25 @@ def create_post_travel_values_chart():
     
     return fig
 
-def create_relaxation_insights():
-    """휴식 지향 사용자를 위한 인사이트"""
+def create_info_channel_usage_chart():
+    """정보 탐색 채널 이용률 차트 (복수응답 반영)"""
     
-    st.markdown('<h2 class="section-title">🧘‍♀️ 휴식 지향 여행 트렌드</h2>', unsafe_allow_html=True)
-    
-    relax_col1, relax_col2, relax_col3 = st.columns(3)
-    
-    with relax_col1:
-        st.markdown(f"""
-        <div class="insight-card" style="text-align: center;">
-            <h4>🌿 힐링 여행 증가율</h4>
-            <p style="font-size: 2em; color: #4CAF50; font-weight: bold;">+35%</p>
-            <p style="font-size: 0.9em;">작년 대비 휴식 중심 여행 증가</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with relax_col2:
-        st.markdown(f"""
-        <div class="insight-card" style="text-align: center;">
-            <h4>🏨 선호 숙박 유형</h4>
-            <p style="font-size: 2em; color: #4CAF50; font-weight: bold;">리조트</p>
-            <p style="font-size: 0.9em;">휴식 지향 여행자의 65%가 선호</p>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with relax_col3:
-        st.markdown(f"""
-        <div class="insight-card" style="text-align: center;">
-            <h4>⏰ 평균 여행 기간</h4>
-            <p style="font-size: 2em; color: #4CAF50; font-weight: bold;">4.5일</p>
-            <p style="font-size: 0.9em;">충분한 휴식을 위한 적정 기간</p>
-        </div>
-        """, unsafe_allow_html=True)
-
-def create_travel_style_analysis():
-    """복수응답 여행 스타일 분석 차트"""
-    # 샘플 데이터 (실제로는 설문 결과에서 집계)
-    style_combinations = {
-        "개인+사회": 35,
-        "사회+소그룹": 40,
-        "개인 단독": 15,
-        "소그룹+단체": 10
+    # 클러스터별 정보 채널 이용 패턴 반영
+    channel_data = {
+        "소셜미디어": 73,        # 클러스터 0 높음
+        "동영상사이트": 81,      # 클러스터 0 높음
+        "글로벌포털": 86,        # 클러스터 4 높음
+        "블로그/후기": 65,       # 클러스터 1 높음
+        "여행사/가이드": 45,     # 전통적 채널
+        "지인추천": 55,          # 일반적 채널
+        "정보탐색안함": 17       # 클러스터 7 높음
     }
     
     fig = px.bar(
-        x=list(style_combinations.keys()),
-        y=list(style_combinations.values()),
-        title="여행 스타일 조합 분포 (복수응답)",
-        color=list(style_combinations.values()),
+        x=list(channel_data.keys()),
+        y=list(channel_data.values()),
+        title="정보 탐색 채널별 이용률 (%)",
+        color=list(channel_data.values()),
         color_continuous_scale=['#A5D6A7', '#4CAF50']
     )
     fig.update_layout(
@@ -558,6 +493,66 @@ def create_travel_style_analysis():
         font_color='#2E7D32',
         title_font_size=16,
         xaxis_tickangle=-45
+    )
+    return fig
+
+def create_cluster_preference_insights():
+    """클러스터별 관광 선호도 인사이트"""
+    
+    st.markdown('<h2 class="section-title">🎯 클러스터별 한국 관광 선호도</h2>', unsafe_allow_html=True)
+    
+    cluster_col1, cluster_col2, cluster_col3 = st.columns(3)
+    
+    with cluster_col1:
+        st.markdown(f"""
+        <div class="insight-card" style="text-align: center;">
+            <h4>🛍️ 한류/쇼핑 선호도</h4>
+            <p style="font-size: 2em; color: #4CAF50; font-weight: bold;">65%</p>
+            <p style="font-size: 0.9em;">클러스터 0, 1, 3이 주로 선호</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with cluster_col2:
+        st.markdown(f"""
+        <div class="insight-card" style="text-align: center;">
+            <h4>🏛️ 전통문화 관심도</h4>
+            <p style="font-size: 2em; color: #4CAF50; font-weight: bold;">45%</p>
+            <p style="font-size: 0.9em;">클러스터 4, 5가 높은 관심 보임</p>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with cluster_col3:
+        st.markdown(f"""
+        <div class="insight-card" style="text-align: center;">
+            <h4>🌿 자연/힐링 추구</h4>
+            <p style="font-size: 2em; color: #4CAF50; font-weight: bold;">30%</p>
+            <p style="font-size: 0.9em;">클러스터 6, 7의 주요 선호 영역</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+def create_travel_style_analysis():
+    """여행 스타일 분석 차트"""
+    # 클러스터 분석 결과 기반 샘플 데이터
+    style_data = {
+        "가족/친구 동행": 70,   # 대부분 클러스터
+        "혼자 여행": 17,        # 클러스터 7 주로
+        "소그룹": 10,
+        "단체투어": 3
+    }
+    
+    fig = px.bar(
+        x=list(style_data.keys()),
+        y=list(style_data.values()),
+        title="한국 여행 스타일 분포 (%)",
+        color=list(style_data.values()),
+        color_continuous_scale=['#A5D6A7', '#4CAF50']
+    )
+    fig.update_layout(
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)',
+        font_color='#2E7D32',
+        title_font_size=16,
+        xaxis_tickangle=0
     )
     return fig
 
@@ -623,22 +618,34 @@ def stats_info():
                 
                 with analysis_col2:
                     # 페르소나 분석 표시
-                    persona_analysis = create_user_persona_analysis(st.session_state.answers, wellness_type)
-                    
-                    st.markdown(f"""
-                    <div class="filter-card">
-                        <h4 style="color: #2E7D32; margin-bottom: 15px;">📊 성향 분석 결과</h4>
-                        <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
-                            <strong>✨ 특징:</strong><br>{persona_analysis['특징']}
-                        </p>
-                        <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
-                            <strong>🎯 추천활동:</strong><br>{persona_analysis['추천활동']}
-                        </p>
-                        <p style="color: #2E7D32; font-weight: 600; margin: 0;">
-                            <strong>💡 여행팁:</strong><br>{persona_analysis['여행팁']}
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
+                    try:
+                        persona_type = cluster_data['name']
+                        persona_analysis = create_user_persona_analysis(st.session_state.answers, persona_type)
+                        
+                        st.markdown(f"""
+                        <div class="filter-card">
+                            <h4 style="color: #2E7D32; margin-bottom: 15px;">📊 성향 분석 결과</h4>
+                            <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                                <strong>✨ 특징:</strong><br>{persona_analysis['특징'][:80]}...
+                            </p>
+                            <p style="color: #2E7D32; font-weight: 600; margin-bottom: 15px;">
+                                <strong>🎯 추천활동:</strong><br>{persona_analysis['추천활동'][:80]}...
+                            </p>
+                            <p style="color: #2E7D32; font-weight: 600; margin: 0;">
+                                <strong>💡 여행팁:</strong><br>{persona_analysis['여행팁'][:80]}...
+                            </p>
+                        </div>
+                        """, unsafe_allow_html=True)
+                    except:
+                        st.markdown(f"""
+                        <div class="filter-card">
+                            <h4 style="color: #2E7D32; margin-bottom: 15px;">📊 클러스터 정보</h4>
+                            <p style="color: #2E7D32; font-weight: 600;">
+                                <strong>설명:</strong> {cluster_data['description']}<br>
+                                <strong>특성:</strong> {', '.join(cluster_data['characteristics'])}
+                            </p>
+                        </div>
+                        """, unsafe_allow_html=True)
     
     return analysis_type, show_advanced
 
@@ -730,7 +737,7 @@ def statistics_page():
     with kpi_col3:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-number">98%</div>
+            <div class="metric-number">95%</div>
             <div class="metric-label">추천 정확도</div>
         </div>
         """, unsafe_allow_html=True)
@@ -738,14 +745,14 @@ def statistics_page():
     with kpi_col4:
         st.markdown(f"""
         <div class="metric-card">
-            <div class="metric-number">95%</div>
+            <div class="metric-number">92%</div>
             <div class="metric-label">사용자 만족도</div>
         </div>
         """, unsafe_allow_html=True)
     
     # 8개 클러스터 시스템 소개
     st.markdown("---")
-    st.markdown('<h2 class="section-title">🎭 8가지 여행 성향 클러스터</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="section-title">🎭 8가지 웰니스 여행 성향 클러스터</h2>', unsafe_allow_html=True)
     
     cluster_info = get_cluster_info()
     cluster_cols = st.columns(4)
@@ -793,7 +800,7 @@ def statistics_page():
                             클러스터 {cluster_result['cluster']}
                         </h3>
                         <div class="score-display">
-                            매칭 점수: {cluster_result['score']}/20
+                            매칭 점수: {cluster_result['score']}/30
                         </div>
                         </br>
                         <div class="confidence-display">
@@ -803,18 +810,22 @@ def statistics_page():
                     """, unsafe_allow_html=True)
                 
                 with user_col2:
-                    # 페르소나 분석
-                    persona_analysis = create_user_persona_analysis(st.session_state.answers, wellness_type)
+                    # 상세 사용자 분석 표시
+                    user_analysis = analyze_user_survey_details(st.session_state.answers)
                     
                     st.markdown(f"""
                     <div class="insight-card" style="height: 337px;">
-                        <h4>✨ 성향 특징</h4>
+                        <h4>🎯 여행 동기</h4>
                         <p style="font-size: 0.9em; line-height: 1.4;">
-                            {persona_analysis['특징'][:80]}...
+                            {user_analysis['travel_motivation']}
                         </p>
-                        <h4 style="margin-top: 15px;">🎯 추천 활동</h4>
+                        <h4 style="margin-top: 15px;">👥 여행 스타일</h4>
                         <p style="font-size: 0.9em; line-height: 1.4;">
-                            {persona_analysis['추천활동'][:60]}...
+                            {user_analysis['travel_style']}
+                        </p>
+                        <h4 style="margin-top: 15px;">🛍️ 쇼핑 관심사</h4>
+                        <p style="font-size: 0.9em; line-height: 1.4;">
+                            {', '.join(user_analysis['shopping_interests'][:3]) if user_analysis['shopping_interests'] else '정보 없음'}
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -836,11 +847,12 @@ def statistics_page():
                         <p style="font-size: 0.9em;">
                             매칭 신뢰도: <strong>{cluster_result['confidence']:.1%}</strong>
                         </p>
+                        <h4 style="margin-top: 15px;">📍 우선순위</h4>
+                        <p style="font-size: 0.9em;">
+                            {user_analysis['priorities']}
+                        </p>
                     </div>
                     """, unsafe_allow_html=True)
-                
-                # 상세 사용자 분석 표시 (새로 추가된 함수)
-                display_detailed_user_analysis(st.session_state.answers)
                 
                 # 개인 클러스터 점수 차트
                 st.markdown("---")
@@ -874,26 +886,32 @@ def statistics_page():
     
     # 새로운 설문 구조 분석 차트들
     st.markdown("---")
-    st.markdown('<h2 class="section-title">📈 새로운 설문 구조 분석</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="section-title">📈 웰니스 관광 성향 분석</h2>', unsafe_allow_html=True)
     
     chart_row1_col1, chart_row1_col2 = st.columns(2)
     
     with chart_row1_col1:
-        # 여행 후 중요 가치 분포 (새로운 휴식 옵션 포함)
+        # 한국 여행 동기 분포
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        fig_values = create_post_travel_values_chart()
-        st.plotly_chart(fig_values, use_container_width=True)
+        fig_motivation = create_korea_travel_motivation_chart()
+        st.plotly_chart(fig_motivation, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
     with chart_row1_col2:
-        # 여행 스타일 조합 분석 (복수응답)
+        # 정보 탐색 채널 이용률
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        fig_styles = create_travel_style_analysis()
-        st.plotly_chart(fig_styles, use_container_width=True)
+        fig_channels = create_info_channel_usage_chart()
+        st.plotly_chart(fig_channels, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     
-    # 휴식 지향 여행 트렌드 분석
-    create_relaxation_insights()
+    # 여행 스타일 분석
+    st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+    fig_style = create_travel_style_analysis()
+    st.plotly_chart(fig_style, use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # 클러스터별 관광 선호도 인사이트
+    create_cluster_preference_insights()
     
     # 관광지 현황 분석
     st.markdown('<h2 class="section-title">🏞️ 관광지 현황 분석</h2>', unsafe_allow_html=True)
@@ -985,16 +1003,16 @@ def statistics_page():
     if show_advanced:
         st.markdown('<h2 class="section-title">🎯 클러스터별 선호도 분석</h2>', unsafe_allow_html=True)
         
-        # 클러스터별 추천 카테고리 매핑
+        # 실제 클러스터별 추천 카테고리 매핑
         cluster_preferences = {
-            0: ["온천/스파", "자연치유"],
-            1: ["온천/스파", "웰니스 리조트"],
-            2: ["요가/명상", "자연치유"],
-            3: ["웰니스 리조트", "온천/스파"],
-            4: ["웰니스 리조트", "자연치유"],
-            5: ["요가/명상", "자연치유"],
-            6: ["요가/명상", "온천/스파"],
-            7: ["자연치유", "요가/명상", "온천/스파"]
+            0: ["한류/쇼핑", "음식/체험"],
+            1: ["한류/쇼핑", "음식/체험", "전통문화"],
+            2: ["자연/힐링"],
+            3: ["음식/체험", "한류/쇼핑"],
+            4: ["전통문화", "한류/쇼핑"],
+            5: ["전통문화"],
+            6: ["자연/힐링", "전통문화"],
+            7: ["자연/힐링"]
         }
         
         st.markdown('<div class="chart-container">', unsafe_allow_html=True)
@@ -1130,37 +1148,6 @@ def statistics_page():
         </div>
         """, unsafe_allow_html=True)
     
-    # 설문 구조 개선 인사이트
-    st.markdown('<h2 class="section-title">🔄 설문 구조 개선 효과</h2>', unsafe_allow_html=True)
-    
-    improvement_col1, improvement_col2 = st.columns(2)
-    
-    with improvement_col1:
-        st.markdown(f"""
-        <div class="insight-card">
-            <h4>✅ 복수응답 도입 효과</h4>
-            <p style="margin-bottom: 15px;"><strong>Q2. 여행 스타일:</strong> 복수 선택 가능</p>
-            <ul style="color: #2E7D32; font-weight: 600; margin: 0; padding-left: 20px;">
-                <li>더 정확한 여행 성향 파악</li>
-                <li>다양한 여행 스타일 조합 분석</li>
-                <li>개인화 정확도 15% 향상</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with improvement_col2:
-        st.markdown(f"""
-        <div class="insight-card">
-            <h4>🧘‍♀️ 휴식 옵션 추가 효과</h4>
-            <p style="margin-bottom: 15px;"><strong>Q8. 여행 후 중요 가치:</strong> "휴식과 힐링" 추가</p>
-            <ul style="color: #2E7D32; font-weight: 600; margin: 0; padding-left: 20px;">
-                <li>웰니스 성향 더 정확히 반영</li>
-                <li>힐링 중심 여행자 10% 증가</li>
-                <li>맞춤 추천 만족도 향상</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-    
     # 주요 인사이트
     st.markdown('<h2 class="section-title">💡 주요 분석 인사이트</h2>', unsafe_allow_html=True)
     
@@ -1210,14 +1197,14 @@ def statistics_page():
         
         cluster_info = get_cluster_info()
         cluster_preferences = {
-            0: ["온천/스파", "자연치유"],
-            1: ["온천/스파", "웰니스 리조트"],
-            2: ["요가/명상", "자연치유"],
-            3: ["웰니스 리조트", "온천/스파"],
-            4: ["웰니스 리조트", "자연치유"],
-            5: ["요가/명상", "자연치유"],
-            6: ["요가/명상", "온천/스파"],
-            7: ["자연치유", "요가/명상", "온천/스파"]
+            0: ["한류/쇼핑", "음식/체험"],
+            1: ["한류/쇼핑", "음식/체험", "전통문화"],
+            2: ["자연/힐링"],
+            3: ["음식/체험", "한류/쇼핑"],
+            4: ["전통문화", "한류/쇼핑"],
+            5: ["전통문화"],
+            6: ["자연/힐링", "전통문화"],
+            7: ["자연/힐링"]
         }
         
         for cluster_id, info in cluster_info.items():
