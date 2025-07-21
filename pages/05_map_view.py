@@ -498,7 +498,7 @@ def enhanced_map_view_page():
     """개선된 지도 뷰 페이지"""
     
     # 헤더
-    st.title('🌿 웰컴 투어 추천 시스템')
+    st.title('🌿 웰커밍 투어 추천 시스템')
     st.markdown("---")
     
     # 지도 설정 렌더링
