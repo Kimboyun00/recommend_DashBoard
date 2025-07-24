@@ -353,8 +353,19 @@ def determine_cluster_from_factors(factor_scores):
         'cluster': best_cluster,
         'confidence': confidence,
         'similarities': cluster_similarities,
-        'factor_scores': factor_scores
+        'factor_scores': factor_scores,
+        'score': cluster_similarities[best_cluster] * 20  # 점수화
     }
+
+# 호환성을 위한 별칭 함수
+def determine_cluster(answers):
+    """설문 답변으로부터 클러스터 결정 (호환성을 위한 래퍼 함수)"""
+    factor_scores = calculate_factor_scores(answers)
+    return determine_cluster_from_factors(factor_scores)
+
+def classify_wellness_type(answers):
+    """웰니스 성향 분류 (호환성을 위한 별칭)"""
+    return determine_cluster(answers)
 
 def validate_answers():
     """설문 답변 유효성 검사"""
@@ -407,7 +418,9 @@ def create_factor_analysis_chart(factor_scores):
             )),
         showlegend=True,
         title="12개 요인별 개인 성향 분석",
-        font=dict(color='#2E7D32', size=12)
+        font=dict(color='#2E7D32', size=12),
+        plot_bgcolor='rgba(0,0,0,0)',
+        paper_bgcolor='rgba(0,0,0,0)'
     )
     
     return fig
@@ -476,6 +489,11 @@ wellness_destinations = {
             "website": "https://www.royalpalace.go.kr",
             "rating": 4.6,
             "price_range": "3,000원",
+            "distance_from_incheon": 42,
+            "travel_time_car": "1시간",
+            "travel_time_train": "1시간 15분",
+            "travel_cost_car": "15,000원",
+            "travel_cost_train": "2,150원",
             "target_clusters": [1, 2, 5],  # 전통문화 관심 클러스터
             "image_url": "🏛️"
         },
@@ -483,11 +501,16 @@ wellness_destinations = {
             "name": "한옥마을 (전주)",
             "lat": 35.8156,
             "lon": 127.1530,
-            "type": "전통문화체험", 
+            "type": "전통문화체험",
             "description": "전통 한옥과 한국 전통문화를 체험할 수 있는 마을",
             "website": "https://www.jeonju.go.kr",
             "rating": 4.5,
             "price_range": "무료-20,000원",
+            "distance_from_incheon": 243,
+            "travel_time_car": "3시간",
+            "travel_time_train": "2시간 30분",
+            "travel_cost_car": "35,000원",
+            "travel_cost_train": "25,600원",
             "target_clusters": [1, 2],
             "image_url": "🏘️"
         }
@@ -502,6 +525,11 @@ wellness_destinations = {
             "website": "https://www.visitseoul.net",
             "rating": 4.3,
             "price_range": "10,000-50,000원",
+            "distance_from_incheon": 45,
+            "travel_time_car": "1시간",
+            "travel_time_train": "1시간 10분",
+            "travel_cost_car": "15,000원",
+            "travel_cost_train": "2,150원",
             "target_clusters": [4, 7, 8],  # 쇼핑 중심 클러스터
             "image_url": "🛍️"
         },
@@ -514,6 +542,11 @@ wellness_destinations = {
             "website": "https://www.gangnam.go.kr",
             "rating": 4.5,
             "price_range": "50,000-200,000원",
+            "distance_from_incheon": 50,
+            "travel_time_car": "1시간 20분",
+            "travel_time_train": "1시간 30분",
+            "travel_cost_car": "18,000원",
+            "travel_cost_train": "2,150원",
             "target_clusters": [4, 7],  # 프리미엄 쇼핑 클러스터
             "image_url": "👜"
         }
@@ -528,6 +561,11 @@ wellness_destinations = {
             "website": "https://www.hallasan.go.kr",
             "rating": 4.7,
             "price_range": "무료",
+            "distance_from_incheon": 460,
+            "travel_time_car": "항공 1시간 + 차량 1시간",
+            "travel_time_train": "항공 이용 필수",
+            "travel_cost_car": "120,000원 (항공료 포함)",
+            "travel_cost_train": "120,000원 (항공료 포함)",
             "target_clusters": [3, 5, 8],  # 자연/힐링 선호 클러스터
             "image_url": "🏔️"
         },
@@ -540,6 +578,11 @@ wellness_destinations = {
             "website": "https://www.knps.or.kr",
             "rating": 4.6,
             "price_range": "3,500원",
+            "distance_from_incheon": 185,
+            "travel_time_car": "2시간 30분",
+            "travel_time_train": "3시간",
+            "travel_cost_car": "28,000원",
+            "travel_cost_train": "18,500원",
             "target_clusters": [3, 5],
             "image_url": "🌿"
         }
@@ -554,6 +597,11 @@ wellness_destinations = {
             "website": "https://www.ddp.or.kr",
             "rating": 4.4,
             "price_range": "무료-30,000원",
+            "distance_from_incheon": 47,
+            "travel_time_car": "1시간 10분",
+            "travel_time_train": "1시간 20분",
+            "travel_cost_car": "16,000원",
+            "travel_cost_train": "2,150원",
             "target_clusters": [6, 8],  # 스마트/디지털 선호 클러스터
             "image_url": "🏢"
         },
@@ -566,6 +614,11 @@ wellness_destinations = {
             "website": "https://www.coex.co.kr",
             "rating": 4.2,
             "price_range": "무료-50,000원",
+            "distance_from_incheon": 52,
+            "travel_time_car": "1시간 25분",
+            "travel_time_train": "1시간 35분",
+            "travel_cost_car": "19,000원",
+            "travel_cost_train": "2,150원",
             "target_clusters": [6],
             "image_url": "🏬"
         }
@@ -580,6 +633,11 @@ wellness_destinations = {
             "website": "https://www.kwangjangmarket.co.kr",
             "rating": 4.4,
             "price_range": "3,000-15,000원",
+            "distance_from_incheon": 45,
+            "travel_time_car": "1시간 10분",
+            "travel_time_train": "1시간 20분",
+            "travel_cost_car": "18,000원",
+            "travel_cost_train": "2,150원",
             "target_clusters": [7, 8],  # 미식/경제적 여행 클러스터
             "image_url": "🍜"
         },
@@ -592,6 +650,11 @@ wellness_destinations = {
             "website": "https://www.visitseoul.net",
             "rating": 4.2,
             "price_range": "8,000-25,000원",
+            "distance_from_incheon": 35,
+            "travel_time_car": "50분",
+            "travel_time_train": "1시간",
+            "travel_cost_car": "12,000원",
+            "travel_cost_train": "1,950원",
             "target_clusters": [6, 7, 8],
             "image_url": "🍽️"
         }
@@ -642,3 +705,89 @@ def calculate_recommendations_by_cluster(cluster_result):
     recommendations.sort(key=lambda x: x["recommendation_score"], reverse=True)
     
     return recommendations[:8]  # 상위 8개 추천
+
+def apply_global_styles():
+    """전역 CSS 스타일 적용"""
+    st.markdown("""
+    <style>
+        /* 전역 스타일 변수 */
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #2E7D32;
+            --primary-light: #81C784;
+            --secondary: #66BB6A;
+            --background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 50%, #A5D6A7 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-radius: 20px;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            --shadow-hover: 0 12px 40px rgba(76, 175, 80, 0.2);
+        }
+        
+        /* 기본 배경 */
+        [data-testid="stAppViewContainer"] > .main {
+            background: var(--background);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* 메인 컨테이너 */
+        .main .block-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 3rem !important;
+        }
+        
+        /* 카드 공통 스타일 */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(76, 175, 80, 0.3);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
+        }
+        
+        /* 버튼 공통 스타일 */
+        div[data-testid="stButton"] > button {
+            background: linear-gradient(45deg, var(--primary), var(--secondary)) !important;
+            border: none !important;
+            border-radius: 15px !important;
+            color: white !important;
+            font-weight: 700 !important;
+            padding: 12px 25px !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: 100% !important;
+        }
+        
+        div[data-testid="stButton"] > button:hover {
+            background: linear-gradient(45deg, #388E3C, var(--primary)) !important;
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4) !important;
+        }
+        
+        /* 기본 UI 숨김 */
+        [data-testid="stHeader"] { display: none; }
+        [data-testid="stSidebarNav"] { display: none; }
+        [data-testid="stSidebar"] { display: none; }
+        [data-testid="collapsedControl"] { display: none; }
+        footer { display: none; }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .main .block-container {
+                padding: 1rem 1.5rem !important;
+            }
+        }
+    </style>
+    """, unsafe_allow_html=True)

@@ -1,11 +1,9 @@
-# pages/03_home.py (12개 요인 기반 웰니스 홈 페이지)
-
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
 import pandas as pd
 import numpy as np
-from utils import check_access_permissions, get_cluster_info
+from utils import check_access_permissions, get_cluster_info, apply_global_styles
 
 # =============================================================================
 # 페이지 초기 설정 및 보안 검증
@@ -30,37 +28,26 @@ if 'logged_in' not in st.session_state or not st.session_state.logged_in:
 # 접근 권한 확인 (홈페이지는 설문 완료 여부와 상관없이 접근 가능)
 check_access_permissions('home')
 
+# 전역 스타일 적용
+apply_global_styles()
+
 # =============================================================================
-# CSS 스타일링 - TailwindCSS 스타일 적용
+# 홈페이지 전용 CSS 스타일링
 # =============================================================================
 
 st.markdown("""
 <style>
-    /* 전체 배경 그라데이션 */
-    [data-testid="stAppViewContainer"] > .main {
-        background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 50%, #A5D6A7 100%);
-        min-height: 100vh;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    /* 메인 컨테이너 */
-    .main .block-container {
-        padding: 2rem 3rem !important;
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-    
-    /* 메인 제목 스타일 */
+    /* 홈 전용 스타일 */
     .home-title {
-        color: #2E7D32 !important;
+        color: var(--primary-dark) !important;
         text-align: center;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(232, 245, 232, 0.9));
+        background: linear-gradient(135deg, var(--card-bg), rgba(232, 245, 232, 0.9));
         padding: 30px 40px;
         border-radius: 25px;
         font-size: 3.2em !important;
         margin-bottom: 40px;
         font-weight: 800 !important;
-        border: 3px solid #4CAF50;
+        border: 3px solid var(--primary);
         box-shadow: 0 15px 40px rgba(76, 175, 80, 0.2);
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
         letter-spacing: 1px;
@@ -75,15 +62,15 @@ st.markdown("""
         left: 0;
         right: 0;
         height: 6px;
-        background: linear-gradient(45deg, #4CAF50, #66BB6A);
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
         border-radius: 25px 25px 0 0;
     }
     
     /* 웰컴 카드 스타일 */
     .welcome-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         backdrop-filter: blur(25px);
-        border: 3px solid #4CAF50;
+        border: 3px solid var(--primary);
         border-radius: 25px;
         padding: 40px;
         margin: 30px 0;
@@ -106,13 +93,13 @@ st.markdown("""
         left: 0;
         right: 0;
         height: 6px;
-        background: linear-gradient(45deg, #4CAF50, #66BB6A);
+        background: linear-gradient(45deg, var(--primary), var(--secondary));
         border-radius: 25px 25px 0 0;
     }
     
     /* 시스템 소개 카드 */
     .system-intro-card {
-        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(255, 255, 255, 0.95));
+        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), var(--card-bg));
         backdrop-filter: blur(25px);
         border: 3px solid rgba(76, 175, 80, 0.6);
         border-radius: 25px;
@@ -125,12 +112,12 @@ st.markdown("""
     .system-intro-card:hover {
         transform: translateY(-3px);
         box-shadow: 0 25px 70px rgba(76, 175, 80, 0.25);
-        border-color: #4CAF50;
+        border-color: var(--primary);
     }
     
     /* 기능 카드 스타일 */
     .feature-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 25px;
@@ -165,12 +152,12 @@ st.markdown("""
         transform: translateY(-10px) scale(1.03);
         box-shadow: 0 25px 70px rgba(76, 175, 80, 0.3);
         background: rgba(255, 255, 255, 1);
-        border-color: #4CAF50;
+        border-color: var(--primary);
     }
     
     /* 통계 카드 */
     .stat-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 20px;
         padding: 30px 25px;
@@ -184,7 +171,7 @@ st.markdown("""
     }
     
     .stat-card:hover {
-        border-color: #4CAF50;
+        border-color: var(--primary);
         box-shadow: 0 12px 35px rgba(76, 175, 80, 0.25);
         transform: translateY(-5px);
         background: rgba(255, 255, 255, 1);
@@ -193,13 +180,13 @@ st.markdown("""
     .stat-number {
         font-size: 3.2em;
         font-weight: 800;
-        color: #2E7D32;
+        color: var(--primary-dark);
         margin-bottom: 10px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
     
     .stat-label {
-        color: #2E7D32;
+        color: var(--primary-dark);
         font-size: 1.3em;
         font-weight: 600;
         letter-spacing: 0.5px;
@@ -207,7 +194,7 @@ st.markdown("""
     
     /* 클러스터 카드 */
     .cluster-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 20px;
@@ -222,14 +209,14 @@ st.markdown("""
     }
     
     .cluster-card:hover {
-        border-color: #4CAF50;
+        border-color: var(--primary);
         box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
         transform: translateY(-3px);
     }
     
     /* 섹션 제목 */
     .section-title {
-        color: #2E7D32 !important;
+        color: var(--primary-dark) !important;
         font-size: 2.4em;
         font-weight: 700;
         margin: 50px 0 30px 0;
@@ -237,14 +224,14 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.9);
         padding: 20px 30px;
         border-radius: 20px;
-        border-left: 6px solid #4CAF50;
+        border-left: 6px solid var(--primary);
         box-shadow: 0 10px 30px rgba(76, 175, 80, 0.15);
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     
     /* 사용자 정보 카드 */
     .user-info-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 20px;
@@ -259,13 +246,13 @@ st.markdown("""
     }
     
     .user-info-card:hover {
-        border-color: #4CAF50;
+        border-color: var(--primary);
         box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
         transform: translateY(-3px);
     }
     
     .user-name {
-        color: #2E7D32;
+        color: var(--primary-dark);
         font-size: 1.4em;
         font-weight: 700;
         margin-bottom: 10px;
@@ -279,7 +266,7 @@ st.markdown("""
     
     /* 차트 컨테이너 */
     .chart-container {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 25px;
@@ -289,13 +276,13 @@ st.markdown("""
     }
     
     .chart-container:hover {
-        border-color: #4CAF50;
+        border-color: var(--primary);
         box-shadow: 0 12px 35px rgba(76, 175, 80, 0.2);
     }
     
     /* 인사이트 카드 */
     .insight-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 20px;
@@ -305,7 +292,7 @@ st.markdown("""
     }
     
     .insight-card:hover {
-        border-color: #4CAF50;
+        border-color: var(--primary);
         box-shadow: 0 8px 25px rgba(76, 175, 80, 0.2);
         transform: translateY(-2px);
     }
@@ -322,75 +309,11 @@ st.markdown("""
     }
     
     .menu-title {
-        color: #2E7D32;
+        color: var(--primary-dark);
         text-align: center;
         margin-bottom: 20px;
         font-weight: 700;
         font-size: 1.4em;
-    }
-    
-    /* 버튼 스타일 */
-    div[data-testid="stButton"] > button {
-        background: linear-gradient(45deg, #4CAF50, #66BB6A) !important;
-        border: none !important;
-        border-radius: 15px !important;
-        color: white !important;
-        font-weight: 700 !important;
-        padding: 15px 30px !important;
-        font-size: 16px !important;
-        transition: all 0.3s ease !important;
-        width: 100% !important;
-        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3) !important;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        min-height: 55px !important;
-    }
-    
-    div[data-testid="stButton"] > button:hover {
-        background: linear-gradient(45deg, #388E3C, #4CAF50) !important;
-        transform: translateY(-3px) !important;
-        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.4) !important;
-    }
-    
-    /* 기본 UI 숨김 */
-    [data-testid="stHeader"] { display: none; }
-    [data-testid="stSidebarNav"] { display: none; }
-    [data-testid="stSidebar"] { display: none; }
-    [data-testid="collapsedControl"] { display: none; }
-    footer { display: none; }
-    
-    /* 반응형 디자인 */
-    @media (max-width: 768px) {
-        .main .block-container {
-            padding: 1rem 1.5rem !important;
-        }
-        
-        .home-title {
-            font-size: 2.6em !important;
-            padding: 25px 30px !important;
-        }
-        
-        .feature-card {
-            height: 250px;
-            padding: 25px 20px;
-        }
-        
-        .stat-number {
-            font-size: 2.8em;
-        }
-        
-        .section-title {
-            font-size: 1.8em;
-            padding: 15px 20px;
-        }
-        
-        .cluster-card {
-            height: 170px;
-        }
-        
-        .system-intro-card {
-            padding: 30px 20px;
-        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -630,7 +553,58 @@ def render_cluster_result():
                     <h4 style="color: #666; margin-bottom: 15px;">
                         {cluster_data['english_name']}
                     </h4>
-                    <p style="color: #2E7D32; font-weight: 600; line-height: 1.6;">
+                    <p style="color: #2E7D32; font-weight: 600; line-height: 1.6; margin-bottom: 20px;">
+                        {cluster_data['description']}
+                    </p>
+                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+                        <div style="background: linear-gradient(45deg, #4CAF50, #66BB6A); color: white; 
+                                    padding: 10px 20px; border-radius: 15px; font-weight: 700;">
+                            신뢰도: {cluster_result['confidence']:.1%}
+                        </div>
+                        <div style="background: linear-gradient(45deg, #2E7D32, #4CAF50); color: white; 
+                                    padding: 10px 20px; border-radius: 15px; font-weight: 700;">
+                            전체 비율: {cluster_data['percentage']}%
+                        </div>
+                        <div style="background: linear-gradient(45deg, #1B5E20, #2E7D32); color: white; 
+                                    padding: 10px 20px; border-radius: 15px; font-weight: 700;">
+                            {cluster_data['count']:,}명 중 하나
+                        </div>
+                    </div>
+                </div>
+                """, unsafe_allow_html=True)
+
+# =============================================================================
+# 메인 홈 페이지 함수
+# =============================================================================
+
+def home_page():
+    """메인 홈 페이지 렌더링"""
+    
+    # 상단 메뉴
+    render_top_menu()
+    
+    # 메인 제목
+    st.markdown('<h1 class="home-title">🌿 한국 관광 성향 진단 시스템 2.0</h1>', unsafe_allow_html=True)
+    
+    # 새로운 시스템 소개
+    st.markdown(f"""
+    <div class="system-intro-card">
+        <h2 style="color: #2E7D32; margin-bottom: 25px; text-align: center; font-size: 1.8em;">
+            🎯 12개 요인 기반 정밀 분석 시스템
+        </h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
+            <div>
+                <h4 style="color: #2E7D32; margin-bottom: 15px; display: flex; align-items: center;">
+                    <span style="font-size: 1.5em; margin-right: 10px;">🔬</span>과학적 분석 기반
+                </h4>
+                <p style="color: #2E7D32; font-weight: 600; line-height: 1.6; margin-bottom: 20px;">
+                    실제 2,591명의 외국인 관광객 데이터를 요인분석하여 12개 핵심 요인을 도출했습니다.
+                </p>
+                
+                <h4 style="color: #2E7D32; margin: 20px 0 15px 0; display: flex; align-items: center;">
+                    <span style="font-size: 1.5em; margin-right: 10px;">🎭</span>8개 정밀 클러스터
+                </h4>
+                <p style="color: #2E7D32; font-weight: 600; line-height: 1.6;">
                     12개 요인을 바탕으로 8가지 독특한 여행 성향 유형으로 정밀 분류합니다.
                 </p>
             </div>
@@ -924,56 +898,4 @@ if __name__ == "__main__":
             if st.button("🏠 로그인 페이지로 이동"):
                 st.switch_page("app.py")
 else:
-    home_page(); font-weight: 600; margin-bottom: 25px; font-size: 1.1em; line-height: 1.6;">
-                        {cluster_data['description']}
-                    </p>
-                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
-                        <div style="background: linear-gradient(45deg, #4CAF50, #66BB6A); color: white; 
-                                    padding: 10px 20px; border-radius: 15px; font-weight: 700;">
-                            신뢰도: {cluster_result['confidence']:.1%}
-                        </div>
-                        <div style="background: linear-gradient(45deg, #2E7D32, #4CAF50); color: white; 
-                                    padding: 10px 20px; border-radius: 15px; font-weight: 700;">
-                            전체 비율: {cluster_data['percentage']}%
-                        </div>
-                        <div style="background: linear-gradient(45deg, #1B5E20, #2E7D32); color: white; 
-                                    padding: 10px 20px; border-radius: 15px; font-weight: 700;">
-                            {cluster_data['count']:,}명 중 하나
-                        </div>
-                    </div>
-                </div>
-                
-
-# =============================================================================
-# 메인 홈 페이지 함수
-# =============================================================================
-
-def home_page():
-    """메인 홈 페이지 렌더링"""
-    
-    # 상단 메뉴
-    render_top_menu()
-    
-    # 메인 제목
-    st.markdown('<h1 class="home-title">🌿 한국 관광 성향 진단 시스템 2.0</h1>', unsafe_allow_html=True)
-    
-    # 새로운 시스템 소개
-    st.markdown(f"""
-    <div class="system-intro-card">
-        <h2 style="color: #2E7D32; margin-bottom: 25px; text-align: center; font-size: 1.8em;">
-            🎯 12개 요인 기반 정밀 분석 시스템
-        </h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;">
-            <div>
-                <h4 style="color: #2E7D32; margin-bottom: 15px; display: flex; align-items: center;">
-                    <span style="font-size: 1.5em; margin-right: 10px;">🔬</span>과학적 분석 기반
-                </h4>
-                <p style="color: #2E7D32; font-weight: 600; line-height: 1.6; margin-bottom: 20px;">
-                    실제 2,591명의 외국인 관광객 데이터를 요인분석하여 12개 핵심 요인을 도출했습니다.
-                </p>
-                
-                <h4 style="color: #2E7D32; margin: 20px 0 15px 0; display: flex; align-items: center;">
-                    <span style="font-size: 1.5em; margin-right: 10px;">🎭</span>8개 정밀 클러스터
-                </h4>
-                <p style="color: #2E7D32
-                """, unsafe_allow_html=True)
+    home_page()

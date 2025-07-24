@@ -1,7 +1,8 @@
 import streamlit as st
 import time
-from utils import (questions, calculate_factor_scores, determine_cluster_from_factors, 
-                  validate_answers, show_footer, reset_survey_state, check_access_permissions)
+from utils import (questions, calculate_factor_scores, determine_cluster, 
+                  validate_answers, show_footer, reset_survey_state, 
+                  check_access_permissions, apply_global_styles)
 
 # 페이지 설정
 st.set_page_config(
@@ -20,57 +21,38 @@ if 'logged_in' not in st.session_state or not st.session_state.logged_in:
         st.switch_page("app.py")
     st.stop()
 
+# 설문 재설정 플래그 확인
 if st.session_state.get('reset_survey_flag', False):
     reset_survey_state()
+    st.session_state.reset_survey_flag = False
 
-# 고급 CSS 스타일링 (TailwindCSS 스타일 적용)
+# 전역 스타일 적용
+apply_global_styles()
+
+# 설문 전용 추가 스타일
 st.markdown("""
 <style>
-    /* 기본 배경 그라데이션 */
-    [data-testid="stAppViewContainer"] > .main {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #4CAF50 100%);
-        min-height: 100vh;
-    }
-    
-    /* 메인 컨테이너 */
-    .main .block-container {
-        max-width: 1000px;
-        margin: 0 auto;
-        padding: 2rem 1rem !important;
-    }
-    
-    /* 프로그레스 컨테이너 */
-    .progress-container {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(15px);
-        border: 2px solid rgba(76, 175, 80, 0.3);
-        border-radius: 20px;
-        padding: 25px;
-        margin: 20px 0;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    }
-    
     /* 질문 카드 스타일 */
     .question-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         backdrop-filter: blur(15px);
         border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 20px;
+        border-radius: var(--border-radius);
         padding: 30px;
         margin: 25px 0;
         transition: all 0.3s ease;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow);
     }
     
     .question-card:hover {
         transform: translateY(-2px);
-        border-color: #4CAF50;
-        box-shadow: 0 12px 40px rgba(76, 175, 80, 0.2);
+        border-color: var(--primary);
+        box-shadow: var(--shadow-hover);
     }
     
     .question-card.error {
         border-color: #FF5722;
-        background: linear-gradient(135deg, rgba(255, 87, 34, 0.1), rgba(255, 255, 255, 0.95));
+        background: linear-gradient(135deg, rgba(255, 87, 34, 0.1), var(--card-bg));
         animation: shake 0.6s ease-in-out;
     }
     
@@ -82,7 +64,7 @@ st.markdown("""
     
     /* 질문 제목 */
     .question-title {
-        color: #2E7D32;
+        color: var(--primary-dark);
         font-size: 1.4em;
         font-weight: 700;
         margin-bottom: 20px;
@@ -96,7 +78,7 @@ st.markdown("""
     /* 요인 태그 */
     .factor-tag {
         display: inline-block;
-        background: linear-gradient(45deg, #4CAF50, #81C784);
+        background: linear-gradient(45deg, var(--primary), var(--primary-light));
         color: white;
         padding: 4px 12px;
         border-radius: 15px;
@@ -106,7 +88,7 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
     }
     
-    /* 라디오 버튼 스타일 */
+    /* 라디오 버튼 스타일 개선 */
     div[data-testid="stRadio"] {
         margin: 15px 0;
     }
@@ -132,53 +114,54 @@ st.markdown("""
     
     div[data-testid="stRadio"] label:hover {
         transform: translateY(-2px) !important;
-        border-color: #4CAF50 !important;
+        border-color: var(--primary) !important;
         box-shadow: 0 4px 15px rgba(76, 175, 80, 0.2) !important;
     }
     
     div[data-testid="stRadio"] input:checked + div {
         background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(129, 199, 132, 0.1)) !important;
-        border-color: #4CAF50 !important;
+        border-color: var(--primary) !important;
         transform: translateY(-2px) !important;
         box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3) !important;
     }
     
     div[data-testid="stRadio"] label span {
         font-size: 1.1em !important;
-        color: #2E7D32 !important;
+        color: var(--primary-dark) !important;
         font-weight: 600 !important;
         line-height: 1.5 !important;
     }
     
     /* 메인 제목 */
     .main-title {
-        color: #2E7D32 !important;
+        color: var(--primary-dark) !important;
         text-align: center;
         font-size: 2.8em !important;
         font-weight: 800 !important;
         margin-bottom: 30px;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         padding: 25px;
-        border-radius: 20px;
-        border: 3px solid #4CAF50;
+        border-radius: var(--border-radius);
+        border: 3px solid var(--primary);
+        box-shadow: var(--shadow);
     }
     
     /* 인트로 카드 */
     .intro-card {
-        background: rgba(255, 255, 255, 0.95);
+        background: var(--card-bg);
         backdrop-filter: blur(15px);
         border: 2px solid rgba(76, 175, 80, 0.4);
-        border-radius: 20px;
+        border-radius: var(--border-radius);
         padding: 25px;
         margin: 20px 0;
         text-align: center;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        box-shadow: var(--shadow);
     }
     
-    /* 진행률 바 커스터마이징 */
+    /* 진행률 바 */
     div[data-testid="stProgress"] > div > div {
-        background: linear-gradient(45deg, #4CAF50, #81C784) !important;
+        background: linear-gradient(45deg, var(--primary), var(--primary-light)) !important;
         border-radius: 10px !important;
         height: 12px !important;
     }
@@ -193,81 +176,21 @@ st.markdown("""
     .progress-text {
         font-size: 1.3em;
         font-weight: 700;
-        color: #2E7D32;
+        color: var(--primary-dark);
         text-align: center;
         margin: 15px 0;
         text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
     }
     
-    /* 완료 버튼 */
-    div[data-testid="stButton"] > button {
-        background: linear-gradient(45deg, #4CAF50, #66BB6A) !important;
-        border: none !important;
-        border-radius: 15px !important;
-        color: white !important;
-        font-weight: 700 !important;
-        padding: 15px 30px !important;
-        font-size: 18px !important;
-        transition: all 0.3s ease !important;
-        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4) !important;
-        text-transform: uppercase !important;
-        letter-spacing: 1px !important;
-        width: 100% !important;
-        min-height: 60px !important;
-    }
-    
-    div[data-testid="stButton"] > button:hover {
-        background: linear-gradient(45deg, #388E3C, #4CAF50) !important;
-        transform: translateY(-3px) !important;
-        box-shadow: 0 10px 30px rgba(76, 175, 80, 0.5) !important;
-    }
-    
-    /* 에러 메시지 */
-    div[data-testid="stAlert"] {
-        border-radius: 15px !important;
-        border: 2px solid #FF5722 !important;
-        background: linear-gradient(135deg, rgba(255, 87, 34, 0.1), rgba(255, 255, 255, 0.95)) !important;
-        color: #FF5722 !important;
-        font-weight: 600 !important;
-        font-size: 1.1em !important;
-    }
-    
-    /* 사이드바 커스터마이징 */
-    section[data-testid="stSidebar"] > div {
-        background: linear-gradient(135deg, rgba(76, 175, 80, 0.1), rgba(129, 199, 132, 0.05));
+    /* 프로그레스 컨테이너 */
+    .progress-container {
+        background: var(--card-bg);
         backdrop-filter: blur(15px);
-    }
-    
-    /* 기본 UI 숨김 */
-    [data-testid="stHeader"] { display: none; }
-    [data-testid="stSidebarNav"] { display: none; }
-    [data-testid="collapsedControl"] { display: none; }
-    footer { display: none; }
-    
-    /* 반응형 디자인 */
-    @media (max-width: 768px) {
-        .main .block-container {
-            padding: 1rem 0.5rem !important;
-        }
-        
-        .main-title {
-            font-size: 2.2em !important;
-            padding: 20px 15px !important;
-        }
-        
-        .question-card {
-            padding: 20px 15px;
-            margin: 15px 0;
-        }
-        
-        div[data-testid="stRadio"] label {
-            padding: 12px 15px !important;
-            min-height: 50px !important;
-        }
-        
-        div[data-testid="stRadio"] label span {
-            font-size: 1em !important;
-        }
+        border: 2px solid rgba(76, 175, 80, 0.3);
+        border-radius: var(--border-radius);
+        padding: 25px;
+        margin: 20px 0;
+        box-shadow: var(--shadow);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -415,8 +338,8 @@ def questionnaire_page():
                     factor_scores = calculate_factor_scores(st.session_state.answers)
                     st.session_state.factor_scores = factor_scores
                     
-                    # 클러스터 결정
-                    cluster_result = determine_cluster_from_factors(factor_scores)
+                    # 클러스터 결정 - 수정된 함수 사용
+                    cluster_result = determine_cluster(st.session_state.answers)
                     st.session_state.cluster_result = cluster_result
                     st.session_state.survey_completed = True
                     
@@ -429,6 +352,13 @@ def questionnaire_page():
                 except Exception as e:
                     st.error(f"❌ 분석 중 오류가 발생했습니다: {str(e)}")
                     st.info("잠시 후 다시 시도해주세요.")
+                    # 디버깅을 위한 상세 오류 정보
+                    with st.expander("🔍 디버그 정보 (개발용)"):
+                        st.write(f"답변 수: {len(st.session_state.answers)}")
+                        st.write(f"답변 키: {list(st.session_state.answers.keys())}")
+                        st.write(f"에러 타입: {type(e).__name__}")
+                        st.write(f"에러 메시지: {str(e)}")
+                    
             else:
                 error_count = len(st.session_state.validation_errors)
                 st.error(f"⚠️ {error_count}개의 문항에 답변이 필요합니다!")
@@ -456,7 +386,7 @@ if __name__ == '__main__':
         st.error("❌ 페이지 로딩 중 오류가 발생했습니다.")
         st.exception(e)
         
-        col1, col2 = st.columns(2)
+        col1, col2, col3 = st.columns(3)
         with col1:
             if st.button("🔄 페이지 새로고침", key="refresh_page"):
                 st.rerun()
@@ -464,5 +394,10 @@ if __name__ == '__main__':
         with col2:
             if st.button("🏠 홈으로 돌아가기", key="home_redirect"):
                 st.switch_page("pages/03_home.py")
+                
+        with col3:
+            if st.button("🚪 로그아웃", key="error_logout"):
+                st.session_state.clear()
+                st.switch_page("app.py")
 else:
     questionnaire_page()

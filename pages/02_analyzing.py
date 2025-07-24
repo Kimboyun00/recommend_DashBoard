@@ -1,10 +1,6 @@
-# pages/02_analyzing.py (웰니스 분석 중 페이지)
-
 import streamlit as st
 import time
-import base64
-from pathlib import Path
-from utils import check_access_permissions
+from utils import check_access_permissions, apply_global_styles
 
 # --- 페이지 설정 ---
 st.set_page_config(
@@ -16,22 +12,12 @@ st.set_page_config(
 # 접근 권한 확인 (기본값: 로그인 + 설문 완료 둘 다 확인)
 check_access_permissions()
 
-# --- 모든 페이지 공통 UI 숨김 CSS 및 분석 페이지 스타일 ---
+# 전역 스타일 적용
+apply_global_styles()
+
+# --- 분석 페이지 전용 스타일 ---
 st.markdown("""
     <style>
-        /* 웰니스 테마 배경 그라데이션 */
-        [data-testid="stAppViewContainer"] > .main {
-            background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 50%, #A5D6A7 100%);
-            min-height: 100vh;
-        }
-        
-        /* 모든 페이지 공통: 헤더, 사이드바 내비게이션, 사이드바 컨트롤 버튼, 푸터 숨기기 */
-        [data-testid="stHeader"] { display: none; }
-        [data-testid="stSidebarNav"] { display: none; } 
-        [data-testid="stSidebar"] { display: none; } 
-        [data-testid="collapsedControl"] { display: none; } 
-        footer { display: none; } 
-
         /* 중앙 정렬을 위한 메인 컨테이너 */
         .main .block-container {
             display: flex;
@@ -44,13 +30,13 @@ st.markdown("""
         
         /* 분석 카드 스타일 */
         .analyzing-card {
-            background: rgba(100, 255, 71, 0.2);
+            background: var(--card-bg);
             backdrop-filter: blur(25px);
-            border: 3px solid #4CAF50;
+            border: 3px solid var(--primary);
             border-radius: 30px;
             padding: 40px 30px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 20px 60px rgba(76, 175, 80, 0.2);
             max-width: 600px;
             width: 90%;
             margin: 0 auto;
@@ -58,9 +44,15 @@ st.markdown("""
             overflow: hidden;
         }
         
-        @keyframes borderGlow {
-            0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.6; transform: scale(1.01); }
+        .analyzing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 30px 30px 0 0;
         }
         
         /* 아이콘 회전 애니메이션 */
@@ -87,10 +79,12 @@ st.markdown("""
             66% { content: "..."; }
             100% { content: "."; }
         }
+        
         .analyzing-text {
             text-align: center;
             margin-left: 90px;
         }
+        
         .analyzing-text::after {
             content: ".";
             animation: ellipsis 1.5s infinite;
@@ -102,7 +96,7 @@ st.markdown("""
         /* 제목 스타일 */
         .analyzing-title {
             text-align: center;
-            color: #2E7D32;
+            color: var(--primary-dark);
             font-size: 2.4em;
             font-weight: 800;
             margin-top: 20px;
@@ -120,11 +114,11 @@ st.markdown("""
             opacity: 0.9;
         }
             
-        /* 진행률 바 외부 컨테이너가 analyzing-card와 같은 폭을 갖도록 설정 */
+        /* 진행률 바 외부 컨테이너 */
         .progress-wrapper {
             max-width: 600px;
             width: 90%;
-            margin: 0 auto;  /* 중앙 정렬 */
+            margin: 0 auto;
         }
             
         /* 진행률 컨테이너 */
@@ -138,7 +132,7 @@ st.markdown("""
         
         /* 진행률 바 */
         .progress-bar {
-            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
             height: 12px;
             border-radius: 8px;
             transition: all 0.5s ease;
@@ -147,16 +141,10 @@ st.markdown("""
             overflow: hidden;
         }
         
-        @keyframes progressShine {
-            0% { left: -100%; }
-            50% { left: 100%; }
-            100% { left: 100%; }
-        }
-        
         /* 진행률 텍스트 */
         .progress-text {
             text-align: left;
-            color: #2E7D32;
+            color: var(--primary-dark);
             font-weight: 700;
             font-size: 1.1em;
             margin-top: 20px;
@@ -167,19 +155,19 @@ st.markdown("""
         .status-wrapper {
             max-width: 600px;
             width: 90%;
-            margin: 0 auto;  /* 중앙 정렬 */
+            margin: 0 auto;
         }
         
         /* 상태 메시지 */
         .status-message {
-            color: #2E7D32;
+            color: var(--primary-dark);
             font-size: 1.0em;
             font-weight: 600;
             margin: 20px 0;
             padding: 15px 20px;
             background: rgba(76, 175, 80, 0.1);
             border-radius: 12px;
-            border-left: 5px solid #4CAF50;
+            border-left: 5px solid var(--primary);
             box-shadow: 0 3px 12px rgba(76, 175, 80, 0.15);
             transition: all 0.3s ease;
         }
@@ -187,12 +175,10 @@ st.markdown("""
         /* 완료 상태 메시지 */
         .status-message.completed {
             background: linear-gradient(135deg, rgba(76, 175, 80, 0.2), rgba(129, 199, 132, 0.15));
-            border-left-color: #4CAF50;
+            border-left-color: var(--primary);
             box-shadow: 0 4px 16px rgba(76, 175, 80, 0.25);
             transform: translateY(-2px);
         }
-        
-        
         
         /* 반응형 디자인 */
         @media (max-width: 768px) {
