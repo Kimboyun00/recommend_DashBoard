@@ -9,7 +9,8 @@ def check_access_permissions(page_type='default'):
     """페이지 접근 권한 확인"""
     if 'logged_in' not in st.session_state or not st.session_state.logged_in:
         st.error("⚠️ 로그인 후 이용해주세요.")
-        st.page_link("app.py", label="로그인 페이지로 돌아가기", icon="🏠")
+        if st.button("🏠 로그인 페이지로 돌아가기", key="access_login_btn"):
+            st.switch_page("app.py")
         st.stop()
     
     if page_type not in ['home', 'questionnaire']:
@@ -17,10 +18,10 @@ def check_access_permissions(page_type='default'):
             st.warning("⚠️ 설문조사를 먼저 완료해주세요.")
             col1, col2 = st.columns(2)
             with col1:
-                if st.button("📝 설문조사 하러 가기"):
+                if st.button("📝 설문조사 하러 가기", key="access_survey_btn"):
                     st.switch_page("pages/01_questionnaire.py")
             with col2:
-                if st.button("🏠 홈으로 가기"):
+                if st.button("🏠 홈으로 가기", key="access_home_btn"):
                     st.switch_page("pages/03_home.py")
             st.stop()
 
@@ -195,7 +196,7 @@ def get_cluster_info():
             "name": "헤리티지 러버",
             "english_name": "Heritage Lover",
             "description": "전통문화 애호가형 재방문자. 전통문화 마니아이며 디지털 미디어도 적극 활용",
-            "characteristics": ["전통문화 마니아", "재방문 경험", "SNS 활용", "심화 체험"],
+            "characteristics": ["전통문화 마니아", "재방문 경험", "SMS 활용", "심화 체험"],
             "color": "#4B0082",
             "percentage": 15.4,
             "count": 399,
@@ -407,20 +408,29 @@ def create_factor_analysis_chart(factor_scores):
         theta=factor_names,
         fill='toself',
         name='나의 요인 점수',
-        line_color='#4CAF50'
+        line_color='#4CAF50',
+        fillcolor='rgba(76, 175, 80, 0.2)'
     ))
     
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[-2, 2]
-            )),
+                range=[-2, 2],
+                tickfont=dict(size=10, color='#2E7D32'),
+                gridcolor='rgba(76, 175, 80, 0.3)'
+            ),
+            angularaxis=dict(
+                tickfont=dict(size=11, color='#2E7D32'),
+                gridcolor='rgba(76, 175, 80, 0.3)'
+            )
+        ),
         showlegend=True,
         title="12개 요인별 개인 성향 분석",
         font=dict(color='#2E7D32', size=12),
         plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
+        paper_bgcolor='rgba(0,0,0,0)',
+        height=500
     )
     
     return fig
@@ -467,7 +477,8 @@ def create_cluster_comparison_chart(user_cluster, factor_scores):
         barmode='group',
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        font_color='#2E7D32'
+        font_color='#2E7D32',
+        height=400
     )
     
     return fig
