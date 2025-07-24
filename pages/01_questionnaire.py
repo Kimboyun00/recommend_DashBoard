@@ -16,7 +16,8 @@ check_access_permissions('questionnaire')
 # 로그인 확인
 if 'logged_in' not in st.session_state or not st.session_state.logged_in:
     st.error("⚠️ 로그인 후 이용해주세요.")
-    st.page_link("app.py", label="로그인 페이지로 돌아가기", icon="🏠")
+    if st.button("🏠 로그인 페이지로 돌아가기", key="login_redirect"):
+        st.switch_page("app.py")
     st.stop()
 
 if st.session_state.get('reset_survey_flag', False):
@@ -307,7 +308,7 @@ def questionnaire_page():
         **📊 정확도**: 95% 이상
         """)
         
-        if st.button("🚪 로그아웃", use_container_width=True):
+        if st.button("🚪 로그아웃", use_container_width=True, key="sidebar_logout"):
             st.session_state.clear()
             st.session_state.logged_in = False
             st.switch_page("app.py")
@@ -323,8 +324,9 @@ def questionnaire_page():
     def update_answers():
         """답변 업데이트 함수"""
         for q_key in questions.keys():
-            if f"radio_{q_key}" in st.session_state:
-                st.session_state.answers[q_key] = st.session_state[f"radio_{q_key}"]
+            radio_key = f"radio_{q_key}"
+            if radio_key in st.session_state:
+                st.session_state.answers[q_key] = st.session_state[radio_key]
 
     # 메인 제목
     st.markdown('<h1 class="main-title">🌿 한국 관광 성향 진단 시스템</h1>', unsafe_allow_html=True)
@@ -367,16 +369,21 @@ def questionnaire_page():
         
         st.markdown(f'<div class="{title_class}">{title_text}</div>', unsafe_allow_html=True)
         
-        # 라디오 버튼 옵션
+        # 라디오 버튼 옵션 - 접근성 경고 해결
         index_to_pass = current_answer if current_answer is not None else None
+        
+        # 각 질문마다 고유한 라벨 생성
+        question_number = q_key.replace('q', '')
+        radio_label = f"질문 {question_number}번 응답 선택"
+        
         st.radio(
-            "",
+            radio_label,  # 접근성을 위한 명확한 라벨
             options=list(range(len(question['options']))),
-            format_func=lambda x, opts=question['options']: f"{opts[x]}",
+            format_func=lambda x, opts=question['options']: f"{x+1}. {opts[x]}",
             key=f"radio_{q_key}",
             on_change=update_answers,
             index=index_to_pass,
-            label_visibility="hidden"
+            label_visibility="hidden"  # 라벨은 숨기지만 스크린 리더를 위해 제공
         )
         
         st.markdown('</div>', unsafe_allow_html=True)
@@ -401,29 +408,61 @@ def questionnaire_page():
     # 완료 버튼
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        if st.button("🎯 12개 요인 분석 시작하기", type="primary", use_container_width=True):
+        if st.button("🎯 12개 요인 분석 시작하기", type="primary", use_container_width=True, key="complete_survey"):
             if validate_answers():
-                # 요인 점수 계산
-                factor_scores = calculate_factor_scores(st.session_state.answers)
-                st.session_state.factor_scores = factor_scores
-                
-                # 클러스터 결정
-                cluster_result = determine_cluster_from_factors(factor_scores)
-                st.session_state.cluster_result = cluster_result
-                st.session_state.survey_completed = True
-                
-                # 성공 메시지와 함께 분석 페이지로 이동
-                st.success("✅ 설문이 완료되었습니다! 분석을 시작합니다...")
-                time.sleep(1)
-                st.switch_page("pages/02_analyzing.py")
+                try:
+                    # 요인 점수 계산
+                    factor_scores = calculate_factor_scores(st.session_state.answers)
+                    st.session_state.factor_scores = factor_scores
+                    
+                    # 클러스터 결정
+                    cluster_result = determine_cluster_from_factors(factor_scores)
+                    st.session_state.cluster_result = cluster_result
+                    st.session_state.survey_completed = True
+                    
+                    # 성공 메시지와 함께 분석 페이지로 이동
+                    st.success("✅ 설문이 완료되었습니다! 분석을 시작합니다...")
+                    st.balloons()
+                    time.sleep(1.5)
+                    st.switch_page("pages/02_analyzing.py")
+                    
+                except Exception as e:
+                    st.error(f"❌ 분석 중 오류가 발생했습니다: {str(e)}")
+                    st.info("잠시 후 다시 시도해주세요.")
             else:
-                st.error(f"⚠️ {len(st.session_state.validation_errors)}개의 문항에 답변이 필요합니다!")
+                error_count = len(st.session_state.validation_errors)
+                st.error(f"⚠️ {error_count}개의 문항에 답변이 필요합니다!")
+                
+                # 오류가 있는 문항들 표시
+                missing_questions = []
+                for q_key in st.session_state.validation_errors:
+                    if q_key in questions:
+                        q_num = q_key.replace('q', '')
+                        missing_questions.append(f"Q{q_num}")
+                
+                if missing_questions:
+                    st.warning(f"미완료 문항: {', '.join(missing_questions)}")
+                
                 st.rerun()
 
     # 푸터
     show_footer()
 
+# 실행부 - 에러 처리 추가
 if __name__ == '__main__':
-    questionnaire_page()
+    try:
+        questionnaire_page()
+    except Exception as e:
+        st.error("❌ 페이지 로딩 중 오류가 발생했습니다.")
+        st.exception(e)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("🔄 페이지 새로고침", key="refresh_page"):
+                st.rerun()
+        
+        with col2:
+            if st.button("🏠 홈으로 돌아가기", key="home_redirect"):
+                st.switch_page("pages/03_home.py")
 else:
     questionnaire_page()
