@@ -6,6 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import os
 import sys
+import time
 
 def check_access_permissions(page_type='default'):
     """페이지 접근 권한 확인"""
@@ -305,8 +306,16 @@ def get_cluster_info():
 def load_wellness_destinations():
     """실제 CSV 파일에서 웰니스 관광지 데이터 로드"""
     try:
+        # 현재 디렉토리에서 CSV 파일 찾기
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        csv_path = os.path.join(current_dir, 'region_data.csv')
+        
+        # 파일이 없으면 상위 디렉토리에서 찾기
+        if not os.path.exists(csv_path):
+            csv_path = 'region_data.csv'
+        
         # CSV 파일 로드
-        df = pd.read_csv('region_data.csv')
+        df = pd.read_csv(csv_path)
         
         # 데이터 검증
         required_columns = ['name', 'lat', 'lon', 'type', 'description', 'rating', 
@@ -341,10 +350,54 @@ def load_wellness_destinations():
         
     except FileNotFoundError:
         st.error("❌ region_data.csv 파일을 찾을 수 없습니다.")
-        return pd.DataFrame()
+        # 더미 데이터 생성
+        return create_dummy_wellness_data()
     except Exception as e:
         st.error(f"❌ 데이터 로드 중 오류가 발생했습니다: {str(e)}")
-        return pd.DataFrame()
+        return create_dummy_wellness_data()
+
+def create_dummy_wellness_data():
+    """더미 웰니스 관광지 데이터 생성"""
+    dummy_data = [
+        {
+            'name': '서울 스파랜드',
+            'lat': 37.5665,
+            'lon': 126.9780,
+            'type': '스파/온천',
+            'description': '서울 시내 프리미엄 스파 시설',
+            'rating': 8.5,
+            'price_range': '100,000-200,000원',
+            'distance_from_incheon': 60,
+            'cluster': 2,
+            'type_en': 'spa_oncheon'
+        },
+        {
+            'name': '제주 웰니스 리조트',
+            'lat': 33.4996,
+            'lon': 126.5312,
+            'type': '웰니스 리조트',
+            'description': '제주도 자연 속 힐링 리조트',
+            'rating': 9.2,
+            'price_range': '300,000-500,000원',
+            'distance_from_incheon': 450,
+            'cluster': 4,
+            'type_en': 'wellness_resort'
+        },
+        {
+            'name': '강원도 산림치유센터',
+            'lat': 37.8853,
+            'lon': 127.7294,
+            'type': '산림/자연치유',
+            'description': '강원도 깊은 산속 자연치유 시설',
+            'rating': 8.8,
+            'price_range': '50,000-100,000원',
+            'distance_from_incheon': 150,
+            'cluster': 1,
+            'type_en': 'forest_healing'
+        }
+    ]
+    
+    return pd.DataFrame(dummy_data)
 
 def calculate_factor_scores(answers):
     """설문 답변을 12개 요인 점수로 변환"""
