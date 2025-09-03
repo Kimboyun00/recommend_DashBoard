@@ -418,7 +418,8 @@ def questionnaire_page():
                 st.session_state.answers[q_key] = st.session_state[radio_key]
 
     # 메인 제목
-    st.markdown('<h1 class="main-title">🌿 웰니스 관광 성향 진단 시스템 </h1>', unsafe_allow_html=True)
+    st.title("🌿 웰니스 관광 성향 진단 시스템")
+    st.markdown("---")
     
     # 소개 메시지
     st.markdown("""
