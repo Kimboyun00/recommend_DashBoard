@@ -546,8 +546,6 @@ def questionnaire_page():
         
         st.markdown('</div>', unsafe_allow_html=True)
 
-    st.markdown("---")
-
     # 완료 버튼
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
@@ -617,12 +615,7 @@ def questionnaire_page():
                 # 페이지 새로고침하여 오류 표시
                 time.sleep(0.5)
                 st.rerun()
-
-    # 추가 도움말
-    st.markdown("---")
     
-    
-
     # 푸터
     show_footer()
 
