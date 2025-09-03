@@ -148,7 +148,7 @@ st.markdown("""
     }
     
     div[data-testid="stRadio"] > div {
-        gap: 12px !important;
+        gap: 5px !important;
     }
     
     div[data-testid="stRadio"] label {
