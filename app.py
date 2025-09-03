@@ -91,7 +91,7 @@ def auth_css():
             width: 100%;
             padding: 12px 0;
             background: linear-gradient(45deg, #4CAF50, #8BC34A);
-                border: 10px;
+                border: none;
                 border-radius: 10px;
                 color: white;
             font-weight: bold;
@@ -108,18 +108,6 @@ def auth_page():
     left_space, form_col, right_space = st.columns((1.2, 1.2, 1.2))
 
     with form_col:
-        # 웰니스 투어 로고 및 제목
-        st.markdown("""
-        <style>
-        .wellness-title {
-            font-size: 34px !important;
-            font-weight: bold;
-        }
-        </style>
-        <h1 class="wellness-title">🌿 웰커밍 투어추천 시스템</h1>
-        """, unsafe_allow_html=True)
-        st.markdown('<p style="color: rgba(76,175,80,0.8); font-size: 1.2em; margin-bottom: 30px;">당신만의 맞춤형 힐링 여행을 찾아보세요</p>', unsafe_allow_html=True)
-        
         choice = st.radio("choice", ["로그인", "회원가입"], horizontal=True, label_visibility="collapsed")
         
         if 'choice_radio' in st.session_state and st.session_state.choice_radio == "로그인":
