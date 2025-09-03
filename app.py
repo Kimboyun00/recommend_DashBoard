@@ -131,7 +131,7 @@ def auth_page():
             username = st.text_input("아이디", key="login_user", placeholder="아이디를 입력하세요")
             password = st.text_input("비밀번호", type="password", key="login_pass", placeholder="비밀번호를 입력하세요")
             
-            if st.button("로 그 인 🚀", key="login_btn"):
+            if st.button("로그인", key="login_btn"):
                 is_authenticated = False
                 if username == "wellness" and password == "1234":
                     is_authenticated = True
