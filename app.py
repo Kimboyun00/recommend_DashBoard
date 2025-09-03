@@ -52,7 +52,7 @@ def auth_css():
         div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div[data-testid="stVerticalBlock"] {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 40px;
             border-radius: 15px;
             width: 100%;
@@ -89,8 +89,7 @@ def auth_css():
         /* 버튼 스타일 */
         div[data-testid="stButton"] > button {
             width: 100%; 
-            padding: 12px 0; 
-            align-items: center;
+            padding: 12px 0;
             background: linear-gradient(45deg, #4CAF50, #8BC34A);
                 border: none;
                 border-radius: 10px;
@@ -155,10 +154,6 @@ def auth_page():
                     st.switch_page("pages/01_questionnaire.py")
                 else:
                     st.error("❌ 아이디 또는 비밀번호가 잘못되었습니다.")
-            
-            # 데모 계정 안내
-            st.markdown("---")
-            st.info("🎯 **데모 계정**: 아이디 `wellness`, 비밀번호 `1234`")
 
         elif choice == "회원가입":
             st.markdown("<h2>📝 회원가입</h2>", unsafe_allow_html=True)
