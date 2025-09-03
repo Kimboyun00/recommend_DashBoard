@@ -492,7 +492,7 @@ def questionnaire_page():
         # 요인 태그
         factor_desc = get_factor_description(question['factor'])
         st.markdown(
-            f'<div class="factor-tag">{question["factor"]}: {factor_desc}</div>',
+            f'<div class="factor-tag">{factor_desc} 문항</div>',
             unsafe_allow_html=True
         )
 
