@@ -119,7 +119,7 @@ st.markdown("""
         color: #2C3E50;
         font-size: 1.25em;
         font-weight: 700;
-        margin-bottom: 16px;
+        margin-bottom: 5px;
         line-height: 1.5;
     }
     
