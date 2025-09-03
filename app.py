@@ -48,7 +48,7 @@ def auth_css():
             padding: 0 !important;
         }
 
-        /* 로그인 폼 컨테이너 */
+        /* 로그인 폼 컨테이너 (st.columns의 중앙 컬럼을 타겟팅) */
         div[data-testid="stHorizontalBlock"] > div:nth-child(2) > div[data-testid="stVerticalBlock"] {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -61,7 +61,7 @@ def auth_css():
         }
         
         h1 { font-size: 2.2em; color: #ffffff; font-weight: 600; margin-bottom: 25px; letter-spacing: 2px; }
-
+        
         /* 로그인/회원가입 선택 라디오 버튼 스타일 */
         div[data-testid="stRadio"] {
             display: flex; justify-content: center; margin-bottom: 25px;
@@ -76,7 +76,6 @@ def auth_css():
             color: white; border-color: #00c6ff;
         }
 
-        /* 입력 필드 스타일 */
         div[data-testid="stTextInput"] input {
             background-color: rgba(255, 255, 255, 0.1); 
             border: 1px solid rgba(255, 255, 255, 0.2);
@@ -86,11 +85,10 @@ def auth_css():
             transition: all 0.3s;
         }
         
-        /* 버튼 스타일 */
         div[data-testid="stButton"] > button {
             width: 100%;
             padding: 12px 0;
-            background: linear-gradient(45deg, #4CAF50, #8BC34A);
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
                 border: none;
                 border-radius: 10px;
                 color: white;
@@ -108,6 +106,18 @@ def auth_page():
     left_space, form_col, right_space = st.columns((1.2, 1.2, 1.2))
 
     with form_col:
+        # 웰니스 투어 로고 및 제목
+        st.markdown("""
+        <style>
+        .wellness-title {
+            font-size: 34px !important;
+            font-weight: bold;
+        }
+        </style>
+        <h1 class="wellness-title">🌿 웰커밍 투어추천 시스템</h1>
+        """, unsafe_allow_html=True)
+        st.markdown('<p style="color: rgba(76,175,80,0.8); font-size: 1.2em; margin-bottom: 30px;">당신만의 맞춤형 힐링 여행을 찾아보세요</p>', unsafe_allow_html=True)
+        
         choice = st.radio("choice", ["로그인", "회원가입"], horizontal=True, label_visibility="collapsed")
         
         if 'choice_radio' in st.session_state and st.session_state.choice_radio == "로그인":
