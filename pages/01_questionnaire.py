@@ -119,7 +119,7 @@ st.markdown("""
         color: #2C3E50;
         font-size: 1.25em;
         font-weight: 700;
-        margin-bottom: 5px;
+        margin-bottom: 16px;
         line-height: 1.5;
     }
     
@@ -144,7 +144,7 @@ st.markdown("""
     
     /* 라디오 버튼 스타일 개선 */
     div[data-testid="stRadio"] {
-        margin: 16px 0;
+        margin: 5px 0;
     }
     
     div[data-testid="stRadio"] > div {
