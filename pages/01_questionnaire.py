@@ -505,13 +505,13 @@ def questionnaire_page():
         st.markdown(f'<div class="{title_class}">{title_text}</div>', unsafe_allow_html=True)
         
         # 라디오 버튼 옵션
+        options = question['options']
         index_to_pass = current_answer if current_answer is not None else None
-        radio_label = f"질문 {i}번 응답 선택"
         
         st.radio(
-            radio_label,
-            options=list(range(len(question['options']))),
-            format_func=lambda x, opts=question['options']: f"{x+1}. {opts[x]}",
+            radio_label=f"질문 {i}번 응답 선택",
+            options=list(range(len(options))),
+            format_func=lambda x, opts=options: f"{x+1}. {opts[x]}",
             key=f"radio_{q_key}",
             on_change=update_answers,
             index=index_to_pass,
