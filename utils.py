@@ -6,7 +6,6 @@ import plotly.express as px
 import plotly.graph_objects as go
 import os
 import sys
-import time
 
 def check_access_permissions(page_type='default'):
     """페이지 접근 권한 확인"""
@@ -64,7 +63,7 @@ questions = {
             "과거 한국 방문 경험이 큰 도움이 된다",
             "경험 여부는 크게 중요하지 않다"
         ],
-        "scores": [5, 4, 2, 1, 3]  # 새로운 국가 추구 vs 과거 경험
+        "scores": [5, 4, 2, 1, 3]
     },
     "q4": {
         "title": "4. 여행지에서 현지 정보 수집을 어떻게 하시나요?",
@@ -185,7 +184,7 @@ def get_cluster_info():
             "english_name": "Nature Seeker", 
             "description": "자연과 전통문화를 추구하는 탐험가형. 산림치유와 전통 체험을 통해 깊이 있는 힐링을 추구합니다.",
             "characteristics": ["자연치유 중시", "전통문화 관심", "체험 활동 선호", "깊이 있는 여행"],
-            "color": "#228B22",
+            "color": "#2ECC71",
             "percentage": 15.9,
             "count": 413,
             "key_factors": {
@@ -200,7 +199,7 @@ def get_cluster_info():
             "english_name": "Urban Wellness",
             "description": "도심형 프리미엄 웰니스를 추구하는 유형. 접근성이 좋은 고급 스파와 힐링 시설을 선호합니다.",
             "characteristics": ["도심 접근성", "프리미엄 서비스", "편의성 중시", "효율적 일정"],
-            "color": "#4169E1",
+            "color": "#3498DB",
             "percentage": 18.2,
             "count": 472,
             "key_factors": {
@@ -215,7 +214,7 @@ def get_cluster_info():
             "english_name": "Balanced Explorer",
             "description": "다양한 경험을 균형있게 추구하는 여행자. 문화와 자연, 휴식과 활동을 조화롭게 계획합니다.",
             "characteristics": ["균형잡힌 여행", "다양한 체험", "문화 관심", "적당한 예산"],
-            "color": "#FF8C00",
+            "color": "#E67E22",
             "percentage": 14.3,
             "count": 371,
             "key_factors": {
@@ -230,7 +229,7 @@ def get_cluster_info():
             "english_name": "Premium Healer",
             "description": "최고급 웰니스 리조트와 프리미엄 힐링 서비스를 추구하는 럭셔리 여행자입니다.",
             "characteristics": ["럭셔리 리조트", "프리미엄 스파", "완벽한 휴식", "고급 서비스"],
-            "color": "#DC143C",
+            "color": "#E74C3C",
             "percentage": 11.4,
             "count": 296,
             "key_factors": {
@@ -245,7 +244,7 @@ def get_cluster_info():
             "english_name": "Culture Connector",
             "description": "전통문화와 현지 체험에 깊이 관심이 있는 문화 탐구형 여행자입니다.",
             "characteristics": ["전통문화 탐구", "현지 체험", "문화적 몰입", "교육적 여행"],
-            "color": "#8B4513",
+            "color": "#8E44AD",
             "percentage": 12.7,
             "count": 329,
             "key_factors": {
@@ -260,7 +259,7 @@ def get_cluster_info():
             "english_name": "Smart Traveler",
             "description": "디지털 기술을 적극 활용하여 효율적이고 스마트한 여행을 추구하는 현대적 여행자입니다.",
             "characteristics": ["디지털 활용", "효율적 일정", "정보 중시", "모던 라이프스타일"],
-            "color": "#00CED1",
+            "color": "#1ABC9C",
             "percentage": 13.6,
             "count": 353,
             "key_factors": {
@@ -275,7 +274,7 @@ def get_cluster_info():
             "english_name": "Freedom Seeker",
             "description": "자유롭고 즉흥적인 여행을 선호하며, 개인적인 힐링과 자유로운 탐험을 추구합니다.",
             "characteristics": ["자유로운 여행", "즉흥적 계획", "개인적 힐링", "유연한 일정"],
-            "color": "#9370DB",
+            "color": "#9B59B6",
             "percentage": 8.9,
             "count": 231,
             "key_factors": {
@@ -290,7 +289,7 @@ def get_cluster_info():
             "english_name": "Active Wellness",
             "description": "활동적인 웰니스와 다양한 체험을 통해 에너지를 충전하는 역동적 여행자입니다.",
             "characteristics": ["활동적 힐링", "다양한 액티비티", "에너지 충전", "체험 중심"],
-            "color": "#FF6347",
+            "color": "#F39C12",
             "percentage": 5.0,
             "count": 130,
             "key_factors": {
@@ -306,16 +305,8 @@ def get_cluster_info():
 def load_wellness_destinations():
     """실제 CSV 파일에서 웰니스 관광지 데이터 로드"""
     try:
-        # 현재 디렉토리에서 CSV 파일 찾기
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        csv_path = os.path.join(current_dir, 'region_data.csv')
-        
-        # 파일이 없으면 상위 디렉토리에서 찾기
-        if not os.path.exists(csv_path):
-            csv_path = 'region_data.csv'
-        
         # CSV 파일 로드
-        df = pd.read_csv(csv_path)
+        df = pd.read_csv('region_data.csv')
         
         # 데이터 검증
         required_columns = ['name', 'lat', 'lon', 'type', 'description', 'rating', 
@@ -350,54 +341,10 @@ def load_wellness_destinations():
         
     except FileNotFoundError:
         st.error("❌ region_data.csv 파일을 찾을 수 없습니다.")
-        # 더미 데이터 생성
-        return create_dummy_wellness_data()
+        return pd.DataFrame()
     except Exception as e:
         st.error(f"❌ 데이터 로드 중 오류가 발생했습니다: {str(e)}")
-        return create_dummy_wellness_data()
-
-def create_dummy_wellness_data():
-    """더미 웰니스 관광지 데이터 생성"""
-    dummy_data = [
-        {
-            'name': '서울 스파랜드',
-            'lat': 37.5665,
-            'lon': 126.9780,
-            'type': '스파/온천',
-            'description': '서울 시내 프리미엄 스파 시설',
-            'rating': 8.5,
-            'price_range': '100,000-200,000원',
-            'distance_from_incheon': 60,
-            'cluster': 2,
-            'type_en': 'spa_oncheon'
-        },
-        {
-            'name': '제주 웰니스 리조트',
-            'lat': 33.4996,
-            'lon': 126.5312,
-            'type': '웰니스 리조트',
-            'description': '제주도 자연 속 힐링 리조트',
-            'rating': 9.2,
-            'price_range': '300,000-500,000원',
-            'distance_from_incheon': 450,
-            'cluster': 4,
-            'type_en': 'wellness_resort'
-        },
-        {
-            'name': '강원도 산림치유센터',
-            'lat': 37.8853,
-            'lon': 127.7294,
-            'type': '산림/자연치유',
-            'description': '강원도 깊은 산속 자연치유 시설',
-            'rating': 8.8,
-            'price_range': '50,000-100,000원',
-            'distance_from_incheon': 150,
-            'cluster': 1,
-            'type_en': 'forest_healing'
-        }
-    ]
-    
-    return pd.DataFrame(dummy_data)
+        return pd.DataFrame()
 
 def calculate_factor_scores(answers):
     """설문 답변을 12개 요인 점수로 변환"""
@@ -575,56 +522,56 @@ def get_cluster_region_info():
             "description": "산림치유와 전통 체험이 결합된 내륙 산간지역",
             "recommended_stay": "1박 2일",
             "main_features": ["산림치유", "전통체험", "자연환경"],
-            "color": "#228B22"
+            "color": "#2ECC71"
         },
         2: {
             "name": "서울/경기/인천 수도권",
             "description": "접근성이 우수한 도심형 웰니스 시설 집중",
             "recommended_stay": "당일 또는 1박",
             "main_features": ["도심접근성", "프리미엄스파", "편의시설"],
-            "color": "#4169E1"
+            "color": "#3498DB"
         },
         3: {
             "name": "대구/경북 동남부 권역",
             "description": "도시형 문화시설과 자연치유 시설 혼재",
             "recommended_stay": "1박 2일",
             "main_features": ["문화시설", "도시관광", "자연치유"],
-            "color": "#FF8C00"
+            "color": "#E67E22"
         },
         4: {
             "name": "제주도 권역",
             "description": "제주 특유의 자연환경을 활용한 프리미엄 웰니스 리조트",
             "recommended_stay": "2박 3일",
             "main_features": ["프리미엄리조트", "제주자연", "특별한경험"],
-            "color": "#DC143C"
+            "color": "#E74C3C"
         },
         6: {
             "name": "경북 영주/영월 권역",
             "description": "국립공원과 연계된 생태치유 전문지역",
             "recommended_stay": "1박 2일",
             "main_features": ["국립공원", "생태치유", "산림욕"],
-            "color": "#00CED1"
+            "color": "#1ABC9C"
         },
         7: {
             "name": "강원 홍천/원주 권역",
             "description": "문화예술과 힐링이 조화된 복합 관광지역",
             "recommended_stay": "1박 2일",
             "main_features": ["문화예술", "힐링센터", "복합관광"],
-            "color": "#9370DB"
+            "color": "#9B59B6"
         },
         8: {
             "name": "강원 평창/정선 권역",
             "description": "스키리조트 연계 사계절 웰니스 리조트",
             "recommended_stay": "1박 2일",
             "main_features": ["스키리조트", "사계절관광", "액티비티"],
-            "color": "#FF6347"
+            "color": "#F39C12"
         },
         9: {
             "name": "강원 동해안 권역",
             "description": "동해안 자연환경과 온천을 활용한 해안형 웰니스",
             "recommended_stay": "1박 2일",
             "main_features": ["동해안경관", "천연온천", "해안힐링"],
-            "color": "#20B2AA"
+            "color": "#16A085"
         }
     }
 
@@ -645,8 +592,8 @@ def create_factor_analysis_chart(factor_scores):
         theta=factor_names,
         fill='toself',
         name='나의 요인 점수',
-        line_color='#4CAF50',
-        fillcolor='rgba(76, 175, 80, 0.2)'
+        line_color='#3498DB',
+        fillcolor='rgba(52, 152, 219, 0.2)'
     ))
     
     fig.update_layout(
@@ -654,17 +601,17 @@ def create_factor_analysis_chart(factor_scores):
             radialaxis=dict(
                 visible=True,
                 range=[-2, 2],
-                tickfont=dict(size=10, color='#2E7D32'),
-                gridcolor='rgba(76, 175, 80, 0.3)'
+                tickfont=dict(size=10, color='#2C3E50'),
+                gridcolor='rgba(52, 152, 219, 0.3)'
             ),
             angularaxis=dict(
-                tickfont=dict(size=11, color='#2E7D32'),
-                gridcolor='rgba(76, 175, 80, 0.3)'
+                tickfont=dict(size=11, color='#2C3E50'),
+                gridcolor='rgba(52, 152, 219, 0.3)'
             )
         ),
         showlegend=True,
         title="12개 요인별 개인 성향 분석",
-        font=dict(color='#2E7D32', size=12),
+        font=dict(color='#2C3E50', size=12),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
         height=500
@@ -696,7 +643,7 @@ def create_cluster_comparison_chart(user_cluster, factor_scores):
         x=[f"요인{i}" for i in factors],
         y=user_scores,
         name="나의 점수",
-        marker_color='#4CAF50'
+        marker_color='#3498DB'
     ))
     
     fig.add_trace(go.Bar(
@@ -714,83 +661,8 @@ def create_cluster_comparison_chart(user_cluster, factor_scores):
         barmode='group',
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
-        font_color='#2E7D32',
+        font_color='#2C3E50',
         height=400
-    )
-    
-    return fig
-
-def create_wellness_map_chart(recommendations, center_lat=37.5, center_lon=127.0):
-    """웰니스 관광지 지도 차트 생성 (Plotly 버전)"""
-    if not recommendations:
-        return None
-        
-    # 지도용 데이터 준비
-    lats = [place['lat'] for place in recommendations[:10]]  # 상위 10개만
-    lons = [place['lon'] for place in recommendations[:10]]
-    names = [place['name'] for place in recommendations[:10]]
-    types = [place['type'] for place in recommendations[:10]]
-    ratings = [place['rating'] for place in recommendations[:10]]
-    scores = [place['recommendation_score'] for place in recommendations[:10]]
-    
-    # 타입별 색상 매핑
-    type_colors = {
-        '스파/온천': '#FF6B6B',
-        '산림/자연치유': '#4ECDC4', 
-        '웰니스 리조트': '#45B7D1',
-        '체험/교육': '#FFA726',
-        '리조트/호텔': '#AB47BC',
-        '문화/예술': '#66BB6A',
-        '힐링/테라피': '#FF7043',
-        '한방/전통의학': '#26A69A',
-        '레저/액티비티': '#EC407A',
-        '기타': '#78909C'
-    }
-    
-    colors = [type_colors.get(t, '#78909C') for t in types]
-    
-    fig = go.Figure()
-    
-    # 관광지 마커 추가
-    fig.add_trace(go.Scattermapbox(
-        lat=lats,
-        lon=lons,
-        mode='markers',
-        marker=dict(
-            size=[10 + (score/10) for score in scores],  # 점수에 따른 크기
-            color=colors,
-            opacity=0.8
-        ),
-        text=names,
-        hovertemplate='<b>%{text}</b><br>' +
-                     'Rating: %{customdata[0]}/10<br>' +
-                     'Type: %{customdata[1]}<br>' +
-                     'Score: %{customdata[2]:.1f}<br>' +
-                     '<extra></extra>',
-        customdata=list(zip(ratings, types, scores)),
-        name='웰니스 관광지'
-    ))
-    
-    # 인천공항 마커 추가
-    fig.add_trace(go.Scattermapbox(
-        lat=[37.4602],
-        lon=[126.4407],
-        mode='markers',
-        marker=dict(size=15, color='red', symbol='airport'),
-        text=['인천국제공항'],
-        hovertemplate='<b>%{text}</b><br>출발지<extra></extra>',
-        name='인천공항'
-    ))
-    
-    fig.update_layout(
-        mapbox=dict(
-            style='open-street-map',
-            center=dict(lat=center_lat, lon=center_lon),
-            zoom=6
-        ),
-        height=600,
-        margin=dict(l=0, r=0, t=30, b=0),
-        title="추천 웰니스 관광지 위치"
     )
     
     return fig
@@ -801,86 +673,195 @@ def show_footer():
     st.markdown("💡 **주의사항**: 본 진단 결과는 참고용이며, 실제 여행 계획 시에는 개인의 선호도를 종합적으로 고려하시기 바랍니다.")
 
 def apply_global_styles():
-    """전역 CSS 스타일 적용"""
+    """밝은 테마 전역 CSS 스타일 적용"""
     st.markdown("""
     <style>
-        /* 전역 스타일 변수 */
+        /* 전역 스타일 변수 - 밝은 테마 */
         :root {
-            --primary: #4CAF50;
-            --primary-dark: #2E7D32;
-            --primary-light: #81C784;
-            --secondary: #66BB6A;
-            --background: linear-gradient(135deg, #E8F5E8 0%, #C8E6C9 50%, #A5D6A7 100%);
+            --primary: #3498DB;
+            --primary-dark: #2980B9;
+            --primary-light: #5DADE2;
+            --secondary: #2ECC71;
+            --accent: #E74C3C;
+            --background: #F8F9FA;
             --card-bg: rgba(255, 255, 255, 0.95);
-            --border-radius: 20px;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            --shadow-hover: 0 12px 40px rgba(76, 175, 80, 0.2);
+            --text-primary: #2C3E50;
+            --text-secondary: #34495E;
+            --border-color: rgba(52, 152, 219, 0.2);
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --shadow-hover: 0 8px 25px rgba(52, 152, 219, 0.15);
         }
         
-        /* 기본 배경 */
-        [data-testid="stAppViewContainer"] > .main {
-            background: var(--background);
+        /* 기본 배경 - 밝은 그라데이션 */
+        .stApp {
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8F4FD 50%, #D6EAF8 100%);
             min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        [data-testid="stAppViewContainer"] > .main {
+            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         
         /* 메인 컨테이너 */
         .main .block-container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 2rem 3rem !important;
+            padding: 2rem 1.5rem !important;
         }
         
-        /* 카드 공통 스타일 */
+        /* 카드 공통 스타일 - 깔끔한 밝은 디자인 */
         .card {
             background: var(--card-bg);
-            backdrop-filter: blur(15px);
-            border: 2px solid rgba(76, 175, 80, 0.3);
-            border-radius: var(--border-radius);
-            padding: 25px;
-            margin: 20px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 16px 0;
             box-shadow: var(--shadow);
             transition: all 0.3s ease;
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary);
+            transform: translateY(-2px);
             box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
         }
         
-        /* 버튼 공통 스타일 */
+        /* 버튼 스타일 - 모던하고 깔끔한 디자인 */
         div[data-testid="stButton"] > button {
-            background: linear-gradient(45deg, var(--primary), var(--secondary)) !important;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
             border: none !important;
-            border-radius: 15px !important;
+            border-radius: 12px !important;
             color: white !important;
-            font-weight: 700 !important;
-            padding: 12px 25px !important;
+            font-weight: 600 !important;
+            padding: 12px 24px !important;
             transition: all 0.3s ease !important;
-            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            width: 100% !important;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2) !important;
+            font-size: 14px !important;
+            letter-spacing: 0.5px !important;
         }
         
         div[data-testid="stButton"] > button:hover {
-            background: linear-gradient(45deg, #388E3C, var(--primary)) !important;
-            transform: translateY(-3px) !important;
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4) !important;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3) !important;
         }
         
-        /* 기본 UI 숨김 */
+        /* 텍스트 스타일 */
+        .main h1, .main h2, .main h3 {
+            color: var(--text-primary) !important;
+            font-weight: 700 !important;
+        }
+        
+        .main p, .main span, .main div {
+            color: var(--text-secondary) !important;
+        }
+        
+        /* 입력 필드 스타일 */
+        div[data-testid="stTextInput"] > div > div > input,
+        div[data-testid="stSelectbox"] > div > div > div {
+            border: 2px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            padding: 12px !important;
+            background: white !important;
+            color: var(--text-primary) !important;
+            font-size: 14px !important;
+        }
+        
+        div[data-testid="stTextInput"] > div > div > input:focus,
+        div[data-testid="stSelectbox"] > div > div > div:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+        }
+        
+        /* 라디오 버튼 스타일 개선 */
+        div[data-testid="stRadio"] > div {
+            gap: 12px !important;
+        }
+        
+        div[data-testid="stRadio"] label {
+            background: white !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: 12px !important;
+            padding: 16px 20px !important;
+            margin: 0 !important;
+            transition: all 0.3s ease !important;
+            cursor: pointer !important;
+            min-height: 60px !important;
+            display: flex !important;
+            align-items: center !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+        }
+        
+        div[data-testid="stRadio"] label:hover {
+            transform: translateY(-1px) !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.15) !important;
+        }
+        
+        div[data-testid="stRadio"] input:checked + div {
+            background: rgba(52, 152, 219, 0.05) !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.2) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        /* 알림 메시지 스타일 */
+        div[data-testid="stAlert"] {
+            border-radius: 12px !important;
+            border: none !important;
+            box-shadow: var(--shadow) !important;
+            margin: 16px 0 !important;
+        }
+        
+        .stSuccess {
+            background: rgba(46, 204, 113, 0.1) !important;
+            color: #27AE60 !important;
+        }
+        
+        .stError {
+            background: rgba(231, 76, 60, 0.1) !important;
+            color: #E74C3C !important;
+        }
+        
+        .stWarning {
+            background: rgba(243, 156, 18, 0.1) !important;
+            color: #F39C12 !important;
+        }
+        
+        .stInfo {
+            background: rgba(52, 152, 219, 0.1) !important;
+            color: var(--primary) !important;
+        }
+        
+        /* 진행률 바 스타일 */
+        div[data-testid="stProgress"] > div > div {
+            background: linear-gradient(90deg, var(--primary), var(--secondary)) !important;
+            border-radius: 8px !important;
+            height: 12px !important;
+        }
+        
+        div[data-testid="stProgress"] > div {
+            background: rgba(52, 152, 219, 0.1) !important;
+            border-radius: 8px !important;
+            height: 12px !important;
+        }
+        
+        /* Streamlit UI 요소 숨기기 */
         [data-testid="stHeader"] { display: none; }
         [data-testid="stSidebarNav"] { display: none; }
         [data-testid="stSidebar"] { display: none; }
-        [data-testid="collapsedControl"] { display: none; }
         footer { display: none; }
         
         /* 반응형 디자인 */
         @media (max-width: 768px) {
             .main .block-container {
-                padding: 1rem 1.5rem !important;
+                padding: 1rem !important;
+            }
+            
+            .card {
+                margin: 12px 0;
+                padding: 16px;
             }
         }
     </style>

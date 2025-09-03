@@ -1,10 +1,11 @@
+# app.py - 개선된 밝은 테마 메인 앱
 import streamlit as st
 import sqlite3
 import hashlib
 import time
 import os
 
-# 페이지 기본 설정 (가장 먼저 실행되어야 함)
+# 페이지 기본 설정
 st.set_page_config(
     page_title="웰커밍 투어 성향 테스트",
     page_icon="🌿",
@@ -12,317 +13,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Streamlit 기본 UI 숨기기 및 전체 스타일 적용
-st.markdown("""
-<style>
-    /* Streamlit 기본 UI 완전히 숨기기 */
-    #MainMenu {visibility: hidden;}
-    header {visibility: hidden;}
-    footer {visibility: hidden;}
-    .stDeployButton {display: none;}
-    .stDecoration {display: none;}
-    [data-testid="stHeader"] {display: none;}
-    [data-testid="stToolbar"] {display: none;}
-    [data-testid="stSidebar"] {display: none;}
-    [data-testid="collapsedControl"] {display: none;}
-    
-    /* 전체 앱 컨테이너 스타일 */
-    .stApp {
-        background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
-        min-height: 100vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem 1rem;
-    }
-    
-    /* 메인 컨테이너 */
-    .main .block-container {
-        padding: 3rem 2.5rem !important;
-        max-width: 500px !important;
-        width: 90% !important;
-        margin: 0 auto !important;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: stretch;
-        min-height: auto !important;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 20px;
-        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-        position: relative;
-        overflow: hidden;
-        transform: translateY(10vh);
-    }
-    
-    /* 상단 그라데이션 라인 */
-    .main .block-container::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 3px;
-        background: linear-gradient(90deg, #10B981, #6366F1, #8B5CF6);
-        border-radius: 20px 20px 0 0;
-    }
-    
-    /* 제목 스타일 */
-    .main h1 {
-        text-align: center;
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 0.5rem;
-        background: linear-gradient(135deg, #10B981, #6366F1);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        letter-spacing: -0.02em;
-    }
-    
-    /* 부제목 스타일 */
-    .main p {
-        text-align: center;
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 1.1rem;
-        margin-bottom: 2rem;
-        font-weight: 400;
-        line-height: 1.6;
-    }
-    
-    /* 탭 버튼 스타일 */
-    .stButton > button {
-        width: 100% !important;
-        padding: 0.75rem 0 !important;
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 12px !important;
-        color: rgba(255, 255, 255, 0.8) !important;
-        font-weight: 600 !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-        backdrop-filter: blur(10px) !important;
-        margin: 0.5rem 0 !important;
-    }
-    
-    .stButton > button:hover {
-        background: rgba(255, 255, 255, 0.2) !important;
-        border-color: #10B981 !important;
-        color: white !important;
-        transform: translateY(-2px) !important;
-    }
-    
-    /* 로그인 버튼 (폼 제출용)은 다른 스타일 */
-    .stForm .stButton > button {
-        background: linear-gradient(135deg, #10B981, #6366F1) !important;
-        border: none !important;
-        color: white !important;
-        font-weight: 700 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-        box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3) !important;
-        margin: 1.5rem 0 1rem 0 !important;
-        padding: 0.875rem 0 !important;
-    }
-    
-    .stForm .stButton > button:hover {
-        background: linear-gradient(135deg, #047857, #10B981) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4) !important;
-    }
-    
-    /* 입력 필드 스타일 */
-    .stTextInput > div > div > input {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border: 1px solid rgba(255, 255, 255, 0.2) !important;
-        border-radius: 12px !important;
-        color: white !important;
-        padding: 0.875rem 1rem !important;
-        font-size: 1rem !important;
-        transition: all 0.3s ease !important;
-        backdrop-filter: blur(10px) !important;
-    }
-    
-    .stTextInput > div > div > input:focus {
-        border-color: #10B981 !important;
-        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2) !important;
-        outline: none !important;
-    }
-    
-    .stTextInput > div > div > input::placeholder {
-        color: rgba(255, 255, 255, 0.5) !important;
-    }
-    
-    .stTextInput label {
-        color: white !important;
-        font-weight: 600 !important;
-        font-size: 0.875rem !important;
-        margin-bottom: 0.5rem !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
-    }
-    
-    /* 라디오 버튼 숨기기 */
-    .stRadio {
-        display: none !important;
-    }
-    
-    /* 알림 메시지 스타일 */
-    .stAlert {
-        border-radius: 12px !important;
-        backdrop-filter: blur(10px) !important;
-        border: none !important;
-        margin: 1rem 0 !important;
-    }
-    
-    /* 성공 메시지 */
-    .stSuccess {
-        background: rgba(16, 185, 129, 0.2) !important;
-        color: white !important;
-        border: 1px solid rgba(16, 185, 129, 0.4) !important;
-    }
-    
-    /* 에러 메시지 */
-    .stError {
-        background: rgba(239, 68, 68, 0.2) !important;
-        color: white !important;
-        border: 1px solid rgba(239, 68, 68, 0.4) !important;
-    }
-    
-    /* 경고 메시지 */
-    .stWarning {
-        background: rgba(245, 158, 11, 0.2) !important;
-        color: white !important;
-        border: 1px solid rgba(245, 158, 11, 0.4) !important;
-    }
-    
-    /* 정보 메시지 */
-    .stInfo {
-        background: rgba(59, 130, 246, 0.2) !important;
-        color: white !important;
-        border: 1px solid rgba(59, 130, 246, 0.4) !important;
-    }
-    
-    /* 정보 카드 */
-    .info-card {
-        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(16, 185, 129, 0.2));
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin: 1.5rem 0;
-        color: white;
-        backdrop-filter: blur(10px);
-    }
-    
-    .info-card h4 {
-        color: #6366F1;
-        margin-bottom: 1rem;
-        font-size: 1.125rem;
-        font-weight: 700;
-    }
-    
-    .demo-credentials {
-        background: rgba(0, 0, 0, 0.3);
-        border-radius: 8px;
-        padding: 1rem;
-        margin: 1rem 0;
-        font-family: 'Courier New', monospace;
-        border-left: 3px solid #6366F1;
-        color: #E5E7EB;
-    }
-    
-    /* 시스템 정보 */
-    .system-features {
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 1.5rem;
-        margin: 2rem 0;
-        backdrop-filter: blur(10px);
-        width: 100%;
-    }
-    
-    .features-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-    
-    .feature-item {
-        text-align: center;
-        padding: 1rem;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        transition: all 0.3s ease;
-    }
-    
-    .feature-item:hover {
-        background: rgba(255, 255, 255, 0.1);
-        transform: translateY(-2px);
-    }
-    
-    .feature-icon {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-        display: block;
-    }
-    
-    .feature-title {
-        font-weight: 700;
-        color: white;
-        margin-bottom: 0.25rem;
-        font-size: 0.875rem;
-    }
-    
-    .feature-desc {
-        color: rgba(255, 255, 255, 0.7);
-        font-size: 0.75rem;
-        line-height: 1.4;
-    }
-    
-    /* 반응형 디자인 */
-    @media (max-width: 768px) {
-        .main .block-container {
-            padding: 2rem 1.5rem !important;
-            margin: 1rem auto !important;
-            max-width: 95% !important;
-            transform: translateY(5vh);
-        }
-        
-        .main h1 {
-            font-size: 2rem;
-        }
-        
-        .features-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .main .block-container {
-            padding: 1.5rem 1rem !important;
-            transform: translateY(2vh);
-        }
-        
-        .main h1 {
-            font-size: 1.75rem;
-        }
-        
-        .features-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-""", unsafe_allow_html=True)
-
 # 데이터베이스 설정
 @st.cache_resource
 def setup_database():
-    """데이터베이스 초기화"""
+    """데이터베이스 초기화 (캐시 적용으로 성능 향상)"""
     try:
         conn = sqlite3.connect('wellness_users.db', check_same_thread=False)
         c = conn.cursor()
@@ -376,90 +70,338 @@ def create_user_account(username, password):
     except Exception as e:
         return False, f"회원가입 중 오류가 발생했습니다: {e}"
 
-def render_login_form():
-    """로그인 폼 렌더링"""
-    with st.form("login_form", clear_on_submit=False):
-        username = st.text_input(
-            "아이디", 
-            placeholder="아이디를 입력하세요",
-            key="login_username"
-        )
-        password = st.text_input(
-            "비밀번호", 
-            type="password", 
-            placeholder="비밀번호를 입력하세요",
-            key="login_password"
-        )
+# 밝은 테마 로그인 UI 스타일
+def auth_css():
+    st.markdown("""
+    <style>
+        /* 전역 변수 - 밝은 테마 */
+        :root {
+            --primary: #3498DB;
+            --primary-dark: #2980B9;
+            --primary-light: #5DADE2;
+            --secondary: #2ECC71;
+            --accent: #E67E22;
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --glass-border: rgba(52, 152, 219, 0.2);
+            --text-primary: #2C3E50;
+            --text-secondary: #34495E;
+        }
         
-        submitted = st.form_submit_button("🚀 로그인")
+        /* Streamlit 기본 UI 숨기기 */
+        [data-testid="stHeader"], 
+        [data-testid="stSidebar"], 
+        footer,
+        [data-testid="stToolbar"] { 
+            display: none !important; 
+        }
         
-        if submitted:
-            if not username or not password:
-                st.error("❌ 아이디와 비밀번호를 모두 입력해주세요.")
-            else:
-                with st.spinner("인증 확인 중..."):
-                    time.sleep(0.8)
-                    
-                    if verify_user_credentials(username, password):
-                        st.session_state.logged_in = True
-                        st.session_state.username = username
-                        st.session_state.reset_survey_flag = True
-                        
-                        st.success("✅ 로그인 성공! 웰니스 여행 추천을 시작합니다.")
-                        st.balloons()
-                        
-                        time.sleep(2)
-                        st.switch_page("pages/03_home.py")
-                    else:
-                        st.error("❌ 아이디 또는 비밀번호가 잘못되었습니다.")
+        /* 메인 배경 - 밝은 그라데이션 */
+        [data-testid="stAppViewContainer"] > .main {
+            background: linear-gradient(135deg, #F8F9FA 0%, #E8F4FD 35%, #D6EAF8 100%);
+            background-size: 400% 400%;
+            animation: gradient-shift 20s ease infinite;
+            min-height: 100vh;
+        }
+        
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
 
-def render_signup_form():
-    """회원가입 폼 렌더링"""
-    with st.form("signup_form", clear_on_submit=True):
-        new_username = st.text_input(
-            "사용할 아이디", 
-            placeholder="영문, 숫자 조합 (4자 이상)",
-            key="signup_username"
-        )
-        new_password = st.text_input(
-            "사용할 비밀번호", 
-            type="password", 
-            placeholder="안전한 비밀번호 (4자 이상)",
-            key="signup_password"
-        )
-        confirm_password = st.text_input(
-            "비밀번호 확인", 
-            type="password", 
-            placeholder="비밀번호를 다시 입력하세요",
-            key="signup_confirm"
-        )
+        /* 메인 컨테이너 중앙 정렬 */
+        .main .block-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 20px !important;
+        }
+
+        /* 로그인 폼 컨테이너 */
+        .auth-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
         
-        submitted = st.form_submit_button("✨ 가입하기")
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 24px 24px 0 0;
+        }
         
-        if submitted:
-            if not new_username or not new_password or not confirm_password:
-                st.error("❌ 모든 필드를 입력해주세요.")
-            elif len(new_username) < 4:
-                st.warning("⚠️ 아이디는 4자 이상이어야 합니다.")
-            elif len(new_password) < 4:
-                st.warning("🔒 비밀번호는 4자 이상이어야 합니다.")
-            elif new_password != confirm_password:
-                st.error("❌ 비밀번호가 일치하지 않습니다.")
-            else:
-                with st.spinner("계정 생성 중..."):
-                    time.sleep(0.8)
-                    
-                    success, message = create_user_account(new_username, new_password)
-                    
-                    if success:
-                        st.success(f"🎉 {message}")
-                        st.info("이제 로그인할 수 있습니다!")
-                        
-                        st.session_state.auth_tab = "로그인"
-                        time.sleep(2.5)
-                        st.rerun()
-                    else:
-                        st.error(f"❌ {message}")
+        /* 제목 스타일 */
+        .auth-title {
+            font-size: 2.4em !important;
+            font-weight: 800 !important;
+            margin-bottom: 12px !important;
+            letter-spacing: 1px !important;
+            background: linear-gradient(135deg, var(--primary-dark), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .auth-subtitle {
+            color: var(--text-secondary) !important;
+            font-size: 1.1em !important;
+            margin-bottom: 32px !important;
+            font-weight: 500 !important;
+            line-height: 1.5 !important;
+        }
+
+        /* 탭 스타일 */
+        div[data-testid="stRadio"] {
+            display: flex !important;
+            justify-content: center !important;
+            margin-bottom: 28px !important;
+            gap: 8px !important;
+        }
+        
+        div[data-testid="stRadio"] > div {
+            display: flex !important;
+            gap: 8px !important;
+        }
+        
+        div[data-testid="stRadio"] label {
+            background: rgba(255, 255, 255, 0.8) !important;
+            border: 2px solid var(--glass-border) !important;
+            border-radius: 12px !important;
+            padding: 12px 24px !important;
+            margin: 0 !important;
+            transition: all 0.3s ease !important;
+            color: var(--text-secondary) !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            backdrop-filter: blur(10px) !important;
+        }
+        
+        div[data-testid="stRadio"] label:hover {
+            background: rgba(255, 255, 255, 1) !important;
+            border-color: var(--primary) !important;
+            color: var(--text-primary) !important;
+            transform: translateY(-1px) !important;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15) !important;
+        }
+        
+        div[data-testid="stRadio"] input:checked + div {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light)) !important;
+            color: white !important;
+            border-color: var(--primary) !important;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3) !important;
+            transform: translateY(-1px) !important;
+        }
+
+        /* 입력 필드 스타일 */
+        div[data-testid="stTextInput"] > div > div > input {
+            background: rgba(255, 255, 255, 0.9) !important;
+            border: 2px solid var(--glass-border) !important;
+            border-radius: 12px !important;
+            color: var(--text-primary) !important;
+            padding: 14px 16px !important;
+            font-size: 1em !important;
+            transition: all 0.3s ease !important;
+            backdrop-filter: blur(10px) !important;
+        }
+        
+        div[data-testid="stTextInput"] > div > div > input:focus {
+            border-color: var(--primary) !important;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1) !important;
+            outline: none !important;
+            background: rgba(255, 255, 255, 1) !important;
+        }
+        
+        div[data-testid="stTextInput"] > div > div > input::placeholder {
+            color: rgba(45, 62, 80, 0.5) !important;
+        }
+        
+        /* 라벨 스타일 */
+        div[data-testid="stTextInput"] label {
+            color: var(--text-primary) !important;
+            font-weight: 600 !important;
+            font-size: 1em !important;
+            margin-bottom: 6px !important;
+        }
+        
+        /* 버튼 스타일 */
+        div[data-testid="stButton"] > button {
+            width: 100% !important;
+            padding: 14px 0 !important;
+            background: linear-gradient(135deg, var(--primary), var(--secondary)) !important;
+            border: none !important;
+            border-radius: 12px !important;
+            color: white !important;
+            font-weight: 700 !important;
+            font-size: 1em !important;
+            transition: all 0.3s ease !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            box-shadow: 0 4px 16px rgba(52, 152, 219, 0.3) !important;
+        }
+        
+        div[data-testid="stButton"] > button:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary)) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4) !important;
+        }
+        
+        /* 성공/오류 메시지 스타일 */
+        div[data-testid="stAlert"] {
+            border-radius: 12px !important;
+            backdrop-filter: blur(10px) !important;
+            border: none !important;
+            margin: 16px 0 !important;
+        }
+        
+        .stSuccess {
+            background: rgba(46, 204, 113, 0.1) !important;
+            color: #27AE60 !important;
+            border: 2px solid rgba(46, 204, 113, 0.3) !important;
+        }
+        
+        .stError {
+            background: rgba(231, 76, 60, 0.1) !important;
+            color: #E74C3C !important;
+            border: 2px solid rgba(231, 76, 60, 0.3) !important;
+        }
+        
+        .stWarning {
+            background: rgba(243, 156, 18, 0.1) !important;
+            color: #F39C12 !important;
+            border: 2px solid rgba(243, 156, 18, 0.3) !important;
+        }
+        
+        .stInfo {
+            background: rgba(52, 152, 219, 0.1) !important;
+            color: var(--primary) !important;
+            border: 2px solid rgba(52, 152, 219, 0.3) !important;
+        }
+        
+        /* 데모 계정 안내 */
+        .demo-info {
+            background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(46, 204, 113, 0.1));
+            border: 2px solid rgba(52, 152, 219, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+            color: var(--text-primary);
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+        }
+        
+        .demo-info h4 {
+            color: var(--primary) !important;
+            margin-bottom: 8px !important;
+            font-size: 1em !important;
+        }
+        
+        /* 시스템 정보 */
+        .system-info {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 24px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .system-info h4 {
+            color: var(--text-primary) !important;
+            margin-bottom: 12px !important;
+            font-size: 1.1em !important;
+        }
+        
+        .system-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 8px;
+            border: 1px solid rgba(52, 152, 219, 0.1);
+        }
+        
+        .stat-number {
+            font-size: 1.3em;
+            font-weight: 800;
+            color: var(--primary);
+            display: block;
+        }
+        
+        .stat-label {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+        
+        /* 로딩 애니메이션 */
+        .loading-spinner {
+            border: 3px solid rgba(52, 152, 219, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid var(--primary);
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .auth-container {
+                padding: 32px 24px;
+                margin: 16px;
+            }
+            
+            .auth-title {
+                font-size: 2em !important;
+            }
+            
+            .system-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .auth-container {
+                padding: 24px 20px;
+            }
+            
+            .auth-title {
+                font-size: 1.8em !important;
+            }
+            
+            div[data-testid="stRadio"] {
+                flex-direction: column !important;
+            }
+        }
+    </style>
+    """, unsafe_allow_html=True)
 
 def auth_page():
     """로그인/회원가입 페이지"""
@@ -470,71 +412,195 @@ def auth_page():
         if st.button("🔄 다시 시도"):
             st.rerun()
         return
+    
+    # CSS 스타일 적용
+    auth_css()
 
-    # 탭 상태 초기화
-    if 'auth_tab' not in st.session_state:
-        st.session_state.auth_tab = "로그인"
-
-    # 제목 표시
-    st.markdown("# 🌿 웰커밍 투어")
-    st.markdown("AI 기반 12개 요인 분석으로 당신만의 맞춤형 힐링 여행을 찾아보세요")
+    # 메인 컨테이너
+    st.markdown("""
+    <div class="auth-container">
+        <h1 class="auth-title">🌿 웰커밍 투어 시스템</h1>
+        <p class="auth-subtitle">당신만의 맞춤형 힐링 여행을 찾아보세요</p>
+    </div>
+    """, unsafe_allow_html=True)
     
-    # 커스텀 탭 버튼
-    tab_col1, tab_col2 = st.columns(2)
-    
-    with tab_col1:
-        if st.button("로그인", key="login_tab", use_container_width=True):
-            st.session_state.auth_tab = "로그인"
-    
-    with tab_col2:
-        if st.button("회원가입", key="signup_tab", use_container_width=True):
-            st.session_state.auth_tab = "회원가입"
-    
-    # 선택된 탭에 따라 폼 표시
-    if st.session_state.auth_tab == "로그인":
-        render_login_form()
+    # 폼을 위한 컨테이너
+    with st.container():
+        # 로그인/회원가입 선택
+        choice = st.radio(
+            "선택", 
+            ["로그인", "회원가입"], 
+            horizontal=True, 
+            label_visibility="collapsed",
+            key="auth_choice"
+        )
         
-        # 데모 계정 안내
-        st.markdown("""
-        <div class="info-card">
-            <h4>🎯 체험용 데모 계정</h4>
-            <div class="demo-credentials">
-                <strong>아이디:</strong> wellness<br>
-                <strong>비밀번호:</strong> 1234
+        # 강제 로그인 모드 처리 (세션에서 설정된 경우)
+        if 'choice_radio' in st.session_state and st.session_state.choice_radio == "로그인":
+            choice = "로그인"
+            del st.session_state.choice_radio
+
+        if choice == "로그인":
+            st.markdown("<h2 style='color: #2C3E50; text-align: center; margin: 24px 0 16px 0; font-weight: 700;'>🔐 로그인</h2>", unsafe_allow_html=True)
+            
+            # 로그인 폼
+            with st.form("login_form", clear_on_submit=False):
+                username = st.text_input(
+                    "아이디", 
+                    placeholder="아이디를 입력하세요",
+                    key="login_username"
+                )
+                password = st.text_input(
+                    "비밀번호", 
+                    type="password", 
+                    placeholder="비밀번호를 입력하세요",
+                    key="login_password"
+                )
+                
+                submitted = st.form_submit_button("🚀 로그인", use_container_width=True)
+                
+                if submitted:
+                    if not username or not password:
+                        st.error("❌ 아이디와 비밀번호를 모두 입력해주세요.")
+                    else:
+                        # 로딩 표시
+                        with st.spinner("인증 확인 중..."):
+                            time.sleep(0.5)  # 사용자 경험을 위한 지연
+                            
+                            if verify_user_credentials(username, password):
+                                st.session_state.logged_in = True
+                                st.session_state.username = username
+                                st.session_state.reset_survey_flag = True
+                                
+                                st.success("✅ 로그인 성공! 웰니스 여행 추천을 시작합니다.")
+                                st.balloons()
+                                
+                                # 잠시 후 홈으로 이동
+                                time.sleep(1.5)
+                                st.switch_page("pages/03_home.py")
+                            else:
+                                st.error("❌ 아이디 또는 비밀번호가 잘못되었습니다.")
+            
+            # 데모 계정 안내
+            st.markdown("""
+            <div class="demo-info">
+                <h4>🎯 체험용 데모 계정</h4>
+                <p style="margin: 6px 0;">
+                    <strong>아이디:</strong> wellness<br>
+                    <strong>비밀번호:</strong> 1234
+                </p>
+                <p style="margin: 6px 0 0 0; font-size: 0.9em; opacity: 0.8;">
+                    💡 즉시 체험해보고 싶다면 위 데모 계정을 사용하세요!
+                </p>
             </div>
-            <p style="margin: 0; font-size: 0.875rem; opacity: 0.8;">
-                💡 즉시 체험해보고 싶다면 위 데모 계정을 사용하세요!
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-    else:  # 회원가입
-        render_signup_form()
+            """, unsafe_allow_html=True)
+
+        elif choice == "회원가입":
+            st.markdown("<h2 style='color: #2C3E50; text-align: center; margin: 24px 0 16px 0; font-weight: 700;'>📝 회원가입</h2>", unsafe_allow_html=True)
+            
+            # 회원가입 폼
+            with st.form("signup_form", clear_on_submit=True):
+                new_username = st.text_input(
+                    "사용할 아이디", 
+                    placeholder="영문, 숫자 조합 (4자 이상)",
+                    key="signup_username"
+                )
+                new_password = st.text_input(
+                    "사용할 비밀번호", 
+                    type="password", 
+                    placeholder="안전한 비밀번호 (4자 이상)",
+                    key="signup_password"
+                )
+                confirm_password = st.text_input(
+                    "비밀번호 확인", 
+                    type="password", 
+                    placeholder="비밀번호를 다시 입력하세요",
+                    key="signup_confirm"
+                )
+                
+                submitted = st.form_submit_button("✨ 가입하기", use_container_width=True)
+                
+                if submitted:
+                    # 입력 검증
+                    if not new_username or not new_password or not confirm_password:
+                        st.error("❌ 모든 필드를 입력해주세요.")
+                    elif len(new_username) < 4:
+                        st.warning("⚠️ 아이디는 4자 이상이어야 합니다.")
+                    elif len(new_password) < 4:
+                        st.warning("🔒 비밀번호는 4자 이상이어야 합니다.")
+                    elif new_password != confirm_password:
+                        st.error("❌ 비밀번호가 일치하지 않습니다.")
+                    else:
+                        # 계정 생성 시도
+                        with st.spinner("계정 생성 중..."):
+                            time.sleep(0.5)
+                            
+                            success, message = create_user_account(new_username, new_password)
+                            
+                            if success:
+                                st.success(f"🎉 {message}")
+                                st.info("이제 로그인할 수 있습니다!")
+                                
+                                # 로그인 모드로 전환
+                                st.session_state.choice_radio = "로그인"
+                                time.sleep(2)
+                                st.rerun()
+                            else:
+                                st.error(f"❌ {message}")
     
     # 시스템 정보
     st.markdown("""
-    <div class="system-features">
-        <h4 style="color: white; text-align: center; margin-bottom: 1rem; font-size: 1.25rem; font-weight: 700;">🚀 시스템 특징</h4>
-        <div class="features-grid">
-            <div class="feature-item">
-                <span class="feature-icon">🔬</span>
-                <div class="feature-title">과학적 분석</div>
-                <div class="feature-desc">2,591명 데이터 요인분석</div>
+    <div class="system-info">
+        <h4>📊 시스템 현황</h4>
+        <div class="system-stats">
+            <div class="stat-item">
+                <span class="stat-number">2,591</span>
+                <div class="stat-label">분석 데이터</div>
             </div>
-            <div class="feature-item">
-                <span class="feature-icon">🎯</span>
-                <div class="feature-title">정밀 분류</div>
-                <div class="feature-desc">12개 요인 8개 클러스터</div>
+            <div class="stat-item">
+                <span class="stat-number">12</span>
+                <div class="stat-label">분석 요인</div>
             </div>
-            <div class="feature-item">
-                <span class="feature-icon">🤖</span>
-                <div class="feature-title">AI 추천</div>
-                <div class="feature-desc">95% 정확도</div>
+            <div class="stat-item">
+                <span class="stat-number">8</span>
+                <div class="stat-label">클러스터 유형</div>
             </div>
-            <div class="feature-item">
-                <span class="feature-icon">⚡</span>
-                <div class="feature-title">실시간</div>
-                <div class="feature-desc">1.2초 응답</div>
+            <div class="stat-item">
+                <span class="stat-number">95%</span>
+                <div class="stat-label">정확도</div>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 시스템 소개
+    st.markdown("""
+    <div style="background: rgba(255, 255, 255, 0.8); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; backdrop-filter: blur(10px); border: 2px solid rgba(52, 152, 219, 0.2);">
+        <h4 style="color: #2C3E50; margin-bottom: 12px; font-size: 1.2em;">🌟 새로운 2.0 시스템</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px;">
+            <div style="text-align: center;">
+                <div style="font-size: 1.8em; margin-bottom: 6px;">🔬</div>
+                <div style="color: #2C3E50; font-size: 0.85em; line-height: 1.4;">
+                    <strong>과학적 근거</strong><br>
+                    실제 데이터 기반<br>
+                    요인분석 적용
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 1.8em; margin-bottom: 6px;">🎯</div>
+                <div style="color: #2C3E50; font-size: 0.85em; line-height: 1.4;">
+                    <strong>정밀 분류</strong><br>
+                    12개 요인<br>
+                    8개 클러스터
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 1.8em; margin-bottom: 6px;">🚀</div>
+                <div style="color: #2C3E50; font-size: 0.85em; line-height: 1.4;">
+                    <strong>맞춤 추천</strong><br>
+                    개인화된<br>
+                    관광지 추천
+                </div>
             </div>
         </div>
     </div>
@@ -548,19 +614,23 @@ def main():
 
     # 로그인 상태 확인
     if st.session_state.logged_in:
+        # 이미 로그인된 경우 홈으로 리다이렉트
         try:
             st.switch_page("pages/03_home.py")
         except Exception as e:
             st.error(f"페이지 이동 중 오류: {e}")
+            # 폴백: 로그인 상태 초기화 후 다시 시작
             st.session_state.logged_in = False
             st.rerun()
     else:
+        # 로그인 페이지 표시
         try:
             auth_page()
         except Exception as e:
             st.error("❌ 시스템 오류가 발생했습니다.")
             st.exception(e)
             
+            # 복구 옵션
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("🔄 페이지 새로고침"):
