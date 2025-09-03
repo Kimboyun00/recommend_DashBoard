@@ -115,7 +115,7 @@ def auth_page():
             font-weight: bold;
         }
         </style>
-        <h1 class="wellness-title">🌿 웰커밍 투어추천 시스템</h1>
+        <h1 class="wellness-title">🌿 WELLCOMING</h1>
         """, unsafe_allow_html=True)
         st.markdown('<p style="color: rgba(76,175,80,0.8); font-size: 1.2em; margin-bottom: 30px;">당신만의 맞춤형 힐링 여행을 찾아보세요</p>', unsafe_allow_html=True)
         
