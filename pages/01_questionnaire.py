@@ -450,6 +450,32 @@ def questionnaire_page():
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    help_col1, help_col2 = st.columns(2)
+    
+    with help_col1:
+        st.markdown("""
+        <div style="background: rgba(52, 152, 219, 0.08); padding: 16px; border-radius: 12px; border-left: 4px solid #3498DB;">
+            <h4 style="color: #2980B9; margin-bottom: 8px; font-size: 1.1em;">💡 설문 작성 팁</h4>
+            <ul style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0; padding-left: 16px;">
+                <li>직관적으로 가장 맞다고 생각하는 답변을 선택하세요</li>
+                <li>모든 문항은 여행 성향 분석에 중요한 역할을 합니다</li>
+                <li>정답은 없으니 솔직하게 답변해주세요</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with help_col2:
+        st.markdown("""
+        <div style="background: rgba(46, 204, 113, 0.08); padding: 16px; border-radius: 12px; border-left: 4px solid #2ECC71;">
+            <h4 style="color: #27AE60; margin-bottom: 8px; font-size: 1.1em;">📊 분석 결과</h4>
+            <ul style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0; padding-left: 16px;">
+                <li>개인별 12개 요인 점수 제공</li>
+                <li>8개 클러스터 중 최적 유형 매칭</li>
+                <li>맞춤형 한국 관광지 추천</li>
+            </ul>
+        </div>
+        """, unsafe_allow_html=True)
     
     # 진행률 표시를 위한 플레이스홀더
     progress_placeholder = st.empty()
@@ -598,31 +624,7 @@ def questionnaire_page():
     # 추가 도움말
     st.markdown("---")
     
-    help_col1, help_col2 = st.columns(2)
     
-    with help_col1:
-        st.markdown("""
-        <div style="background: rgba(52, 152, 219, 0.08); padding: 16px; border-radius: 12px; border-left: 4px solid #3498DB;">
-            <h4 style="color: #2980B9; margin-bottom: 8px; font-size: 1.1em;">💡 설문 작성 팁</h4>
-            <ul style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0; padding-left: 16px;">
-                <li>직관적으로 가장 맞다고 생각하는 답변을 선택하세요</li>
-                <li>모든 문항은 여행 성향 분석에 중요한 역할을 합니다</li>
-                <li>정답은 없으니 솔직하게 답변해주세요</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    with help_col2:
-        st.markdown("""
-        <div style="background: rgba(46, 204, 113, 0.08); padding: 16px; border-radius: 12px; border-left: 4px solid #2ECC71;">
-            <h4 style="color: #27AE60; margin-bottom: 8px; font-size: 1.1em;">📊 분석 결과</h4>
-            <ul style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0; padding-left: 16px;">
-                <li>개인별 12개 요인 점수 제공</li>
-                <li>8개 클러스터 중 최적 유형 매칭</li>
-                <li>맞춤형 한국 관광지 추천</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
 
     # 푸터
     show_footer()
