@@ -87,7 +87,7 @@ def auth_css():
         
         div[data-testid="stButton"] > button {
             width: 100% !important;
-            padding: 12px 0;
+            padding: 12px;
             background: linear-gradient(45deg, #4CAF50, #8BC34A);
                 border: none;
                 border-radius: 10px;
