@@ -155,12 +155,12 @@ st.markdown("""
         background: rgba(255, 255, 255, 0.9) !important;
         border: 2px solid rgba(52, 152, 219, 0.2) !important;
         border-radius: 12px !important;
-        padding: 3px 20px !important;
+        padding: 10px 20px !important;
         margin: 0 !important;
         transition: all 0.3s ease !important;
         backdrop-filter: blur(10px) !important;
         cursor: pointer !important;
-        min-height: 60px !important;
+        min-height: 40px !important;
         display: flex !important;
         align-items: center !important;
         box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06) !important;
