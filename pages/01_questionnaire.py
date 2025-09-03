@@ -117,7 +117,7 @@ st.markdown("""
     /* 질문 제목 */
     .question-title {
         color: #2C3E50;
-        font-size: 1.25em;
+        font-size: 1.8em;
         font-weight: 700;
         margin-bottom: 5px;
         line-height: 1.5;
@@ -134,7 +134,7 @@ st.markdown("""
         color: white;
         padding: 6px 14px;
         border-radius: 16px;
-        font-size: 1em;
+        font-size: 1.5em;
         font-weight: 700;
         margin-bottom: 14px;
         box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
