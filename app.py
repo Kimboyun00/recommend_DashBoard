@@ -94,6 +94,7 @@ def auth_css():
                 color: white;
             font-weight: bold;
             transition: all 0.3s;
+            margin-top: 10px;
         }
     </style>
     """, unsafe_allow_html=True)
