@@ -326,6 +326,28 @@ st.markdown("""
         border: 2px solid rgba(52, 152, 219, 0.2);
     }
     
+    /* 카드 헤더(요인+제목) */
+    .q-card-head {
+    margin-top: 12px;
+    margin-bottom: 8px;
+    }
+
+    /* 헤더 바로 다음에 오는 스트림릿 블록(= 라디오 루트)을 카드처럼 보이게 */
+    .q-card-head + div {
+    background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px;
+    padding: 16px 16px 8px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    margin-bottom: 18px;
+    }
+
+    /* 에러인 경우 테두리 강조 */
+    .q-card-head.error + div {
+    border-color: #E74C3C;
+    box-shadow: 0 0 0 3px rgba(231,76,60,.07) inset, 0 6px 18px rgba(0,0,0,0.06);
+    }
+    
     /* 반응형 디자인 개선 */
     @media (max-width: 768px) {
         .question-card {
@@ -486,40 +508,37 @@ def questionnaire_page():
     for i, (q_key, question) in enumerate(questions.items(), 1):
         is_error = q_key in st.session_state.validation_errors
         current_answer = st.session_state.answers.get(q_key)
-        
-        # 질문 카드 생성
-        card_class = "question-card error" if is_error else "question-card"
+
+        card_error_cls = " error" if is_error else ""
         title_class = "question-title error" if is_error else "question-title"
-        
-        with st.container():
-            st.markdown(f'<div class="{card_class}">', unsafe_allow_html=True)
-            
-            # 요인 태그
-            factor_desc = get_factor_description(question['factor'])
-            st.markdown(f'<div class="factor-tag">{question["factor"]}: {factor_desc}</div>', unsafe_allow_html=True)
-            
-            # 질문 제목
-            title_text = question['title']
-            if is_error:
-                title_text += " ⚠️ **필수 응답**"
-            
-            st.markdown(f'<div class="{title_class}">{title_text}</div>', unsafe_allow_html=True)
-            
-            # 라디오 버튼 옵션
-            index_to_pass = current_answer if current_answer is not None else None
-            radio_label = f"질문 {i}번 응답 선택"
-            
-            st.radio(
-                radio_label,
-                options=list(range(len(question['options']))),
-                format_func=lambda x, opts=question['options']: f"{x+1}. {opts[x]}",
-                key=f"radio_{q_key}",
-                on_change=update_answers,
-                index=index_to_pass,
-                label_visibility="hidden"  # 라벨은 숨기지만 스크린 리더를 위해 제공
-            )
-            
-            st.markdown('</div>', unsafe_allow_html=True)
+
+        # 1) 카드 헤더(요인 태그 + 제목) 블록 (여기가 '마커' 역할)
+        factor_desc = get_factor_description(question['factor'])
+        title_text = question['title']
+        if is_error:
+            title_text += " ⚠️ **필수 응답**"
+
+        st.markdown(
+            f'''
+            <div class="q-card-head{card_error_cls}">
+                <div class="factor-tag">{question["factor"]}: {factor_desc}</div>
+                <div class="{title_class}">{title_text}</div>
+            </div>
+            ''',
+            unsafe_allow_html=True
+        )
+
+        # 2) 라디오 (바로 '바로 다음'에 와야 함! 중간에 다른 컴포넌트 넣지 말 것)
+        index_to_pass = current_answer if current_answer is not None else None
+        st.radio(
+            label=f"질문 {i}번 응답 선택",
+            options=list(range(len(question['options']))),
+            format_func=lambda x, opts=question['options']: f"{x+1}. {opts[x]}",
+            key=f"radio_{q_key}",
+            index=index_to_pass,
+            on_change=update_answers,
+            label_visibility="hidden"
+        )
 
     # 진행률 계산 및 표시
     answered_count = len([q for q in questions.keys() if st.session_state.answers.get(q) is not None])
