@@ -723,7 +723,8 @@ def recommendations_page():
     """메인 추천 결과 페이지"""
     
     # 제목
-    st.markdown('<h1 class="main-title">🎯 12개 요인 기반 성향 분석 결과</h1>', unsafe_allow_html=True)
+    st.title("🌿 웰니스 관광 성향 진단 시스템")
+    st.markdown("---")
     
     # 클러스터 분석 결과 표시
     cluster_result = render_cluster_analysis_result()
