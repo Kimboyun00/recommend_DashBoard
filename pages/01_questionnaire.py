@@ -144,7 +144,7 @@ st.markdown("""
     
     /* 라디오 버튼 스타일 개선 */
     div[data-testid="stRadio"] {
-        margin: 5px 0;
+        margin: 0;
     }
     
     div[data-testid="stRadio"] > div {
