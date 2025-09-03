@@ -507,17 +507,7 @@ def questionnaire_page():
                 title_text += " ⚠️ **필수 응답**"
             st.markdown(f'<div class="{title_class}">{title_text}</div>', unsafe_allow_html=True)
 
-            # 라디오 버튼
-            index_to_pass = current_answer if current_answer is not None else None
-            st.radio(
-                label=f"질문 {i}번 응답 선택",
-                options=list(range(len(question['options']))),
-                format_func=lambda x, opts=question['options']: f"{x+1}. {opts[x]}",
-                key=f"radio_{q_key}",
-                index=index_to_pass,
-                on_change=update_answers,
-                label_visibility="hidden"
-            )
+            
 
             # 카드 닫기
             st.markdown('</div>', unsafe_allow_html=True)
