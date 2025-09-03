@@ -416,163 +416,137 @@ def auth_page():
     # CSS 스타일 적용
     auth_css()
 
-    # 메인 컨테이너
+    # 통합된 메인 컨테이너 (제목 + 폼을 하나로)
     st.markdown("""
     <div class="auth-container">
         <h1 class="auth-title">🌿 웰커밍 투어 시스템</h1>
         <p class="auth-subtitle">당신만의 맞춤형 힐링 여행을 찾아보세요</p>
-    </div>
     """, unsafe_allow_html=True)
-    
-    # 폼을 위한 컨테이너
-    with st.container():
-        # 로그인/회원가입 선택
-        choice = st.radio(
-            "선택", 
-            ["로그인", "회원가입"], 
-            horizontal=True, 
-            label_visibility="collapsed",
-            key="auth_choice"
-        )
+
+    # 로그인/회원가입 선택 (컨테이너 내부에서)
+    choice = st.radio(
+        "선택", 
+        ["로그인", "회원가입"], 
+        horizontal=True, 
+        label_visibility="collapsed",
+        key="auth_choice"
+    )
+
+    # 강제 로그인 모드 처리 (세션에서 설정된 경우)
+    if 'choice_radio' in st.session_state and st.session_state.choice_radio == "로그인":
+        choice = "로그인"
+        del st.session_state.choice_radio
+
+    if choice == "로그인":
+        st.markdown("<h2 style='color: #2C3E50; text-align: center; margin: 24px 0 16px 0; font-weight: 700;'>🔐 로그인</h2>", unsafe_allow_html=True)
         
-        # 강제 로그인 모드 처리 (세션에서 설정된 경우)
-        if 'choice_radio' in st.session_state and st.session_state.choice_radio == "로그인":
-            choice = "로그인"
-            del st.session_state.choice_radio
-
-        if choice == "로그인":
-            st.markdown("<h2 style='color: #2C3E50; text-align: center; margin: 24px 0 16px 0; font-weight: 700;'>🔐 로그인</h2>", unsafe_allow_html=True)
+        # 로그인 폼
+        with st.form("login_form", clear_on_submit=False):
+            username = st.text_input(
+                "아이디", 
+                placeholder="아이디를 입력하세요",
+                key="login_username"
+            )
+            password = st.text_input(
+                "비밀번호", 
+                type="password", 
+                placeholder="비밀번호를 입력하세요",
+                key="login_password"
+            )
             
-            # 로그인 폼
-            with st.form("login_form", clear_on_submit=False):
-                username = st.text_input(
-                    "아이디", 
-                    placeholder="아이디를 입력하세요",
-                    key="login_username"
-                )
-                password = st.text_input(
-                    "비밀번호", 
-                    type="password", 
-                    placeholder="비밀번호를 입력하세요",
-                    key="login_password"
-                )
-                
-                submitted = st.form_submit_button("🚀 로그인", use_container_width=True)
-                
-                if submitted:
-                    if not username or not password:
-                        st.error("❌ 아이디와 비밀번호를 모두 입력해주세요.")
-                    else:
-                        # 로딩 표시
-                        with st.spinner("인증 확인 중..."):
-                            time.sleep(0.5)  # 사용자 경험을 위한 지연
-                            
-                            if verify_user_credentials(username, password):
-                                st.session_state.logged_in = True
-                                st.session_state.username = username
-                                st.session_state.reset_survey_flag = True
-                                
-                                st.success("✅ 로그인 성공! 웰니스 여행 추천을 시작합니다.")
-                                st.balloons()
-                                
-                                # 잠시 후 홈으로 이동
-                                time.sleep(1.5)
-                                st.switch_page("pages/03_home.py")
-                            else:
-                                st.error("❌ 아이디 또는 비밀번호가 잘못되었습니다.")
+            submitted = st.form_submit_button("🚀 로그인", use_container_width=True)
             
-            # 데모 계정 안내
-            st.markdown("""
-            <div class="demo-info">
-                <h4>🎯 체험용 데모 계정</h4>
-                <p style="margin: 6px 0;">
-                    <strong>아이디:</strong> wellness<br>
-                    <strong>비밀번호:</strong> 1234
-                </p>
-                <p style="margin: 6px 0 0 0; font-size: 0.9em; opacity: 0.8;">
-                    💡 즉시 체험해보고 싶다면 위 데모 계정을 사용하세요!
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        elif choice == "회원가입":
-            st.markdown("<h2 style='color: #2C3E50; text-align: center; margin: 24px 0 16px 0; font-weight: 700;'>📝 회원가입</h2>", unsafe_allow_html=True)
-            
-            # 회원가입 폼
-            with st.form("signup_form", clear_on_submit=True):
-                new_username = st.text_input(
-                    "사용할 아이디", 
-                    placeholder="영문, 숫자 조합 (4자 이상)",
-                    key="signup_username"
-                )
-                new_password = st.text_input(
-                    "사용할 비밀번호", 
-                    type="password", 
-                    placeholder="안전한 비밀번호 (4자 이상)",
-                    key="signup_password"
-                )
-                confirm_password = st.text_input(
-                    "비밀번호 확인", 
-                    type="password", 
-                    placeholder="비밀번호를 다시 입력하세요",
-                    key="signup_confirm"
-                )
-                
-                submitted = st.form_submit_button("✨ 가입하기", use_container_width=True)
-                
-                if submitted:
-                    # 입력 검증
-                    if not new_username or not new_password or not confirm_password:
-                        st.error("❌ 모든 필드를 입력해주세요.")
-                    elif len(new_username) < 4:
-                        st.warning("⚠️ 아이디는 4자 이상이어야 합니다.")
-                    elif len(new_password) < 4:
-                        st.warning("🔒 비밀번호는 4자 이상이어야 합니다.")
-                    elif new_password != confirm_password:
-                        st.error("❌ 비밀번호가 일치하지 않습니다.")
-                    else:
-                        # 계정 생성 시도
-                        with st.spinner("계정 생성 중..."):
-                            time.sleep(0.5)
+            if submitted:
+                if not username or not password:
+                    st.error("❌ 아이디와 비밀번호를 모두 입력해주세요.")
+                else:
+                    # 로딩 표시
+                    with st.spinner("인증 확인 중..."):
+                        time.sleep(0.5)  # 사용자 경험을 위한 지연
+                        
+                        if verify_user_credentials(username, password):
+                            st.session_state.logged_in = True
+                            st.session_state.username = username
+                            st.session_state.reset_survey_flag = True
                             
-                            success, message = create_user_account(new_username, new_password)
+                            st.success("✅ 로그인 성공! 웰니스 여행 추천을 시작합니다.")
+                            st.balloons()
                             
-                            if success:
-                                st.success(f"🎉 {message}")
-                                st.info("이제 로그인할 수 있습니다!")
-                                
-                                # 로그인 모드로 전환
-                                st.session_state.choice_radio = "로그인"
-                                time.sleep(2)
-                                st.rerun()
-                            else:
-                                st.error(f"❌ {message}")
-    
-    # 시스템 정보
-    st.markdown("""
-    <div class="system-info">
-        <h4>📊 시스템 현황</h4>
-        <div class="system-stats">
-            <div class="stat-item">
-                <span class="stat-number">2,591</span>
-                <div class="stat-label">분석 데이터</div>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">12</span>
-                <div class="stat-label">분석 요인</div>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">8</span>
-                <div class="stat-label">클러스터 유형</div>
-            </div>
-            <div class="stat-item">
-                <span class="stat-number">95%</span>
-                <div class="stat-label">정확도</div>
-            </div>
+                            # 잠시 후 홈으로 이동
+                            time.sleep(1.5)
+                            st.switch_page("pages/03_home.py")
+                        else:
+                            st.error("❌ 아이디 또는 비밀번호가 잘못되었습니다.")
+        
+        # 데모 계정 안내
+        st.markdown("""
+        <div class="demo-info">
+            <h4>🎯 체험용 데모 계정</h4>
+            <p style="margin: 6px 0;">
+                <strong>아이디:</strong> wellness<br>
+                <strong>비밀번호:</strong> 1234
+            </p>
+            <p style="margin: 6px 0 0 0; font-size: 0.9em; opacity: 0.8;">
+                💡 즉시 체험해보고 싶다면 위 데모 계정을 사용하세요!
+            </p>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
+        """, unsafe_allow_html=True)
+
+    elif choice == "회원가입":
+        st.markdown("<h2 style='color: #2C3E50; text-align: center; margin: 24px 0 16px 0; font-weight: 700;'>📝 회원가입</h2>", unsafe_allow_html=True)
+        
+        # 회원가입 폼
+        with st.form("signup_form", clear_on_submit=True):
+            new_username = st.text_input(
+                "사용할 아이디", 
+                placeholder="영문, 숫자 조합 (4자 이상)",
+                key="signup_username"
+            )
+            new_password = st.text_input(
+                "사용할 비밀번호", 
+                type="password", 
+                placeholder="안전한 비밀번호 (4자 이상)",
+                key="signup_password"
+            )
+            confirm_password = st.text_input(
+                "비밀번호 확인", 
+                type="password", 
+                placeholder="비밀번호를 다시 입력하세요",
+                key="signup_confirm"
+            )
+            
+            submitted = st.form_submit_button("✨ 가입하기", use_container_width=True)
+            
+            if submitted:
+                # 입력 검증
+                if not new_username or not new_password or not confirm_password:
+                    st.error("❌ 모든 필드를 입력해주세요.")
+                elif len(new_username) < 4:
+                    st.warning("⚠️ 아이디는 4자 이상이어야 합니다.")
+                elif len(new_password) < 4:
+                    st.warning("🔒 비밀번호는 4자 이상이어야 합니다.")
+                elif new_password != confirm_password:
+                    st.error("❌ 비밀번호가 일치하지 않습니다.")
+                else:
+                    # 계정 생성 시도
+                    with st.spinner("계정 생성 중..."):
+                        time.sleep(0.5)
+                        
+                        success, message = create_user_account(new_username, new_password)
+                        
+                        if success:
+                            st.success(f"🎉 {message}")
+                            st.info("이제 로그인할 수 있습니다!")
+                            
+                            # 로그인 모드로 전환
+                            st.session_state.choice_radio = "로그인"
+                            time.sleep(2)
+                            st.rerun()
+                        else:
+                            st.error(f"❌ {message}")
+
+    # 컨테이너 닫기 태그
+    st.markdown("</div>", unsafe_allow_html=True)
     # 시스템 소개
     st.markdown("""
     <div style="background: rgba(255, 255, 255, 0.8); border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center; backdrop-filter: blur(10px); border: 2px solid rgba(52, 152, 219, 0.2);">
