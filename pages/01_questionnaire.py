@@ -394,25 +394,6 @@ def questionnaire_page():
         </div>
         """, unsafe_allow_html=True)
         
-        # 시스템 정보
-        st.markdown("""
-        <div class="sidebar-progress">
-            <h4 style="color: #2980B9; margin-bottom: 12px; font-size: 1em;">📊 분석 시스템</h4>
-            <div style="margin: 8px 0;">
-                <span style="color: #3498DB; font-weight: 600; font-size: 0.9em;">🔬 과학적 근거:</span><br>
-                <span style="color: #5D6D7E; font-size: 0.8em;">2,591명 데이터 기반</span>
-            </div>
-            <div style="margin: 8px 0;">
-                <span style="color: #3498DB; font-weight: 600; font-size: 0.9em;">🎯 분석 정확도:</span><br>
-                <span style="color: #5D6D7E; font-size: 0.8em;">95% 이상</span>
-            </div>
-            <div style="margin: 8px 0;">
-                <span style="color: #3498DB; font-weight: 600; font-size: 0.9em;">⏱️ 소요 시간:</span><br>
-                <span style="color: #5D6D7E; font-size: 0.8em;">약 5분</span>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
-        
         # 로그아웃 버튼
         st.markdown("---")
         if st.button("🚪 로그아웃", use_container_width=True, key="sidebar_logout"):
@@ -437,7 +418,7 @@ def questionnaire_page():
                 st.session_state.answers[q_key] = st.session_state[radio_key]
 
     # 메인 제목
-    st.markdown('<h1 class="main-title">🌿 한국 관광 성향 진단 시스템 2.0</h1>', unsafe_allow_html=True)
+    st.markdown('<h1 class="main-title">🌿 웰니스 관광 성향 진단 시스템 </h1>', unsafe_allow_html=True)
     
     # 소개 메시지
     st.markdown("""
@@ -586,10 +567,10 @@ def questionnaire_page():
                     # 디버깅 정보 (개발 환경에서만)
                     with st.expander("🔍 기술 정보 (개발자용)", expanded=False):
                         st.code(f"""
-오류 타입: {type(e).__name__}
-오류 메시지: {str(e)}
-답변 수: {len(st.session_state.answers)}
-완료된 문항: {list(st.session_state.answers.keys())}
+                                오류 타입: {type(e).__name__}
+                                오류 메시지: {str(e)}
+                                답변 수: {len(st.session_state.answers)}
+                                완료된 문항: {list(st.session_state.answers.keys())}
                         """)
                         
                         # 재시도 버튼
