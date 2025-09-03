@@ -590,42 +590,33 @@ def render_top_recommendations(recommended_places):
     for i, place in enumerate(recommended_places[:8]):
         with st.container():
             st.markdown(f"""
-            <div class="recommendation-card">
-                <div class="ranking-badge">#{i+1}</div>
-                <div style="display: flex; align-items: flex-start; margin: 25px 0;">
-                    <div style="font-size: 5em; margin-right: 30px; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));">
-                        {place.get('image_url', '🌿')}
-                    </div>
-                    <div style="flex: 1;">
-                        <h3 style="color: #2E7D32; margin: 0 0 15px 0; font-size: 1.8em;">{place['name']}</h3>
-                        <p style="color: #666; margin: 0 0 20px 0; line-height: 1.7; font-size: 1.05em;">
-                            {place['description']}
-                        </p>
-                        
-                        <div style="margin: 20px 0;">
-                            <span class="destination-rating">⭐ {place['rating']}/10</span>
-                            <span class="destination-price">💰 {place['price_range']}</span>
-                            <span class="destination-distance">📍 {place['distance_from_incheon']}km</span>
-                            <span class="info-tag">🏷️ {place['type']}</span>
-                            <span class="info-tag">🎯 {place['recommendation_score']:.0f}점</span>
-                            {'<span class="info-tag" style="background: rgba(76, 175, 80, 0.3); border-color: #4CAF50;">✅ 완벽매칭</span>' if place.get('cluster_match') else ''}
-                        </div>
-                        
-                        <div class="destination-detail">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.95em;">
-                                <div>
-                                    <strong style="color: #2E7D32;">🚗 자차 이용:</strong><br>
-                                    {place.get('travel_time_car', '정보없음')} ({place.get('travel_cost_car', '정보없음')})
-                                </div>
-                                <div>
-                                    <strong style="color: #2E7D32;">🚇 대중교통:</strong><br>
-                                    {place.get('travel_time_train', '정보없음')} ({place.get('travel_cost_train', '정보없음')})
-                                </div>
-                            </div>
-                            {f'<div style="margin-top: 15px;"><strong style="color: #2E7D32;">🌐 웹사이트:</strong> <a href="{place.get("website", "")}" target="_blank" style="color: #4CAF50;">{place.get("website", "정보없음")}</a></div>' if place.get('website') and place['website'] != '정보없음' else ''}
-                            {f'<div style="margin-top: 10px; font-size: 0.9em; color: #888;"><strong>📚 출처:</strong> {place.get("sources", "")}</div>' if place.get('sources') else ''}
-                        </div>
-                    </div>
+            <div style="text-align: center; font-size: 4.5em; margin: 25px 0; filter: drop-shadow(0 4px 8px rgba(76, 175, 80, 0.3));">
+                {place['image_url']}
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col2:
+            # Streamlit 네이티브 컴포넌트 사용
+            st.markdown(f"## #{index + 1} {place['name']}")
+            st.write(place['description'])
+            
+            # 점수 표시
+            st.success(f"🎯 추천 점수: {place['recommendation_score']:.0f}/100점")
+
+            # 정보 태그들
+            st.markdown(f"""
+            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
+                <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
+                    ⭐ 평점 : {place['rating']}/5
+                </div>
+                <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
+                    💰 비용 : {place['price_range']}
+                </div>
+                <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
+                    📍 거리 : {place['distance_from_incheon']}km
+                </div>
+                <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
+                    🏷️ 카테고리 : {place['type']}
                 </div>
             </div>
             """, unsafe_allow_html=True)
