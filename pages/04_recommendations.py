@@ -674,34 +674,6 @@ def render_wellness_recommendations():
     # 다운로드 섹션
     render_download_section(filtered_places, cluster_result)
 
-# 도시 매핑 딕셔너리
-CITY_MAPPING = {
-    'Seoul Seoul': '서울특별시',
-    'Incheon Incheon': '인천광역시',
-    'Busan Busan': '부산광역시',
-    'Daegu Daegu': '대구광역시',
-    'Gwangju Gwangju': '광주광역시',
-    'Daejeon Daejeon': '대전광역시',
-    'Ulsan Ulsan': '울산광역시',
-    'Sejong Sejong': '세종특별자치시',
-    'Gyeonggi-do': '경기도',
-    'Gangwon-do': '강원도',
-    'Chungcheongbuk-do': '충청북도',
-    'Chungcheongnam-do': '충청남도',
-    'Jeollabuk-do': '전라북도',
-    'Jeollanam-do': '전라남도',
-    'Gyeongsangbuk-do': '경상북도',
-    'Gyeongsangnam-do': '경상남도',
-    'Jeju-do': '제주특별자치도'
-}
-
-# 주소 변환 함수 수정
-def get_korean_address(address):
-    """영문 주소를 한글로 변환"""
-    for eng, kor in CITY_MAPPING.items():
-        if eng in address:
-            return kor
-    return address
 
 def render_top_recommendations(recommended_places):
     """상위 추천 관광지 표시"""
@@ -720,8 +692,7 @@ def render_top_recommendations(recommended_places):
             lat = float(place.get('latitude', place.get('mapY', 0)))
             lon = float(place.get('longitude', place.get('mapX', 0)))
             if lat != 0 and lon != 0:
-                address = get_address_from_coordinates(lat, lon)
-                address = get_korean_address(address)  # 한글 주소로 변환
+                address = get_address_from_coordinates(lat, lon)  # get_korean_address 호출 제거
             else:
                 address = '위치 정보 없음'
         except:
