@@ -111,6 +111,8 @@ def auth_page():
     left_space, form_col, right_space = st.columns((1.2, 1.2, 1.2))
 
     with form_col:
+        choice = st.radio("choice", ["로그인", "회원가입"], horizontal=True, label_visibility="collapsed")
+        
         if 'choice_radio' in st.session_state and st.session_state.choice_radio == "로그인":
             choice = "로그인"
             del st.session_state.choice_radio
