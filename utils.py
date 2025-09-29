@@ -194,48 +194,127 @@ def get_cluster_info():
 
 @st.cache_data(ttl=3600)
 def load_wellness_destinations():
-    """실제 CSV 파일에서 웰니스 관광지 데이터 로드"""
+    """실제 CSV 파일들에서 웰니스 관광지 데이터 로드"""
     try:
-        # CSV 파일 로드
-        df = pd.read_csv('region_data.csv')
+        # 웰니스 관광지 기본 정보
+        wellness_df = pd.read_csv('GIS/wellness_tourism_list.csv')
         
-        # 데이터 검증
-        required_columns = ['name', 'lat', 'lon', 'type', 'description', 'rating', 
-                          'price_range', 'distance_from_incheon', 'cluster']
+        # 클러스터 점수 정보
+        cluster_score_df = pd.read_csv('GIS/wellness_cluster_score.csv')
         
+        # 두 데이터프레임 조인
+        df = pd.merge(wellness_df, cluster_score_df, on='contentId', how='inner')
+        
+        # 필요한 컬럼만 선택하고 이름 변경
+        df = df.rename(columns={
+            'title_x': 'name',
+            'mapX': 'lon', 
+            'mapY': 'lat',
+            'wellnessThemaCd': 'wellness_theme',
+            'lDongRegnCd': 'region_code'
+        })
+        
+        # 기존 코드와의 호환성을 위한 추가 컬럼들
+        df['type'] = '웰니스 관광지'  # 기본값
+        df['description'] = '한국 웰니스 관광 공식 추천지'
+        df['rating'] = 8.5  # 기본 평점
+        df['price_range'] = '50,000-200,000원'  # 기본 가격대
+        df['image_url'] = '🌿'  # 기본 이모지
+        df['website'] = ''
+        df['sources'] = '한국관광공사 웰니스 관광지'
+        
+        # 필수 컬럼 확인
+        required_columns = ['name', 'lat', 'lon', 'contentId', 'wellness_theme', 'region_code']
         missing_columns = [col for col in required_columns if col not in df.columns]
+        
         if missing_columns:
-            st.error(f"❌ CSV 파일에 필수 컬럼이 누락되었습니다: {missing_columns}")
+            st.error(f"❌ 필수 컬럼이 누락되었습니다: {missing_columns}")
             return pd.DataFrame()
         
         # 데이터 정리
         df = df.dropna(subset=['name', 'lat', 'lon'])
         
-        # 타입별 한국어 카테고리 매핑
-        type_mapping = {
-            '스파/온천': 'spa_oncheon',
-            '산림/자연치유': 'forest_healing', 
-            '웰니스 리조트': 'wellness_resort',
-            '체험/교육': 'experience_education',
-            '리조트/호텔': 'resort_hotel',
-            '문화/예술': 'culture_art',
-            '힐링/테라피': 'healing_therapy',
-            '한방/전통의학': 'traditional_medicine',
-            '레저/액티비티': 'leisure_activity',
-            '기타': 'others'
-        }
-        
-        # 영어 타입 컬럼 추가
-        df['type_en'] = df['type'].map(type_mapping).fillna('others')
-        
         return df
         
-    except FileNotFoundError:
-        st.error("❌ region_data.csv 파일을 찾을 수 없습니다.")
+    except FileNotFoundError as e:
+        st.error(f"❌ CSV 파일을 찾을 수 없습니다: {e}")
         return pd.DataFrame()
     except Exception as e:
         st.error(f"❌ 데이터 로드 중 오류가 발생했습니다: {str(e)}")
         return pd.DataFrame()
+
+@st.cache_data(ttl=3600)
+def load_wellness_nearby_spots():
+    """웰니스 관광지 주변 관광지 데이터 로드"""
+    try:
+        nearby_df = pd.read_csv('GIS/wellness_nearby_spots_list.csv')
+        return nearby_df
+    except FileNotFoundError:
+        st.error("❌ wellness_nearby_spots_list.csv 파일을 찾을 수 없습니다.")
+        return pd.DataFrame()
+    except Exception as e:
+        st.error(f"❌ 주변 관광지 데이터 로드 중 오류: {str(e)}")
+        return pd.DataFrame()
+
+@st.cache_data(ttl=3600)
+def load_category_map():
+    """카테고리 매핑 정보 로드"""
+    try:
+        category_df = pd.read_csv('GIS/category_map.csv')
+        return category_df
+    except FileNotFoundError:
+        st.error("❌ category_map.csv 파일을 찾을 수 없습니다.")
+        return pd.DataFrame()
+    except Exception as e:
+        st.error(f"❌ 카테고리 데이터 로드 중 오류: {str(e)}")
+        return pd.DataFrame()
+
+def get_wellness_theme_names():
+    """웰니스 테마 코드-이름 매핑"""
+    return {
+        'A0101': '자연',
+        'A0102': '인문(문화/예술/역사)', 
+        'A0201': '숙박',
+        'A0202': '관광지',
+        'A0203': '레포츠',
+        'A0204': '쇼핑',
+        'A0205': '음식',
+        'A0206': '교통',
+        'A0207': '문화시설',
+        'A0208': '축제공연행사',
+        'B0201': '숙박업소',
+        'C0101': '추천코스',
+        'C0102': '가족코스',
+        'C0103': '나홀로코스', 
+        'C0104': '힐링코스',
+        'C0105': '도보코스',
+        'C0106': '캠핑코스',
+        'C0107': '맛코스',
+        'C0108': '문화관광코스',
+        'C0109': '건강걷기코스'
+    }
+
+def get_region_names():
+    """지역 코드-이름 매핑"""
+    return {
+        1: '서울특별시',
+        2: '인천광역시', 
+        3: '대전광역시',
+        4: '대구광역시',
+        5: '광주광역시',
+        6: '부산광역시',
+        7: '울산광역시',
+        8: '세종특별자치시',
+        31: '경기도',
+        32: '강원도',
+        33: '충청북도', 
+        34: '충청남도',
+        35: '경상북도',
+        36: '경상남도',
+        37: '전라북도',
+        38: '전라남도',
+        39: '제주특별자치도'
+    }
 
 def calculate_cluster_scores(answers):
     """설문 답변을 바탕으로 3개 클러스터 점수 계산"""
@@ -343,68 +422,30 @@ def reset_survey_state():
 
 @st.cache_data(ttl=1800)
 def calculate_recommendations_by_cluster(cluster_result):
-    """클러스터 기반 실제 웰니스 관광지 추천 계산"""
+    """클러스터 기반 실제 웰니스 관광지 추천 계산 (상위 10개)"""
     wellness_df = load_wellness_destinations()
     
     if wellness_df.empty:
         return []
     
     user_cluster = cluster_result['cluster']
-    cluster_info = get_cluster_info()
+    
+    # 해당 클러스터의 점수 컬럼명
+    score_column = f'score_cluster_{user_cluster}'
+    
+    if score_column not in wellness_df.columns:
+        st.error(f"❌ 클러스터 {user_cluster} 점수 컬럼을 찾을 수 없습니다.")
+        return []
+    
+    # 클러스터 점수 기준으로 정렬하여 상위 10개 선택
+    top_recommendations = wellness_df.nlargest(10, score_column)
     
     recommendations = []
     
-    # 클러스터별 선호 관광지 타입 매핑 (3개 클러스터 기준)
-    cluster_preferences = {
-        0: ['한방/전통의학', '문화/예술', '체험/교육'],           # 장기체류 지인방문형
-        1: ['스파/온천', '산림/자연치유', '웰니스 리조트'],      # 전형적 중간형 관광객  
-        2: ['웰니스 리조트', '스파/온천', '리조트/호텔']        # 단기 고소비 재방문층
-    }
-    
-    preferred_types = cluster_preferences.get(user_cluster, ['스파/온천'])
-    
-    # 각 관광지에 대해 추천 점수 계산
-    for idx, place in wellness_df.iterrows():
-        score = 0
-        
-        # 기본 평점 반영 (0-10점을 0-40점으로 스케일)
-        score += place['rating'] * 4
-        
-        # 클러스터 선호 타입 보너스
-        if place['type'] in preferred_types:
-            type_bonus = (3 - preferred_types.index(place['type'])) * 15
-            score += type_bonus
-        
-        # 클러스터별 특별 가중치
-        if user_cluster == 0:  # 장기체류 지인방문형
-            # 접근성과 가격 중시
-            if '무료' in str(place['price_range']) or place['price_range'].startswith(('10,000', '20,000')):
-                score += 15
-            if place['distance_from_incheon'] <= 100:  # 가까운 거리 선호
-                score += 10
-                
-        elif user_cluster == 1:  # 전형적 중간형 관광객
-            # 평점과 균형 중시
-            score += place['rating'] * 2  # 평점 가중치 추가
-            if 50000 <= int(''.join(filter(str.isdigit, place['price_range'].split('-')[0]))) <= 200000:
-                score += 10  # 중간 가격대 선호
-                
-        elif user_cluster == 2:  # 단기 고소비 재방문층
-            # 프리미엄과 효율성 중시
-            if any(keyword in place['price_range'] for keyword in ['500,000', '1,000,000']):
-                score += 20  # 고가격대 선호
-            if place['rating'] >= 8.0:  # 고평점 선호
-                score += 15
-        
-        # 접근성 보너스 (거리가 가까울수록 높은 점수)
-        distance_score = max(0, 15 - (place['distance_from_incheon'] / 50))
-        score += distance_score
-        
-        # 클러스터 신뢰도 반영
-        score += cluster_result['confidence'] * 20
-        
+    for idx, place in top_recommendations.iterrows():
         # 결과 생성
         place_recommendation = {
+            'contentId': place['contentId'],
             'name': place['name'],
             'lat': place['lat'],
             'lon': place['lon'],
@@ -412,23 +453,163 @@ def calculate_recommendations_by_cluster(cluster_result):
             'description': place['description'],
             'rating': place['rating'],
             'price_range': place['price_range'],
-            'distance_from_incheon': place['distance_from_incheon'],
-            'travel_time_car': place.get('travel_time_primary', '정보 없음'),
-            'travel_time_train': place.get('travel_time_secondary', '정보 없음'),
-            'travel_cost_car': place.get('travel_cost_primary', '정보 없음'),
-            'travel_cost_train': place.get('travel_cost_secondary', '정보 없음'),
-            'image_url': place.get('image_url', '🌿'),
-            'recommendation_score': score,
-            'cluster_match': place['type'] in preferred_types,
-            'website': place.get('website', ''),
-            'sources': place.get('sources', ''),
-            'cluster_region': place.get('cluster', 1)
+            'image_url': place['image_url'],
+            'recommendation_score': place[score_column],  # 클러스터 점수를 추천점수로 사용
+            'cluster_match': True,  # 클러스터 기반 추천이므로 모두 매칭
+            'website': place['website'],
+            'sources': place['sources'],
+            'wellness_theme': place['wellness_theme'],
+            'region_code': place['region_code'],
+            # 기존 코드 호환성을 위한 더미 값들
+            'distance_from_incheon': 0,
+            'travel_time_car': '정보 없음',
+            'travel_time_train': '정보 없음', 
+            'travel_cost_car': '정보 없음',
+            'travel_cost_train': '정보 없음',
+            'cluster_region': place['region_code']
         }
         
         recommendations.append(place_recommendation)
     
-    # 점수 순으로 정렬
-    recommendations.sort(key=lambda x: x["recommendation_score"], reverse=True)
+    return recommendations
+
+def get_nearby_attractions(wellness_content_id, limit=5):
+    """특정 웰니스 관광지의 주변 관광지 상위 5개 반환"""
+    nearby_df = load_wellness_nearby_spots()
+    
+    if nearby_df.empty:
+        return []
+    
+    # 해당 웰니스 관광지의 주변 관광지 필터링
+    nearby_spots = nearby_df[nearby_df['wellness_contentId'] == wellness_content_id]
+    
+    if nearby_spots.empty:
+        return []
+    
+    # 상위 5개 선택 (데이터가 이미 우선순위대로 정렬되어 있다고 가정)
+    top_nearby = nearby_spots.head(limit)
+    
+    nearby_list = []
+    for idx, spot in top_nearby.iterrows():
+        nearby_info = {
+            'contentId': spot['nearby_contentid'],
+            'name': spot['nearby_title'],
+            'category1': spot['nearby_category1'],
+            'category2': spot['nearby_category2'], 
+            'category3': spot['nearby_category3']
+        }
+        nearby_list.append(nearby_info)
+    
+    return nearby_list
+
+def get_wellness_theme_filter_options():
+    """웰니스 테마 필터 옵션 반환"""
+    wellness_df = load_wellness_destinations()
+    
+    if wellness_df.empty:
+        return []
+    
+    theme_names = get_wellness_theme_names()
+    available_themes = wellness_df['wellness_theme'].unique()
+    
+    filter_options = []
+    for theme_code in available_themes:
+        if pd.notna(theme_code):  # NaN 값 제외
+            theme_name = theme_names.get(theme_code, theme_code)
+            filter_options.append({
+                'code': theme_code,
+                'name': theme_name,
+                'count': len(wellness_df[wellness_df['wellness_theme'] == theme_code])
+            })
+    
+    # 개수 순으로 정렬
+    filter_options.sort(key=lambda x: x['count'], reverse=True)
+    
+    return filter_options
+
+def get_region_filter_options():
+    """지역 필터 옵션 반환"""
+    wellness_df = load_wellness_destinations()
+    
+    if wellness_df.empty:
+        return []
+    
+    region_names = get_region_names()
+    available_regions = wellness_df['region_code'].unique()
+    
+    filter_options = []
+    for region_code in available_regions:
+        if pd.notna(region_code):  # NaN 값 제외
+            region_code = int(region_code)
+            region_name = region_names.get(region_code, f'지역코드 {region_code}')
+            filter_options.append({
+                'code': region_code,
+                'name': region_name,
+                'count': len(wellness_df[wellness_df['region_code'] == region_code])
+            })
+    
+    # 개수 순으로 정렬
+    filter_options.sort(key=lambda x: x['count'], reverse=True)
+    
+    return filter_options
+
+def apply_wellness_filters(cluster_result, theme_filter=None, region_filter=None):
+    """필터 적용된 웰니스 관광지 추천"""
+    wellness_df = load_wellness_destinations()
+    
+    if wellness_df.empty:
+        return []
+    
+    # 필터 적용
+    filtered_df = wellness_df.copy()
+    
+    if theme_filter and theme_filter != '전체':
+        filtered_df = filtered_df[filtered_df['wellness_theme'] == theme_filter]
+    
+    if region_filter and region_filter != '전체':
+        filtered_df = filtered_df[filtered_df['region_code'] == region_filter]
+    
+    if filtered_df.empty:
+        return []
+    
+    user_cluster = cluster_result['cluster'] 
+    score_column = f'score_cluster_{user_cluster}'
+    
+    if score_column not in filtered_df.columns:
+        return []
+    
+    # 클러스터 점수 기준으로 정렬하여 상위 10개 선택
+    top_recommendations = filtered_df.nlargest(10, score_column)
+    
+    recommendations = []
+    
+    for idx, place in top_recommendations.iterrows():
+        place_recommendation = {
+            'contentId': place['contentId'],
+            'name': place['name'],
+            'lat': place['lat'],
+            'lon': place['lon'],
+            'type': place['type'],
+            'description': place['description'],
+            'rating': place['rating'],
+            'price_range': place['price_range'],
+            'image_url': place['image_url'],
+            'recommendation_score': place[score_column],
+            'cluster_match': True,
+            'website': place['website'],
+            'sources': place['sources'],
+            'wellness_theme': place['wellness_theme'],
+            'region_code': place['region_code'],
+            # 기존 코드 호환성을 위한 더미 값들
+            'distance_from_incheon': 0,
+            'travel_time_car': '정보 없음',
+            'travel_time_train': '정보 없음',
+            'travel_cost_car': '정보 없음', 
+            'travel_cost_train': '정보 없음',
+            'cluster_region': place['region_code']
+        }
+        
+        recommendations.append(place_recommendation)
     
     return recommendations
 
