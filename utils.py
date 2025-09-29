@@ -603,28 +603,25 @@ def apply_wellness_filters(cluster_result, theme_filter=None, region_filter=None
     
     for idx, place in top_recommendations.iterrows():
         place_recommendation = {
-            'contentId': place['contentId'],
-            'name': place['name'],
-            'lat': place['lat'],
-            'lon': place['lon'],
-            'type': place['type'],
-            'description': place['description'],
-            'rating': place['rating'],
-            'price_range': place['price_range'],
-            'image_url': place['image_url'],
-            'recommendation_score': place[score_column],
+            'content_id': place.get('content_id', place.get('contentId', 0)),
+            'title': place.get('title', '제목 없음'),
+            'latitude': float(place.get('latitude', place.get('mapY', 0.0))),
+            'longitude': float(place.get('longitude', place.get('mapX', 0.0))),
+            'address': place.get('address', place.get('addr1', '주소 정보 없음')),
+            'wellness_theme': place.get('wellness_theme', place.get('wellnessThemaCd', 'A0202')),
+            'region_code': place.get('region_code', place.get('lDongRegnCd', 0)),
+            'score': float(place.get(score_column, 0.0)),
+            # 기본값 설정
+            'type': '웰니스 관광지',
+            'description': place.get('description', '설명 없음'),
+            'rating': float(place.get('rating', 4.0)),
+            'price_level': str(place.get('price_level', '정보 없음')),
             'cluster_match': True,
-            'website': place['website'],
-            'sources': place['sources'],
-            'wellness_theme': place['wellness_theme'],
-            'region_code': place['region_code'],
-            # 기존 코드 호환성을 위한 더미 값들
             'distance_from_incheon': 0,
             'travel_time_car': '정보 없음',
             'travel_time_train': '정보 없음',
-            'travel_cost_car': '정보 없음', 
-            'travel_cost_train': '정보 없음',
-            'cluster_region': place['region_code']
+            'travel_cost_car': '정보 없음',
+            'travel_cost_train': '정보 없음'
         }
         
         recommendations.append(place_recommendation)
