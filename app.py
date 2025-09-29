@@ -77,7 +77,7 @@ def auth_css():
         }
         div[data-testid="stRadio"] input:checked + div {
             background-color: rgba(0, 198, 255, 0.3);
-            color: white; border-color: #00c6ff;
+            color: black !important; border-color: #00c6ff;
         }
 
         div[data-testid="stTextInput"] input {
