@@ -202,53 +202,44 @@ def load_wellness_destinations():
         # 클러스터 점수 정보
         cluster_score_df = pd.read_csv('GIS/wellness_cluster_score.csv')
         
+        # 두 데이터프레임 조인 전 컬럼 존재 여부 확인
+        print("Wellness DF columns:", wellness_df.columns.tolist())
+        print("Cluster Score DF columns:", cluster_score_df.columns.tolist())
+        
         # 두 데이터프레임 조인
         df = pd.merge(wellness_df, cluster_score_df, on='contentId', how='inner')
         
-        # 컬럼명 표준화 (실제 CSV 파일의 컬럼명에 맞춤)
+        # address 컬럼 생성 (addr1이 있다면 사용)
+        if 'addr1' in df.columns:
+            df['address'] = df['addr1']
+        else:
+            df['address'] = "주소 정보 없음"
+            
+        # wellness_theme 컬럼 생성 (wellnessThemaCd 사용)
+        if 'wellnessThemaCd' in df.columns:
+            df['wellness_theme'] = df['wellnessThemaCd']
+        else:
+            df['wellness_theme'] = "A0202"  # 기본값
+            
+        # 필수 컬럼 매핑
         column_mapping = {
             'contentId': 'content_id',
             'title_x': 'title',
-            'addr1': 'address',  # addr1을 address로 매핑
             'mapX': 'longitude',
             'mapY': 'latitude',
-            'lDongRegnCd': 'region_code',
-            'wellnessThemaCd': 'wellness_theme',  # wellnessThemaCd를 wellness_theme으로 매핑
-            'score_cluster_0': 'cluster_0_score',
-            'score_cluster_1': 'cluster_1_score',
-            'score_cluster_2': 'cluster_2_score'
+            'lDongRegnCd': 'region_code'
         }
         
         # 컬럼명 변경
         df = df.rename(columns=column_mapping)
         
-        # addr2가 있고 addr1이 없는 경우 addr2를 address로 사용
-        if 'addr2' in df.columns and 'address' not in df.columns:
-            df['address'] = df['addr2']
-        elif 'address' not in df.columns:
-            df['address'] = '주소 정보 없음'  # 기본값 설정
-            
-        # wellness_theme이 없는 경우 기본값 설정
-        if 'wellness_theme' not in df.columns:
-            df['wellness_theme'] = 'A0202'  # 기본 테마 코드
-        
-        # 필수 컬럼 확인
-        required_columns = ['title', 'content_id', 'address', 'wellness_theme', 'region_code']
-        missing_columns = [col for col in required_columns if col not in df.columns]
-        
-        if missing_columns:
-            st.error(f"❌ 필수 컬럼이 누락되었습니다: {missing_columns}")
-            st.write("현재 사용 가능한 컬럼:", df.columns.tolist())
-            return pd.DataFrame()
+        # 데이터 확인을 위한 출력
+        print("Available columns after processing:", df.columns.tolist())
         
         # NaN 값 처리
         df['address'] = df['address'].fillna('주소 정보 없음')
         df['wellness_theme'] = df['wellness_theme'].fillna('A0202')
-        df['region_code'] = df['region_code'].fillna(0)
-        
-        # 디버깅용 정보 출력
-        st.write("데이터 로드 완료")
-        st.write("사용 가능한 컬럼:", df.columns.tolist())
+        df['region_code'] = df['region_code'].fillna('0')
         
         return df
         
@@ -257,7 +248,7 @@ def load_wellness_destinations():
         return pd.DataFrame()
     except Exception as e:
         st.error(f"❌ 데이터 로드 중 오류가 발생했습니다: {str(e)}")
-        st.write("사용 가능한 컬럼:", wellness_df.columns.tolist() if 'wellness_df' in locals() else "데이터프레임이 생성되지 않음")
+        st.write("오류 발생 시점의 데이터프레임 컬럼:", wellness_df.columns.tolist() if 'wellness_df' in locals() else "데이터프레임이 생성되지 않음")
         return pd.DataFrame()
 
 @st.cache_data(ttl=3600)
