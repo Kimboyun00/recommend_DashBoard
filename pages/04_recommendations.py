@@ -607,11 +607,11 @@ def render_top_recommendations(recommended_places):
             <div class="recommendation-card">
                 <div class="ranking-badge">#{idx}</div>
                 <h3>{place['title']}</h3>
-                <p>{place['description']}</p>
+                <p>{place.get('description', '설명 정보가 없습니다.')}</p>
                 <div class="destination-detail">
-                    <span class="destination-rating">평점: {place['rating']:.1f}</span>
-                    <span class="destination-price">가격대: {'₩' * int(place['price_level'])}</span>
-                    <p>📍 {place['address']}</p>
+                    <span class="destination-rating">평점: {place.get('rating', 4.0):.1f}</span>
+                    <span class="destination-price">가격대: {"₩" * place.get('price_level', 2)}</span>
+                    <p>📍 {place.get('address', '주소 정보 없음')}</p>
                 </div>
             </div>
             """, unsafe_allow_html=True)
@@ -622,8 +622,8 @@ def render_top_recommendations(recommended_places):
                 if nearby_spots:
                     for spot in nearby_spots:
                         st.markdown(f"""
-                        - **{spot['title']}** ({spot['category']})
-                          - 거리: {spot['distance']:.1f}km
+                        - **{spot['name']}** ({spot.get('category1', '기타')})
+                          - 거리: {spot.get('distance', 0):.1f}km
                         """)
                 else:
                     st.info("주변 관광지 정보가 없습니다.")

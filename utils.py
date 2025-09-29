@@ -582,10 +582,10 @@ def apply_wellness_filters(cluster_result, theme_filter=None, region_filter=None
     filtered_df = wellness_df.copy()
     
     if theme_filter and theme_filter != '전체':
-        filtered_df = filtered_df[filtered_df['wellness_theme'] == theme_filter]
+        filtered_df = filtered_df['wellness_theme'] == theme_filter
     
     if region_filter and region_filter != '전체':
-        filtered_df = filtered_df[filtered_df['region_code'] == region_filter]
+        filtered_df = filtered_df['region_code'] == region_filter
     
     if filtered_df.empty:
         return []
@@ -611,19 +611,11 @@ def apply_wellness_filters(cluster_result, theme_filter=None, region_filter=None
             'wellness_theme': place.get('wellness_theme', place.get('wellnessThemaCd', 'A0202')),
             'region_code': place.get('region_code', place.get('lDongRegnCd', 0)),
             'score': float(place.get(score_column, 0.0)),
-            # 기본값 설정
-            'type': '웰니스 관광지',
-            'description': place.get('description', '설명 없음'),
-            'rating': float(place.get('rating', 4.0)),
-            'price_level': str(place.get('price_level', '정보 없음')),
-            'cluster_match': True,
-            'distance_from_incheon': 0,
-            'travel_time_car': '정보 없음',
-            'travel_time_train': '정보 없음',
-            'travel_cost_car': '정보 없음',
-            'travel_cost_train': '정보 없음'
+            'price_level': 2,  # 기본 가격대 레벨 설정
+            'description': place.get('overview', '설명 정보가 없습니다.'),
+            'rating': 4.0,  # 기본 평점
+            'type': '웰니스 관광지'
         }
-        
         recommendations.append(place_recommendation)
     
     return recommendations
