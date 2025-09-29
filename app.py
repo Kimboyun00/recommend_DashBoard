@@ -72,6 +72,7 @@ def auth_css():
             justify-content: center;
             align-items: center;
             margin-bottom: 25px;
+            width: 100%;
         }
 
         /* 🔹 전체 라벨(제목)은 숨김 처리 */
