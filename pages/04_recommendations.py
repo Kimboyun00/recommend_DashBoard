@@ -7,22 +7,42 @@ import pandas as pd
 import numpy as np
 import sys
 import os
+from datetime import datetime
+from pathlib import Path
 
 # 현재 디렉토리를 Python 경로에 추가
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
+current_dir = Path(__file__).parent
+parent_dir = current_dir.parent
+if str(parent_dir) not in sys.path:
+    sys.path.append(str(parent_dir))
 
 try:
-    from utils import (check_access_permissions, get_cluster_info, 
-                      create_factor_analysis_chart, create_cluster_comparison_chart,
-                      calculate_recommendations_by_cluster, questions, 
-                      load_wellness_destinations, get_cluster_region_info,
-                      apply_global_styles, export_recommendations_to_csv,
-                      get_statistics_summary)
+    from utils import (
+        # 페이지 접근 관련
+        check_access_permissions,
+        apply_global_styles,
+        
+        # 클러스터 및 분석 관련
+        get_cluster_info,
+        calculate_recommendations_by_cluster,
+        get_cluster_region_info,
+        
+        # 차트 생성 관련
+        create_factor_analysis_chart,
+        create_cluster_comparison_chart,
+        
+        # 데이터 처리 관련
+        questions,
+        load_wellness_destinations,
+        get_nearby_attractions,
+        get_wellness_theme_filter_options,
+        get_region_filter_options,
+        apply_wellness_filters,
+        export_recommendations_to_csv,
+        get_statistics_summary
+    )
 except ImportError as e:
-    st.error(f"❌ 필수 모듈을 불러올 수 없습니다: {e}")
+    st.error(f"❌ 필수 모듈을 불러올 수 없습니다: {str(e)}")
     st.info("💡 `utils.py` 파일이 올바른 위치에 있는지 확인해주세요.")
     st.stop()
 
@@ -39,9 +59,10 @@ if 'survey_completed' not in st.session_state or not st.session_state.survey_com
 
 # 페이지 설정
 st.set_page_config(
-    page_title="12개 요인 분석 결과",
+    page_title="웰니스 관광 추천 시스템",
     page_icon="🎯",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 # 접근 권한 확인
@@ -519,107 +540,93 @@ def render_factor_analysis():
         st.markdown('</div>', unsafe_allow_html=True)
 
 def render_wellness_recommendations():
-    """실제 CSV 데이터 기반 웰니스 관광지 추천"""
+    """웰니스 관광지 추천 결과 표시"""
     if 'cluster_result' not in st.session_state:
-        return []
-        
+        st.error("⚠️ 클러스터 분석 결과를 찾을 수 없습니다.")
+        return
+    
     cluster_result = st.session_state.cluster_result
+    cluster_info = get_cluster_info()[cluster_result['cluster']]
     
-    # 실제 추천 계산
-    try:
-        recommended_places = calculate_recommendations_by_cluster(cluster_result)
-        
-        if not recommended_places:
-            st.warning("⚠️ 추천 관광지를 찾을 수 없습니다.")
-            return []
-            
-    except Exception as e:
-        st.error(f"❌ 추천 계산 중 오류: {str(e)}")
-        return []
-    
-    st.markdown('<h2 class="section-title">🏞️ 맞춤형 한국 웰니스 관광지 추천</h2>', unsafe_allow_html=True)
-    
-    # 추천 통계
-    metrics_col1, metrics_col2, metrics_col3, metrics_col4 = st.columns(4)
-    
-    with metrics_col1:
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-number">{len(recommended_places)}</div>
-            <div class="metric-label">추천 관광지</div>
+    st.markdown(f"""
+    <div class="cluster-result-card">
+        <h2>🎯 추천 결과</h2>
+        <h3>{cluster_info['name']}</h3>
+        <p>{cluster_info['description']}</p>
+        <div class="info-tags">
+            {' '.join([f'<span class="info-tag">{char}</span>' for char in cluster_info['characteristics']])}
         </div>
-        """, unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
     
-    with metrics_col2:
-        cluster_matches = sum(1 for place in recommended_places if place.get('cluster_match', False))
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-number">{cluster_matches}</div>
-            <div class="metric-label">완벽 매칭</div>
-        </div>
-        """, unsafe_allow_html=True)
+    # 관광지 추천 계산
+    recommended_places = calculate_recommendations_by_cluster(cluster_result)
     
-    with metrics_col3:
-        avg_score = np.mean([place['recommendation_score'] for place in recommended_places])
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-number">{avg_score:.0f}</div>
-            <div class="metric-label">평균 점수</div>
-        </div>
-        """, unsafe_allow_html=True)
+    if not recommended_places:
+        st.warning("⚠️ 추천 가능한 관광지를 찾을 수 없습니다.")
+        return
     
-    with metrics_col4:
-        avg_rating = np.mean([place['rating'] for place in recommended_places])
-        st.markdown(f"""
-        <div class="metric-card">
-            <div class="metric-number">{avg_rating:.1f}</div>
-            <div class="metric-label">평균 평점</div>
-        </div>
-        """, unsafe_allow_html=True)
+    # 필터 옵션
+    col1, col2 = st.columns(2)
+    with col1:
+        theme_filter = st.multiselect(
+            "웰니스 테마 필터",
+            options=get_wellness_theme_filter_options(),
+            default=None
+        )
+    with col2:
+        region_filter = st.multiselect(
+            "지역 필터",
+            options=get_region_filter_options(),
+            default=None
+        )
     
-    return recommended_places
+    # 필터 적용
+    filtered_places = apply_wellness_filters(
+        cluster_result,
+        theme_filter,
+        region_filter
+    )
+    
+    # 추천 결과 표시
+    render_top_recommendations(filtered_places)
+    
+    # 분석 차트 표시
+    render_analysis_charts(filtered_places)
+    
+    # 다운로드 섹션
+    render_download_section(filtered_places, cluster_result)
 
 def render_top_recommendations(recommended_places):
-    """상위 추천 관광지 상세 표시"""
-    if not recommended_places:
-        return
-        
-    st.markdown('<h2 class="section-title">🎯 상위 추천 관광지</h2>', unsafe_allow_html=True)
+    """상위 추천 관광지 표시"""
+    st.markdown("<h2 class='section-title'>📍 추천 관광지</h2>", unsafe_allow_html=True)
     
-    # 상위 8개 관광지 표시
-    for i, place in enumerate(recommended_places[:8]):
+    for idx, place in enumerate(recommended_places, 1):
         with st.container():
             st.markdown(f"""
-            <div style="text-align: center; font-size: 4.5em; margin: 25px 0; filter: drop-shadow(0 4px 8px rgba(76, 175, 80, 0.3));">
-                {place['image_url']}
+            <div class="recommendation-card">
+                <div class="ranking-badge">#{idx}</div>
+                <h3>{place['title']}</h3>
+                <p>{place['description']}</p>
+                <div class="destination-detail">
+                    <span class="destination-rating">평점: {place['rating']:.1f}</span>
+                    <span class="destination-price">가격대: {'₩' * int(place['price_level'])}</span>
+                    <p>📍 {place['address']}</p>
+                </div>
             </div>
             """, unsafe_allow_html=True)
-        
-        with col2:
-            # Streamlit 네이티브 컴포넌트 사용
-            st.markdown(f"## #{index + 1} {place['name']}")
-            st.write(place['description'])
             
-            # 점수 표시
-            st.success(f"🎯 추천 점수: {place['recommendation_score']:.0f}/100점")
-
-            # 정보 태그들
-            st.markdown(f"""
-            <div style="display: flex; flex-wrap: wrap; gap: 10px; margin: 20px 0;">
-                <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
-                    ⭐ 평점 : {place['rating']}/5
-                </div>
-                <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
-                    💰 비용 : {place['price_range']}
-                </div>
-                <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
-                    📍 거리 : {place['distance_from_incheon']}km
-                </div>
-                <div style="background: rgba(76, 175, 80, 0.15); border: 2px solid rgba(76, 175, 80, 0.3); border-radius: 12px; padding: 8px 15px; color: #2E7D32; font-weight: 700; flex: 1; min-width: 120px; text-align: center;">
-                    🏷️ 카테고리 : {place['type']}
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
+            # 주변 관광지 정보
+            with st.expander("주변 관광지 보기"):
+                nearby_spots = get_nearby_attractions(place['content_id'])
+                if nearby_spots:
+                    for spot in nearby_spots:
+                        st.markdown(f"""
+                        - **{spot['title']}** ({spot['category']})
+                          - 거리: {spot['distance']:.1f}km
+                        """)
+                else:
+                    st.info("주변 관광지 정보가 없습니다.")
 
 def render_analysis_charts(recommended_places):
     """분석 차트 렌더링"""
