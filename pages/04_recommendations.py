@@ -731,7 +731,6 @@ def render_top_recommendations(recommended_places):
                         <div class="nearby-spot-item">
                             <span class="nearby-spot-name">{spot['nearby_title']}</span>
                             <span class="nearby-spot-category">{spot['nearby_category1']}</span>
-                            <span class="nearby-spot-distance">{float(spot['distance']):.1f}km</span>
                         </div>
                         """
                     nearby_html += "</div></div>"
