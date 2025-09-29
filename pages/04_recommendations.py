@@ -3,6 +3,7 @@
 import streamlit as st
 import plotly.express as px
 import plotly.graph_objects as go
+import reverse_geocoder as rg
 import pandas as pd
 import numpy as np
 import sys
@@ -364,9 +365,80 @@ st.markdown("""
         margin: 5px;
         box-shadow: 0 3px 10px rgba(33, 150, 243, 0.3);
     }
+    
+    .nearby-spots {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px dashed rgba(76, 175, 80, 0.3);
+    }
+    
+    .nearby-spots h4 {
+        color: #2E7D32;
+        margin-bottom: 12px;
+        font-size: 1.1em;
+    }
+    
+    .nearby-spots-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .nearby-spot-item {
+        background: rgba(76, 175, 80, 0.1);
+        padding: 8px 12px;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .nearby-spot-name {
+        font-weight: 600;
+        color: #2E7D32;
+    }
+    
+    .nearby-spot-category {
+        color: #666;
+        font-size: 0.9em;
+    }
+    
+    .nearby-spot-distance {
+        background: #4CAF50;
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8em;
+        font-weight: 600;
+    }
+    
+    .address {
+        font-size: 1.1em;
+        color: #2E7D32;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+    
+    .place-description {
+        color: #666;
+        line-height: 1.6;
+        margin: 15px 0;
+    }
 </style>
 """, unsafe_allow_html=True)
 
+def get_address_from_coordinates(lat, lon):
+    """위도/경도로 주소 정보 가져오기"""
+    try:
+        result = rg.search((lat, lon))
+        if result and len(result) > 0:
+            location = result[0]
+            address = f"{location['admin1']} {location['admin2']} {location.get('name', '')}"
+            return address
+        return "주소 정보 없음"
+    except:
+        return "주소 정보 없음"
+    
 def create_region_distribution_chart(recommendations):
     """지역별 추천 분포 차트"""
     if not recommendations:
@@ -602,31 +674,45 @@ def render_top_recommendations(recommended_places):
     st.markdown("<h2 class='section-title'>📍 추천 관광지</h2>", unsafe_allow_html=True)
     
     for idx, place in enumerate(recommended_places, 1):
+        # 위도/경도로 주소 가져오기
+        address = get_address_from_coordinates(
+            float(place['latitude']), 
+            float(place['longitude'])
+        )
+        
+        # 주변 관광지 정보 미리 가져오기
+        nearby_spots = get_nearby_attractions(place['content_id'])
+        nearby_html = ""
+        
+        if nearby_spots:
+            nearby_html = """
+            <div class="nearby-spots">
+                <h4>🏷️ 주변 관광지</h4>
+                <div class="nearby-spots-list">
+            """
+            for spot in nearby_spots[:3]:  # 상위 3개만 표시
+                nearby_html += f"""
+                <div class="nearby-spot-item">
+                    <span class="nearby-spot-name">{spot['name']}</span>
+                    <span class="nearby-spot-category">{spot.get('category1', '기타')}</span>
+                    <span class="nearby-spot-distance">{spot.get('distance', 0):.1f}km</span>
+                </div>
+                """
+            nearby_html += "</div></div>"
+        
         with st.container():
             st.markdown(f"""
             <div class="recommendation-card">
                 <div class="ranking-badge">#{idx}</div>
                 <h3>{place['title']}</h3>
-                <p>{place.get('description', '설명 정보가 없습니다.')}</p>
+                <p class="place-description">{place.get('description', '설명 정보가 없습니다.')}</p>
                 <div class="destination-detail">
-                    <span class="destination-rating">평점: {place.get('rating', 4.0):.1f}</span>
-                    <span class="destination-price">가격대: {"₩" * place.get('price_level', 2)}</span>
-                    <p>📍 {place.get('address', '주소 정보 없음')}</p>
+                    <p class="address">📍 {address}</p>
+                    {nearby_html}
                 </div>
             </div>
             """, unsafe_allow_html=True)
-            
-            # 주변 관광지 정보
-            with st.expander("주변 관광지 보기"):
-                nearby_spots = get_nearby_attractions(place['content_id'])
-                if nearby_spots:
-                    for spot in nearby_spots:
-                        st.markdown(f"""
-                        - **{spot['name']}** ({spot.get('category1', '기타')})
-                          - 거리: {spot.get('distance', 0):.1f}km
-                        """)
-                else:
-                    st.info("주변 관광지 정보가 없습니다.")
+
 
 def render_analysis_charts(recommended_places):
     """분석 차트 렌더링"""
