@@ -210,17 +210,22 @@ def load_wellness_destinations():
             'title_x': 'name',
             'mapX': 'lon', 
             'mapY': 'lat',
-            'wellnessThemaCd': 'wellness_theme',
+            'wellnessThemaCd': 'wellness_theme',  # wellness_theme 컬럼 매핑 확인
             'lDongRegnCd': 'region_code'
         })
         
+        # wellness_theme 컬럼이 없는 경우 기본값 설정
+        if 'wellness_theme' not in df.columns:
+            st.warning("wellness_theme 컬럼이 없어 기본값을 설정합니다.")
+            df['wellness_theme'] = 'A0202'  # 기본값으로 '관광지' 코드 설정
+        
         # 기존 코드와의 호환성을 위한 추가 컬럼들
         df['type'] = '웰니스 관광지'  # 기본값
-        df['description'] = '한국 웰니스 관광 공식 추천지'
-        df['rating'] = 8.5  # 기본 평점
-        df['price_range'] = '50,000-200,000원'  # 기본 가격대
+        df['description'] = df.get('overview', '한국 웰니스 관광 공식 추천지')  # overview 컬럼이 있으면 사용
+        df['rating'] = df.get('rating', 8.5)  # rating 컬럼이 있으면 사용
+        df['price_level'] = df.get('price_level', '50,000-200,000원')  # 기본 가격대
         df['image_url'] = '🌿'  # 기본 이모지
-        df['website'] = ''
+        df['website'] = df.get('homepage', '')  # homepage 컬럼이 있으면 사용
         df['sources'] = '한국관광공사 웰니스 관광지'
         
         # 필수 컬럼 확인
@@ -422,54 +427,47 @@ def reset_survey_state():
 
 @st.cache_data(ttl=1800)
 def calculate_recommendations_by_cluster(cluster_result):
-    """클러스터 기반 실제 웰니스 관광지 추천 계산 (상위 10개)"""
+    """클러스터 결과를 기반으로 웰니스 관광지 추천"""
     wellness_df = load_wellness_destinations()
     
     if wellness_df.empty:
         return []
-    
-    user_cluster = cluster_result['cluster']
-    
-    # 해당 클러스터의 점수 컬럼명
-    score_column = f'score_cluster_{user_cluster}'
-    
-    if score_column not in wellness_df.columns:
-        st.error(f"❌ 클러스터 {user_cluster} 점수 컬럼을 찾을 수 없습니다.")
-        return []
-    
-    # 클러스터 점수 기준으로 정렬하여 상위 10개 선택
-    top_recommendations = wellness_df.nlargest(10, score_column)
-    
-    recommendations = []
-    
-    for idx, place in top_recommendations.iterrows():
-        # 결과 생성
-        place_recommendation = {
-            'contentId': place['contentId'],
-            'name': place['name'],
-            'lat': place['lat'],
-            'lon': place['lon'],
-            'type': place['type'],
-            'description': place['description'],
-            'rating': place['rating'],
-            'price_range': place['price_range'],
-            'image_url': place['image_url'],
-            'recommendation_score': place[score_column],  # 클러스터 점수를 추천점수로 사용
-            'cluster_match': True,  # 클러스터 기반 추천이므로 모두 매칭
-            'website': place['website'],
-            'sources': place['sources'],
-            'wellness_theme': place['wellness_theme'],
-            'region_code': place['region_code'],
-            # 기존 코드 호환성을 위한 더미 값들
-            'distance_from_incheon': 0,
-            'travel_time_car': '정보 없음',
-            'travel_time_train': '정보 없음', 
-            'travel_cost_car': '정보 없음',
-            'travel_cost_train': '정보 없음',
-            'cluster_region': place['region_code']
-        }
         
-        recommendations.append(place_recommendation)
+    cluster_id = cluster_result['cluster']
+    
+    # 클러스터별 가중치 설정
+    weights = {
+        0: {'nature_score': 0.3, 'culture_score': 0.2, 'healing_score': 0.5},  # 장기체류 지인방문형
+        1: {'nature_score': 0.4, 'culture_score': 0.4, 'healing_score': 0.2},  # 전형적 중간형 관광객
+        2: {'nature_score': 0.2, 'culture_score': 0.5, 'healing_score': 0.3}   # 단기 고소비 재방문층
+    }
+    
+    # 클러스터별 가중 점수 계산
+    wellness_df['weighted_score'] = (
+        wellness_df['nature_score'] * weights[cluster_id]['nature_score'] +
+        wellness_df['culture_score'] * weights[cluster_id]['culture_score'] +
+        wellness_df['healing_score'] * weights[cluster_id]['healing_score']
+    )
+    
+    # 상위 10개 관광지 선정
+    top_recommendations = wellness_df.nlargest(10, 'weighted_score')
+    
+    # 결과를 딕셔너리 리스트로 변환
+    recommendations = []
+    for idx, row in top_recommendations.iterrows():
+        recommendations.append({
+            'title': row['title'],
+            'content_id': row['content_id'],
+            'address': row['address'],
+            'description': row['description'],
+            'rating': row['rating'],
+            'price_level': row['price_level'],
+            'theme': row['wellness_theme'],
+            'score': row['weighted_score'],
+            'region': row['region_code'],
+            'latitude': row['latitude'],
+            'longitude': row['longitude']
+        })
     
     return recommendations
 
