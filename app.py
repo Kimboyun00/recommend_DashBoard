@@ -68,17 +68,32 @@ def auth_css():
         
         /* 로그인/회원가입 선택 라디오 버튼 스타일 */
         div[data-testid="stRadio"] {
-            display: flex; justify-content: center; margin-bottom: 25px;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
         }
-        div[data-testid="stRadio"] label {
-            display: none;
-            padding: 8px 20px; border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px; margin: 0 5px; transition: all 0.3s;
-            background-color: transparent; color: rgba(255,255,255,0.7);
+
+        /* 🔹 전체 라벨(제목)은 숨김 처리 */
+        div[data-testid="stRadio"] > label {
+            display: none !important;
         }
-        div[data-testid="stRadio"] input:checked + div {
+
+        /* 🔹 옵션 라벨만 버튼처럼 스타일 적용 */
+        div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+            padding: 8px 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            margin: 0 5px;
+            transition: all 0.3s;
+            background-color: transparent;
+            color: rgba(255,255,255,0.7);
+        }
+
+        /* 🔹 선택된 옵션 스타일 */
+        div[data-testid="stRadio"] > div[role="radiogroup"] > label[aria-checked="true"] {
             background-color: rgba(0, 198, 255, 0.3);
-            color: black !important; border-color: #00c6ff;
+            color: black !important;
+            border-color: #00c6ff;
         }
 
         div[data-testid="stTextInput"] input {
