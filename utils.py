@@ -205,39 +205,39 @@ def load_wellness_destinations():
         # 두 데이터프레임 조인
         df = pd.merge(wellness_df, cluster_score_df, on='contentId', how='inner')
         
-        # 필요한 컬럼만 선택하고 이름 변경
-        df = df.rename(columns={
-            'title_x': 'name',
-            'mapX': 'lon', 
-            'mapY': 'lat',
-            'wellnessThemaCd': 'wellness_theme',  # wellness_theme 컬럼 매핑 확인
-            'lDongRegnCd': 'region_code'
-        })
+        # 컬럼명 표준화
+        column_mapping = {
+            'title_x': 'title',
+            'mapX': 'longitude',
+            'mapY': 'latitude',
+            'addr1': 'address',
+            'contentId': 'content_id',
+            'wellnessThemaCd': 'wellness_theme',
+            'lDongRegnCd': 'region_code',
+            'natureScore': 'nature',
+            'cultureScore': 'culture',
+            'healingScore': 'healing'
+        }
         
-        # wellness_theme 컬럼이 없는 경우 기본값 설정
-        if 'wellness_theme' not in df.columns:
-            st.warning("wellness_theme 컬럼이 없어 기본값을 설정합니다.")
-            df['wellness_theme'] = 'A0202'  # 기본값으로 '관광지' 코드 설정
-        
-        # 기존 코드와의 호환성을 위한 추가 컬럼들
-        df['type'] = '웰니스 관광지'  # 기본값
-        df['description'] = df.get('overview', '한국 웰니스 관광 공식 추천지')  # overview 컬럼이 있으면 사용
-        df['rating'] = df.get('rating', 8.5)  # rating 컬럼이 있으면 사용
-        df['price_level'] = df.get('price_level', '50,000-200,000원')  # 기본 가격대
-        df['image_url'] = '🌿'  # 기본 이모지
-        df['website'] = df.get('homepage', '')  # homepage 컬럼이 있으면 사용
-        df['sources'] = '한국관광공사 웰니스 관광지'
+        # 컬럼명 변경
+        df = df.rename(columns=column_mapping)
         
         # 필수 컬럼 확인
-        required_columns = ['name', 'lat', 'lon', 'contentId', 'wellness_theme', 'region_code']
+        required_columns = ['title', 'content_id', 'address', 'wellness_theme', 'region_code']
         missing_columns = [col for col in required_columns if col not in df.columns]
         
         if missing_columns:
             st.error(f"❌ 필수 컬럼이 누락되었습니다: {missing_columns}")
+            st.write("사용 가능한 컬럼:", df.columns.tolist())
             return pd.DataFrame()
         
-        # 데이터 정리
-        df = df.dropna(subset=['name', 'lat', 'lon'])
+        # 기본 점수 컬럼이 없는 경우 생성
+        if 'nature' not in df.columns:
+            df['nature'] = 0.5
+        if 'culture' not in df.columns:
+            df['culture'] = 0.5
+        if 'healing' not in df.columns:
+            df['healing'] = 0.5
         
         return df
         
@@ -437,39 +437,56 @@ def calculate_recommendations_by_cluster(cluster_result):
     
     # 클러스터별 가중치 설정
     weights = {
-        0: {'nature_score': 0.3, 'culture_score': 0.2, 'healing_score': 0.5},  # 장기체류 지인방문형
-        1: {'nature_score': 0.4, 'culture_score': 0.4, 'healing_score': 0.2},  # 전형적 중간형 관광객
-        2: {'nature_score': 0.2, 'culture_score': 0.5, 'healing_score': 0.3}   # 단기 고소비 재방문층
+        0: {'nature': 0.3, 'culture': 0.2, 'healing': 0.5},  # 장기체류 지인방문형
+        1: {'nature': 0.4, 'culture': 0.4, 'healing': 0.2},  # 전형적 중간형 관광객
+        2: {'nature': 0.2, 'culture': 0.5, 'healing': 0.3}   # 단기 고소비 재방문층
     }
     
-    # 클러스터별 가중 점수 계산
-    wellness_df['weighted_score'] = (
-        wellness_df['nature_score'] * weights[cluster_id]['nature_score'] +
-        wellness_df['culture_score'] * weights[cluster_id]['culture_score'] +
-        wellness_df['healing_score'] * weights[cluster_id]['healing_score']
-    )
-    
-    # 상위 10개 관광지 선정
-    top_recommendations = wellness_df.nlargest(10, 'weighted_score')
-    
-    # 결과를 딕셔너리 리스트로 변환
-    recommendations = []
-    for idx, row in top_recommendations.iterrows():
-        recommendations.append({
-            'title': row['title'],
-            'content_id': row['content_id'],
-            'address': row['address'],
-            'description': row['description'],
-            'rating': row['rating'],
-            'price_level': row['price_level'],
-            'theme': row['wellness_theme'],
-            'score': row['weighted_score'],
-            'region': row['region_code'],
-            'latitude': row['latitude'],
-            'longitude': row['longitude']
-        })
-    
-    return recommendations
+    try:
+        # 점수 컬럼이 없는 경우 기본값 설정
+        if 'nature' not in wellness_df.columns:
+            wellness_df['nature'] = wellness_df.get('natureScore', 0.5)
+        if 'culture' not in wellness_df.columns:
+            wellness_df['culture'] = wellness_df.get('cultureScore', 0.5)
+        if 'healing' not in wellness_df.columns:
+            wellness_df['healing'] = wellness_df.get('healingScore', 0.5)
+        
+        # 클러스터별 가중 점수 계산
+        wellness_df['weighted_score'] = (
+            wellness_df['nature'] * weights[cluster_id]['nature'] +
+            wellness_df['culture'] * weights[cluster_id]['culture'] +
+            wellness_df['healing'] * weights[cluster_id]['healing']
+        )
+        
+        # 상위 10개 관광지 선정
+        top_recommendations = wellness_df.nlargest(10, 'weighted_score')
+        
+        # 결과를 딕셔너리 리스트로 변환
+        recommendations = []
+        for idx, row in top_recommendations.iterrows():
+            recommendations.append({
+                'title': row.get('title', row.get('name', '제목 없음')),
+                'content_id': row.get('contentId', row.get('content_id', 0)),
+                'address': row.get('addr1', row.get('address', '주소 정보 없음')),
+                'description': row.get('overview', row.get('description', '설명 없음')),
+                'rating': float(row.get('rating', 0.0)),
+                'price_level': str(row.get('price_level', '정보 없음')),
+                'theme': row.get('wellness_theme', 'A0202'),
+                'score': float(row.get('weighted_score', 0.0)),
+                'region': row.get('region_code', row.get('areacode', 0)),
+                'latitude': float(row.get('mapY', row.get('latitude', 0.0))),
+                'longitude': float(row.get('mapX', row.get('longitude', 0.0)))
+            })
+        
+        return recommendations
+        
+    except KeyError as e:
+        st.error(f"데이터 처리 중 오류가 발생했습니다: {str(e)}")
+        st.write("사용 가능한 컬럼:", wellness_df.columns.tolist())
+        return []
+    except Exception as e:
+        st.error(f"예상치 못한 오류가 발생했습니다: {str(e)}")
+        return []
 
 def get_nearby_attractions(wellness_content_id, limit=5):
     """특정 웰니스 관광지의 주변 관광지 상위 5개 반환"""
