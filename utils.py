@@ -205,39 +205,40 @@ def load_wellness_destinations():
         # 두 데이터프레임 조인
         df = pd.merge(wellness_df, cluster_score_df, on='contentId', how='inner')
         
-        # 컬럼명 표준화
+        # 컬럼명 표준화 (실제 CSV 파일의 컬럼명에 맞춤)
         column_mapping = {
-            'title_x': 'title',
+            'contentId': 'content_id',
+            'title_x': 'title',  # 조인 후 생성되는 컬럼명
             'mapX': 'longitude',
             'mapY': 'latitude',
-            'addr1': 'address',
-            'contentId': 'content_id',
-            'wellnessThemaCd': 'wellness_theme',
             'lDongRegnCd': 'region_code',
-            'natureScore': 'nature',
-            'cultureScore': 'culture',
-            'healingScore': 'healing'
+            'wellnessThemaCd': 'wellness_theme',
+            'score_cluster_0': 'cluster_0_score',
+            'score_cluster_1': 'cluster_1_score',
+            'score_cluster_2': 'cluster_2_score'
         }
         
         # 컬럼명 변경
         df = df.rename(columns=column_mapping)
         
         # 필수 컬럼 확인
-        required_columns = ['title', 'content_id', 'address', 'wellness_theme', 'region_code']
+        required_columns = ['title', 'content_id', 'wellness_theme', 'region_code']
         missing_columns = [col for col in required_columns if col not in df.columns]
         
         if missing_columns:
             st.error(f"❌ 필수 컬럼이 누락되었습니다: {missing_columns}")
-            st.write("사용 가능한 컬럼:", df.columns.tolist())
+            st.write("현재 사용 가능한 컬럼:", df.columns.tolist())
             return pd.DataFrame()
         
-        # 기본 점수 컬럼이 없는 경우 생성
-        if 'nature' not in df.columns:
-            df['nature'] = 0.5
-        if 'culture' not in df.columns:
-            df['culture'] = 0.5
-        if 'healing' not in df.columns:
-            df['healing'] = 0.5
+        # 클러스터 점수가 없는 경우 기본값 설정
+        for i in range(3):
+            score_col = f'cluster_{i}_score'
+            if score_col not in df.columns:
+                df[score_col] = df.get(f'score_cluster_{i}', 0.5)
+        
+        # NaN 값 처리
+        df['wellness_theme'] = df['wellness_theme'].fillna('A0202')  # 기본 테마 코드
+        df['region_code'] = df['region_code'].fillna(0)  # 기본 지역 코드
         
         return df
         
@@ -246,6 +247,7 @@ def load_wellness_destinations():
         return pd.DataFrame()
     except Exception as e:
         st.error(f"❌ 데이터 로드 중 오류가 발생했습니다: {str(e)}")
+        st.write("사용 가능한 컬럼:", wellness_df.columns.tolist() if 'wellness_df' in locals() else "데이터프레임이 생성되지 않음")
         return pd.DataFrame()
 
 @st.cache_data(ttl=3600)
