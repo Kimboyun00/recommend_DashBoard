@@ -70,6 +70,7 @@ def auth_css():
         div[data-testid="stRadio"] {
             display: flex;
             justify-content: center;
+            align-items: center;
             margin-bottom: 25px;
         }
 
@@ -77,7 +78,12 @@ def auth_css():
         div[data-testid="stRadio"] > label {
             display: none !important;
         }
-
+        /* 🔹 옵션 라벨 버튼 스타일 */
+        div[data-testid="stRadio"] > div[role="radiogroup"] {
+            display: flex;
+            justify-content: center;
+            gap: 10px; /* 🔹 버튼 간격 */
+        }
         /* 🔹 옵션 라벨만 버튼처럼 스타일 적용 */
         div[data-testid="stRadio"] > div[role="radiogroup"] > label {
             padding: 8px 20px;
