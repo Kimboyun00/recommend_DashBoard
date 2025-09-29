@@ -669,36 +669,80 @@ def render_wellness_recommendations():
     # 다운로드 섹션
     render_download_section(filtered_places, cluster_result)
 
+# 도시 매핑 딕셔너리
+CITY_MAPPING = {
+    'Seoul Seoul': '서울특별시',
+    'Incheon Incheon': '인천광역시',
+    'Busan Busan': '부산광역시',
+    'Daegu Daegu': '대구광역시',
+    'Gwangju Gwangju': '광주광역시',
+    'Daejeon Daejeon': '대전광역시',
+    'Ulsan Ulsan': '울산광역시',
+    'Sejong Sejong': '세종특별자치시',
+    'Gyeonggi-do': '경기도',
+    'Gangwon-do': '강원도',
+    'Chungcheongbuk-do': '충청북도',
+    'Chungcheongnam-do': '충청남도',
+    'Jeollabuk-do': '전라북도',
+    'Jeollanam-do': '전라남도',
+    'Gyeongsangbuk-do': '경상북도',
+    'Gyeongsangnam-do': '경상남도',
+    'Jeju-do': '제주특별자치도'
+}
+
+# 주소 변환 함수 수정
+def get_korean_address(address):
+    """영문 주소를 한글로 변환"""
+    for eng, kor in CITY_MAPPING.items():
+        if eng in address:
+            return kor
+    return address
+
 def render_top_recommendations(recommended_places):
     """상위 추천 관광지 표시"""
     st.markdown("<h2 class='section-title'>📍 추천 관광지</h2>", unsafe_allow_html=True)
     
+    # 주변 관광지 데이터 로드
+    nearby_spots_df = pd.read_csv('GIS/wellness_nearby_spots_list.csv')
+    
     for idx, place in enumerate(recommended_places, 1):
-        # 위도/경도로 주소 가져오기
-        address = get_address_from_coordinates(
-            float(place['latitude']), 
-            float(place['longitude'])
-        )
+        # 위도/경도로 주소 가져오기 (한글 주소로 변환)
+        try:
+            address = get_address_from_coordinates(
+                float(place['latitude']), 
+                float(place['longitude'])
+            )
+            # 주소가 영문으로 나오는 것을 방지
+            if 'Seoul Seoul' in address:
+                address = '서울특별시'
+            elif 'Incheon Incheon' in address:
+                address = '인천광역시'
+            # 필요한 다른 지역도 추가
+        except:
+            address = "주소 정보를 불러올 수 없습니다"
         
-        # 주변 관광지 정보 미리 가져오기
-        nearby_spots = get_nearby_attractions(place['content_id'])
+        # 주변 관광지 정보 가져오기
         nearby_html = ""
-        
-        if nearby_spots:
-            nearby_html = """
-            <div class="nearby-spots">
-                <h4>🏷️ 주변 관광지</h4>
-                <div class="nearby-spots-list">
-            """
-            for spot in nearby_spots[:3]:  # 상위 3개만 표시
-                nearby_html += f"""
-                <div class="nearby-spot-item">
-                    <span class="nearby-spot-name">{spot['name']}</span>
-                    <span class="nearby-spot-category">{spot.get('category1', '기타')}</span>
-                    <span class="nearby-spot-distance">{spot.get('distance', 0):.1f}km</span>
-                </div>
+        try:
+            nearby_places = nearby_spots_df[nearby_spots_df['wellness_contentId'] == place['content_id']]
+            if not nearby_places.empty:
+                nearby_html = """
+                <div class="nearby-spots">
+                    <h4>🏷️ 주변 관광지</h4>
+                    <div class="nearby-spots-list">
                 """
-            nearby_html += "</div></div>"
+                for _, spot in nearby_places.head(3).iterrows():  # 상위 3개만 표시
+                    nearby_html += f"""
+                    <div class="nearby-spot-item">
+                        <span class="nearby-spot-name">{spot['nearby_title']}</span>
+                        <span class="nearby-spot-category">{spot['nearby_category1']}</span>
+                        <span class="nearby-spot-distance">{spot['distance']:.1f}km</span>
+                    </div>
+                    """
+                nearby_html += "</div></div>"
+        except Exception as e:
+            st.error(f"주변 관광지 정보 로드 중 오류: {str(e)}")
+            nearby_html = ""
         
         with st.container():
             st.markdown(f"""
