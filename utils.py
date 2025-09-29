@@ -27,276 +27,167 @@ def check_access_permissions(page_type='default'):
                     st.switch_page("pages/03_home.py")
             st.stop()
 
-# 12개 요인별 설문 문항 정의
+# 7개 문항 정의 (기존 12개에서 7개로 축소)
 questions = {
     "q1": {
-        "title": "1. 여행 계획을 세울 때 어떤 방식을 선호하시나요?",
-        "factor": "요인1",  # 계획적 정보 추구형
+        "title": "1. 한국에 머무를 계획 기간은 얼마나 되나요?",
+        "category": "체류 기간",
         "options": [
-            "숙박시설을 개별적으로 자세히 비교하여 예약한다",
-            "글로벌 포털사이트에서 종합적으로 정보를 수집한다", 
-            "맛집 정보를 미리 철저히 조사한다",
-            "호텔 위주로 안전하고 편안한 숙소를 선택한다",
-            "대충 정해도 현지에서 알아서 해결할 수 있다"
+            "1~6일 (단기 관광)",
+            "7~10일 (일반적인 여행)",
+            "11~20일 (중장기 여행)", 
+            "21일 이상 (장기 체류)"
         ],
-        "scores": [5, 4, 3, 2, 1]
+        "weights": {
+            0: {"cluster_0": 0, "cluster_1": 1, "cluster_2": 2},  # 1~6일
+            1: {"cluster_0": 0, "cluster_1": 2, "cluster_2": 0},  # 7~10일
+            2: {"cluster_0": 1, "cluster_1": 1, "cluster_2": 0},  # 11~20일
+            3: {"cluster_0": 3, "cluster_1": 0, "cluster_2": 0}   # 21일+
+        }
     },
     "q2": {
-        "title": "2. 한국 여행에서 웰니스/힐링의 중요도는 어느 정도인가요?",
-        "factor": "요인2",  # 웰니스 중심형
+        "title": "2. 1인 1일 예상 지출액은 어느 정도인가요? (USD 기준)",
+        "category": "지출 수준",
         "options": [
-            "웰니스가 여행의 가장 주요한 목적 중 하나다",
-            "힐링과 휴식이 여행 전체 만족도에 큰 영향을 준다",
-            "스파나 온천 정보를 적극적으로 찾아본다",
-            "웰니스 시설이 있으면 좋지만 필수는 아니다",
-            "웰니스보다는 다른 활동에 더 관심이 있다"
+            "$0~150 (저예산형)",
+            "$151~350 (중간 예산형)",
+            "$351~700 (고예산형)",
+            "$701 이상 (프리미엄형)"
         ],
-        "scores": [5, 4, 3, 2, 1]
+        "weights": {
+            0: {"cluster_0": 3, "cluster_1": 0, "cluster_2": 0},  # $0~150
+            1: {"cluster_0": 0, "cluster_1": 2, "cluster_2": 0},  # $151~350
+            2: {"cluster_0": 0, "cluster_1": 0, "cluster_2": 1},  # $351~700
+            3: {"cluster_0": 0, "cluster_1": 0, "cluster_2": 3}   # $701+
+        }
     },
     "q3": {
-        "title": "3. 한국 여행 경험에 대해 어떻게 생각하시나요?",
-        "factor": "요인3",  # 한국 여행 경험축
+        "title": "3. 한국 방문은 몇 번째인가요?",
+        "category": "방문 경험",
         "options": [
-            "한국은 나에게 완전히 새로운 탐험지다",
-            "새로운 국가를 경험하는 것이 가장 흥미롭다",
-            "이전 방문 경험을 바탕으로 계획한다",
-            "과거 한국 방문 경험이 큰 도움이 된다",
-            "경험 여부는 크게 중요하지 않다"
+            "처음 방문",
+            "2~3번째 방문",
+            "4~5번째 방문",
+            "6번째 이상 방문"
         ],
-        "scores": [5, 4, 2, 1, 3]
+        "weights": {
+            0: {"cluster_0": 0, "cluster_1": 2, "cluster_2": 0},  # 처음
+            1: {"cluster_0": 1, "cluster_1": 2, "cluster_2": 0},  # 2~3번
+            2: {"cluster_0": 1, "cluster_1": 0, "cluster_2": 1},  # 4~5번
+            3: {"cluster_0": 0, "cluster_1": 0, "cluster_2": 3}   # 6번+
+        }
     },
     "q4": {
-        "title": "4. 여행지에서 현지 정보 수집을 어떻게 하시나요?",
-        "factor": "요인4",  # 실용적 현지 탐색형
+        "title": "4. 주된 숙박 형태는 무엇에 가장 가깝나요?",
+        "category": "숙박 유형",
         "options": [
-            "방문지의 구체적인 정보를 현지에서 적극 수집한다",
-            "현지인들과 소통하여 숨은 명소를 찾는다",
-            "관광안내소나 현지 가이드를 적극 활용한다",
-            "미리 계획한 장소만 방문하는 편이다",
-            "특별한 정보 수집 없이 즉석에서 결정한다"
+            "친척이나 친구 집",
+            "호텔이나 리조트",
+            "게스트하우스나 호스텔",
+            "에어비앤비나 콘도미니엄"
         ],
-        "scores": [5, 4, 3, 2, 1]
+        "weights": {
+            0: {"cluster_0": 3, "cluster_1": 0, "cluster_2": 0},  # 친척/친구
+            1: {"cluster_0": 0, "cluster_1": 2, "cluster_2": 1},  # 호텔/리조트
+            2: {"cluster_0": 1, "cluster_1": 1, "cluster_2": 0},  # 게스트/호스텔
+            3: {"cluster_0": 0, "cluster_1": 1, "cluster_2": 1}   # 에어비앤비/콘도
+        }
     },
     "q5": {
-        "title": "5. 여행 중 편의시설과 이동성에 대한 중요도는?",
-        "factor": "요인5",  # 편의 인프라 중시형
+        "title": "5. 전통문화 체험(한복 입기, 전통 음식 만들기 등)에 대한 관심도는?",
+        "category": "문화 체험",
         "options": [
-            "모바일/인터넷 편의성이 매우 중요하다",
-            "이동거리가 길면 여행 만족도가 크게 떨어진다",
-            "대중교통 편의성을 중시한다",
-            "관광지 정보 접근성이 좋아야 한다",
-            "다소 불편해도 특별한 경험이 더 중요하다"
+            "매우 높다 - 꼭 체험하고 싶다",
+            "어느 정도 있다 - 기회가 되면 해보고 싶다",
+            "잘 모르겠다 - 상황에 따라",
+            "관심이 낮다 - 별로 중요하지 않다"
         ],
-        "scores": [5, 4, 3, 2, 1]
+        "weights": {
+            0: {"cluster_0": 1, "cluster_1": 2, "cluster_2": 0},  # 매우 높다
+            1: {"cluster_0": 1, "cluster_1": 1, "cluster_2": 0},  # 어느 정도
+            2: {"cluster_0": 0, "cluster_1": 0, "cluster_2": 0},  # 잘 모름
+            3: {"cluster_0": 0, "cluster_1": 0, "cluster_2": 1}   # 낮다
+        }
     },
     "q6": {
-        "title": "6. 한국의 전통문화와 안전에 대한 관심도는?",
-        "factor": "요인6",  # 전통문화 안전 추구형
+        "title": "6. 박물관이나 전시관 관람에 대한 의향은?",
+        "category": "문화 관람",
         "options": [
-            "한국 전통 문화를 깊이 체험하고 싶다",
-            "치안과 안전이 가장 우선적 고려사항이다",
-            "전통과 현대가 조화된 곳을 선호한다",
-            "전통문화보다는 현대적인 것에 관심이 많다",
-            "안전보다는 모험적 경험을 선호한다"
+            "매우 높다 - 여러 곳을 방문하고 싶다",
+            "어느 정도 있다 - 1-2곳 정도는 가보고 싶다",
+            "잘 모르겠다 - 시간이 남으면",
+            "관심이 낮다 - 굳이 가지 않아도 된다"
         ],
-        "scores": [5, 4, 3, 2, 1]
+        "weights": {
+            0: {"cluster_0": 1, "cluster_1": 2, "cluster_2": 0},  # 매우 높다
+            1: {"cluster_0": 1, "cluster_1": 1, "cluster_2": 0},  # 어느 정도
+            2: {"cluster_0": 0, "cluster_1": 0, "cluster_2": 0},  # 잘 모름
+            3: {"cluster_0": 0, "cluster_1": 0, "cluster_2": 1}   # 낮다
+        }
     },
     "q7": {
-        "title": "7. 자연환경과 산림치유에 대한 관심도는?",
-        "factor": "요인7",  # 자연치유형
+        "title": "7. 아래 중 가장 본인의 여행 스타일에 가까운 것은?",
+        "category": "여행 스타일",
         "options": [
-            "산림욕과 자연치유가 여행의 주요 목적이다",
-            "깨끗한 자연환경에서 힐링하고 싶다",
-            "국립공원이나 생태공원을 선호한다",
-            "자연도 좋지만 도시 관광을 더 선호한다",
-            "자연환경에는 별로 관심이 없다"
+            "오래 머물며 여유있게 지인도 만나고 문화도 천천히 즐긴다",
+            "평균적인 일정으로 주요 명소와 체험을 균형있게 본다",
+            "짧게 강하게! 쇼핑·미식 등 소비 중심으로 효율적으로 즐긴다"
         ],
-        "scores": [5, 4, 3, 2, 1]
-    },
-    "q8": {
-        "title": "8. 숙박 및 서비스 수준에 대한 선호도는?",
-        "factor": "요인8",  # 프리미엄 서비스형
-        "options": [
-            "5성급 호텔이나 프리미엄 리조트를 선호한다",
-            "고급 스파나 웰니스 서비스를 중시한다",
-            "서비스 품질이 가격보다 중요하다",
-            "적당한 수준의 숙박시설로도 만족한다",
-            "저예산으로 경제적인 여행을 선호한다"
-        ],
-        "scores": [5, 4, 3, 2, 1]
-    },
-    "q9": {
-        "title": "9. 여행 동반자와 여행 스타일에 대해 어떻게 생각하시나요?",
-        "factor": "요인9",  # 사회적 여행형
-        "options": [
-            "가족이나 친구와 함께하는 여행을 선호한다",
-            "그룹 활동이나 단체 프로그램을 좋아한다",
-            "동반자와 함께 추억을 만드는 것이 중요하다",
-            "혼자만의 시간도 필요하다",
-            "완전히 혼자 여행하는 것을 선호한다"
-        ],
-        "scores": [5, 4, 3, 2, 1]
-    },
-    "q10": {
-        "title": "10. 디지털 미디어 활용과 정보 수집에 대한 관심도는?",
-        "factor": "요인10",  # 디지털 활용형
-        "options": [
-            "유튜브나 SNS에서 여행정보를 적극 수집한다",
-            "온라인 리뷰나 평점을 매우 중시한다",
-            "모바일 앱을 통한 예약과 정보 확인을 선호한다",
-            "오프라인 정보도 함께 참고한다",
-            "디지털보다는 직접 경험을 더 선호한다"
-        ],
-        "scores": [5, 4, 3, 2, 1]
-    },
-    "q11": {
-        "title": "11. 출입국 절차와 여행 준비에 대한 중요도는?",
-        "factor": "요인11",  # 절차 중시형
-        "options": [
-            "출입국 절차와 비자 등을 매우 세심하게 준비한다",
-            "여행 보험이나 안전 대비책을 철저히 마련한다",
-            "모든 일정과 예약을 미리 확정한다",
-            "기본적인 준비만 하고 유연하게 대응한다",
-            "최소한의 준비만 하고 즉흥적으로 여행한다"
-        ],
-        "scores": [5, 4, 3, 2, 1]
-    },
-    "q12": {
-        "title": "12. 교통수단과 접근성에 대한 선호도는?",
-        "factor": "요인12",  # 교통 편의형
-        "options": [
-            "대중교통을 적극적으로 이용하고 싶다",
-            "교통비용보다는 편의성과 시간을 중시한다",
-            "숙박 예약 시 교통 접근성을 우선 고려한다",
-            "렌터카나 개인 차량 이용을 선호한다",
-            "교통편보다는 목적지 자체가 더 중요하다"
-        ],
-        "scores": [5, 4, 3, 2, 1]
+        "weights": {
+            0: {"cluster_0": 3, "cluster_1": 0, "cluster_2": 0},  # 장기·지인·여유
+            1: {"cluster_0": 0, "cluster_1": 3, "cluster_2": 0},  # 평균형·균형
+            2: {"cluster_0": 0, "cluster_1": 0, "cluster_2": 3}   # 짧고 강한 소비
+        }
     }
 }
 
-# 클러스터 정보 (실제 분석 결과 기반)
+# 3개 클러스터 정보 (기존 8개에서 3개로 축소)
 def get_cluster_info():
-    """12개 요인 기반 8개 클러스터 정보"""
+    """3개 클러스터 정보"""
     return {
-        1: {
-            "name": "네이처 씨커",
-            "english_name": "Nature Seeker", 
-            "description": "자연과 전통문화를 추구하는 탐험가형. 산림치유와 전통 체험을 통해 깊이 있는 힐링을 추구합니다.",
-            "characteristics": ["자연치유 중시", "전통문화 관심", "체험 활동 선호", "깊이 있는 여행"],
+        0: {
+            "name": "장기체류 지인방문형",
+            "english_name": "Long-stay Social Visitor", 
+            "description": "한국에 오래 머물며 지인과의 만남을 중시하고, 저예산으로 문화를 천천히 체험하는 유형입니다.",
+            "characteristics": ["장기 체류", "지인 방문", "저예산", "문화 체험"],
             "color": "#2ECC71",
-            "percentage": 15.9,
-            "count": 413,
+            "percentage": 25.8,
+            "count": 669,
             "key_factors": {
-                "요인7": 1.2,   # 자연치유 (높음)
-                "요인6": 0.8,   # 전통문화
-                "요인4": 0.6,   # 현지탐색
-                "요인11": 0.5   # 절차중시
+                "체류기간": "21일 이상",
+                "지출수준": "저예산형",
+                "방문경험": "재방문자",
+                "숙박형태": "지인집"
+            }
+        },
+        1: {
+            "name": "전형적 중간형 관광객",
+            "english_name": "Typical Balanced Tourist",
+            "description": "일반적인 관광 일정과 예산으로 한국의 주요 명소와 문화를 균형있게 체험하는 대표적인 관광객 유형입니다.",
+            "characteristics": ["표준 일정", "균형 예산", "문화 관심", "호텔 선호"],
+            "color": "#3498DB",
+            "percentage": 52.4,
+            "count": 1358,
+            "key_factors": {
+                "체류기간": "7-10일",
+                "지출수준": "중간 예산형",
+                "방문경험": "처음 또는 재방문",
+                "숙박형태": "호텔/리조트"
             }
         },
         2: {
-            "name": "어반 웰니스",
-            "english_name": "Urban Wellness",
-            "description": "도심형 프리미엄 웰니스를 추구하는 유형. 접근성이 좋은 고급 스파와 힐링 시설을 선호합니다.",
-            "characteristics": ["도심 접근성", "프리미엄 서비스", "편의성 중시", "효율적 일정"],
-            "color": "#3498DB",
-            "percentage": 18.2,
-            "count": 472,
-            "key_factors": {
-                "요인8": 1.1,   # 프리미엄서비스 (높음)
-                "요인5": 0.9,   # 편의인프라
-                "요인2": 0.8,   # 웰니스중심
-                "요인10": 0.7   # 디지털활용
-            }
-        },
-        3: {
-            "name": "밸런스드 익스플로러",
-            "english_name": "Balanced Explorer",
-            "description": "다양한 경험을 균형있게 추구하는 여행자. 문화와 자연, 휴식과 활동을 조화롭게 계획합니다.",
-            "characteristics": ["균형잡힌 여행", "다양한 체험", "문화 관심", "적당한 예산"],
-            "color": "#E67E22",
-            "percentage": 14.3,
-            "count": 371,
-            "key_factors": {
-                "요인4": 0.9,   # 현지탐색
-                "요인6": 0.7,   # 전통문화
-                "요인3": 0.6,   # 여행경험
-                "요인12": 0.5   # 교통편의
-            }
-        },
-        4: {
-            "name": "프리미엄 힐러",
-            "english_name": "Premium Healer",
-            "description": "최고급 웰니스 리조트와 프리미엄 힐링 서비스를 추구하는 럭셔리 여행자입니다.",
-            "characteristics": ["럭셔리 리조트", "프리미엄 스파", "완벽한 휴식", "고급 서비스"],
+            "name": "단기 고소비 재방문층",
+            "english_name": "Short-stay Premium Repeater",
+            "description": "짧은 기간 동안 고예산으로 쇼핑, 미식 등을 집중적으로 즐기는 경험 많은 재방문 고객입니다.",
+            "characteristics": ["단기 집중", "고예산", "쇼핑 중심", "효율 추구"],
             "color": "#E74C3C",
-            "percentage": 11.4,
-            "count": 296,
+            "percentage": 21.8,
+            "count": 564,
             "key_factors": {
-                "요인8": 1.4,   # 프리미엄서비스 (매우높음)
-                "요인2": 1.1,   # 웰니스중심
-                "요인1": 0.8,   # 계획적정보추구
-                "요인5": 0.7    # 편의인프라
-            }
-        },
-        5: {
-            "name": "컬처 커넥터",
-            "english_name": "Culture Connector",
-            "description": "전통문화와 현지 체험에 깊이 관심이 있는 문화 탐구형 여행자입니다.",
-            "characteristics": ["전통문화 탐구", "현지 체험", "문화적 몰입", "교육적 여행"],
-            "color": "#8E44AD",
-            "percentage": 12.7,
-            "count": 329,
-            "key_factors": {
-                "요인6": 1.3,   # 전통문화 (매우높음)
-                "요인4": 1.0,   # 현지탐색
-                "요인11": 0.6,  # 절차중시
-                "요인9": 0.5    # 사회적여행
-            }
-        },
-        6: {
-            "name": "스마트 트래블러",
-            "english_name": "Smart Traveler",
-            "description": "디지털 기술을 적극 활용하여 효율적이고 스마트한 여행을 추구하는 현대적 여행자입니다.",
-            "characteristics": ["디지털 활용", "효율적 일정", "정보 중시", "모던 라이프스타일"],
-            "color": "#1ABC9C",
-            "percentage": 13.6,
-            "count": 353,
-            "key_factors": {
-                "요인10": 1.2,  # 디지털활용 (높음)
-                "요인1": 1.0,   # 계획적정보추구
-                "요인5": 0.8,   # 편의인프라
-                "요인12": 0.6   # 교통편의
-            }
-        },
-        7: {
-            "name": "프리덤 씨커",
-            "english_name": "Freedom Seeker",
-            "description": "자유롭고 즉흥적인 여행을 선호하며, 개인적인 힐링과 자유로운 탐험을 추구합니다.",
-            "characteristics": ["자유로운 여행", "즉흥적 계획", "개인적 힐링", "유연한 일정"],
-            "color": "#9B59B6",
-            "percentage": 8.9,
-            "count": 231,
-            "key_factors": {
-                "요인7": 0.9,   # 자연치유
-                "요인9": -0.8,  # 사회적여행 (낮음)
-                "요인11": -0.6, # 절차중시 (낮음)
-                "요인1": -0.5   # 계획적정보추구 (낮음)
-            }
-        },
-        8: {
-            "name": "액티브 웰니스",
-            "english_name": "Active Wellness",
-            "description": "활동적인 웰니스와 다양한 체험을 통해 에너지를 충전하는 역동적 여행자입니다.",
-            "characteristics": ["활동적 힐링", "다양한 액티비티", "에너지 충전", "체험 중심"],
-            "color": "#F39C12",
-            "percentage": 5.0,
-            "count": 130,
-            "key_factors": {
-                "요인4": 1.1,   # 현지탐색
-                "요인7": 0.8,   # 자연치유
-                "요인9": 0.7,   # 사회적여행
-                "요인12": 0.6   # 교통편의
+                "체류기간": "1-6일",
+                "지출수준": "고예산형",
+                "방문경험": "다수 재방문",
+                "숙박형태": "프리미엄 숙소"
             }
         }
     }
@@ -346,65 +237,82 @@ def load_wellness_destinations():
         st.error(f"❌ 데이터 로드 중 오류가 발생했습니다: {str(e)}")
         return pd.DataFrame()
 
-def calculate_factor_scores(answers):
-    """설문 답변을 12개 요인 점수로 변환"""
-    factor_scores = {}
+def calculate_cluster_scores(answers):
+    """설문 답변을 바탕으로 3개 클러스터 점수 계산"""
+    cluster_scores = {"cluster_0": 0, "cluster_1": 0, "cluster_2": 0}
     
-    for i in range(1, 13):
-        factor_key = f"요인{i}"
-        factor_scores[factor_key] = 0.0
-    
-    # 각 문항의 답변을 해당 요인 점수로 변환
+    # 각 문항의 답변에 따라 클러스터별 점수 누적
     for q_key, answer_idx in answers.items():
         if q_key in questions and answer_idx is not None:
             question_data = questions[q_key]
-            factor = question_data["factor"]
-            score = question_data["scores"][answer_idx]
+            weights = question_data["weights"][answer_idx]
             
-            # 1-5 점수를 -2 ~ +2 범위로 정규화 (요인분석 스케일에 맞춤)
-            normalized_score = (score - 3) * 0.8
-            factor_scores[factor] = normalized_score
+            for cluster, weight in weights.items():
+                cluster_scores[cluster] += weight
     
-    return factor_scores
+    return cluster_scores
 
-def determine_cluster_from_factors(factor_scores):
-    """12개 요인 점수를 바탕으로 클러스터 결정"""
-    cluster_info = get_cluster_info()
+def determine_cluster(answers):
+    """설문 답변으로부터 클러스터 결정 (새로운 3개 클러스터 방식)"""
+    cluster_scores = calculate_cluster_scores(answers)
     
-    # 각 클러스터와의 유사도 계산
-    cluster_similarities = {}
+    # 최고 점수의 클러스터 선택
+    best_cluster_key = max(cluster_scores, key=cluster_scores.get)
+    best_cluster_id = int(best_cluster_key.split('_')[1])
     
-    for cluster_id, info in cluster_info.items():
-        similarity = 0.0
-        key_factors = info["key_factors"]
+    # 신뢰도 계산 (최고 점수 / 전체 점수 합)
+    total_score = sum(cluster_scores.values())
+    confidence = cluster_scores[best_cluster_key] / total_score if total_score > 0 else 0
+    
+    # 동점 처리 (타이브레이커)
+    if list(cluster_scores.values()).count(cluster_scores[best_cluster_key]) > 1:
+        # Q1(체류일) 우선순위로 타이브레이커
+        q1_answer = answers.get('q1')
+        if q1_answer is not None:
+            if q1_answer == 3:  # 21일 이상 → cluster_0 우선
+                best_cluster_id = 0
+            elif q1_answer == 1:  # 7-10일 → cluster_1 우선  
+                best_cluster_id = 1
+            elif q1_answer == 0:  # 1-6일 → cluster_2 우선
+                best_cluster_id = 2
         
-        # 주요 요인들과의 유사도 계산
-        for factor, target_value in key_factors.items():
-            user_value = factor_scores.get(factor, 0.0)
-            # 유클리드 거리의 역수로 유사도 계산
-            distance = abs(user_value - target_value)
-            similarity += 1 / (1 + distance)
-        
-        # 주요 요인 수로 평균화
-        cluster_similarities[cluster_id] = similarity / len(key_factors)
-    
-    # 가장 유사한 클러스터 선택
-    best_cluster = max(cluster_similarities, key=cluster_similarities.get)
-    confidence = cluster_similarities[best_cluster] / sum(cluster_similarities.values())
+        # Q2(지출) 2순위 타이브레이커
+        if list(cluster_scores.values()).count(cluster_scores[best_cluster_key]) > 1:
+            q2_answer = answers.get('q2')
+            if q2_answer is not None:
+                if q2_answer == 0:  # 저예산 → cluster_0
+                    best_cluster_id = 0
+                elif q2_answer == 1:  # 중간예산 → cluster_1
+                    best_cluster_id = 1
+                elif q2_answer >= 2:  # 고예산 → cluster_2
+                    best_cluster_id = 2
     
     return {
-        'cluster': best_cluster,
+        'cluster': best_cluster_id,
         'confidence': confidence,
-        'similarities': cluster_similarities,
-        'factor_scores': factor_scores,
-        'score': cluster_similarities[best_cluster] * 20  # 점수화
+        'cluster_scores': cluster_scores,
+        'score': cluster_scores[f"cluster_{best_cluster_id}"]
     }
 
-# 호환성을 위한 별칭 함수
-def determine_cluster(answers):
-    """설문 답변으로부터 클러스터 결정 (호환성을 위한 래퍼 함수)"""
-    factor_scores = calculate_factor_scores(answers)
-    return determine_cluster_from_factors(factor_scores)
+def calculate_factor_scores(answers):
+    """호환성을 위한 더미 함수 - 3개 클러스터에서는 사용하지 않음"""
+    # 3개 주요 차원으로 간소화된 점수 반환
+    return {
+        "체류기간": answers.get('q1', 0) * 0.5,
+        "지출수준": answers.get('q2', 0) * 0.8, 
+        "방문경험": answers.get('q3', 0) * 0.6,
+        "숙박형태": answers.get('q4', 0) * 0.4,
+        "문화관심": (answers.get('q5', 0) + answers.get('q6', 0)) * 0.3,
+        "여행스타일": answers.get('q7', 0) * 0.7
+    }
+
+def determine_cluster_from_factors(factor_scores):
+    """호환성을 위한 래퍼 함수"""
+    # factor_scores는 사용하지 않고, 세션의 answers를 직접 사용
+    if 'answers' in st.session_state:
+        return determine_cluster(st.session_state.answers)
+    else:
+        return {'cluster': 1, 'confidence': 0.5, 'cluster_scores': {}, 'score': 0}
 
 def classify_wellness_type(answers):
     """웰니스 성향 분류 (호환성을 위한 별칭)"""
@@ -446,16 +354,11 @@ def calculate_recommendations_by_cluster(cluster_result):
     
     recommendations = []
     
-    # 클러스터별 선호 관광지 타입 매핑
+    # 클러스터별 선호 관광지 타입 매핑 (3개 클러스터 기준)
     cluster_preferences = {
-        1: ['산림/자연치유', '체험/교육', '한방/전통의학'],  # 네이처 씨커
-        2: ['스파/온천', '웰니스 리조트', '힐링/테라피'],     # 어반 웰니스
-        3: ['문화/예술', '체험/교육', '산림/자연치유'],       # 밸런스드 익스플로러
-        4: ['웰니스 리조트', '스파/온천', '리조트/호텔'],     # 프리미엄 힐러
-        5: ['문화/예술', '체험/교육', '한방/전통의학'],       # 컬처 커넥터
-        6: ['스파/온천', '웰니스 리조트', '레저/액티비티'],   # 스마트 트래블러
-        7: ['산림/자연치유', '힐링/테라피', '체험/교육'],     # 프리덤 씨커
-        8: ['레저/액티비티', '산림/자연치유', '체험/교육']    # 액티브 웰니스
+        0: ['한방/전통의학', '문화/예술', '체험/교육'],           # 장기체류 지인방문형
+        1: ['스파/온천', '산림/자연치유', '웰니스 리조트'],      # 전형적 중간형 관광객  
+        2: ['웰니스 리조트', '스파/온천', '리조트/호텔']        # 단기 고소비 재방문층
     }
     
     preferred_types = cluster_preferences.get(user_cluster, ['스파/온천'])
@@ -472,18 +375,33 @@ def calculate_recommendations_by_cluster(cluster_result):
             type_bonus = (3 - preferred_types.index(place['type'])) * 15
             score += type_bonus
         
+        # 클러스터별 특별 가중치
+        if user_cluster == 0:  # 장기체류 지인방문형
+            # 접근성과 가격 중시
+            if '무료' in str(place['price_range']) or place['price_range'].startswith(('10,000', '20,000')):
+                score += 15
+            if place['distance_from_incheon'] <= 100:  # 가까운 거리 선호
+                score += 10
+                
+        elif user_cluster == 1:  # 전형적 중간형 관광객
+            # 평점과 균형 중시
+            score += place['rating'] * 2  # 평점 가중치 추가
+            if 50000 <= int(''.join(filter(str.isdigit, place['price_range'].split('-')[0]))) <= 200000:
+                score += 10  # 중간 가격대 선호
+                
+        elif user_cluster == 2:  # 단기 고소비 재방문층
+            # 프리미엄과 효율성 중시
+            if any(keyword in place['price_range'] for keyword in ['500,000', '1,000,000']):
+                score += 20  # 고가격대 선호
+            if place['rating'] >= 8.0:  # 고평점 선호
+                score += 15
+        
         # 접근성 보너스 (거리가 가까울수록 높은 점수)
-        distance_score = max(0, 20 - (place['distance_from_incheon'] / 50))
+        distance_score = max(0, 15 - (place['distance_from_incheon'] / 50))
         score += distance_score
         
         # 클러스터 신뢰도 반영
         score += cluster_result['confidence'] * 20
-        
-        # 가격 접근성 (무료나 저렴한 가격 우대)
-        if '무료' in str(place['price_range']):
-            score += 10
-        elif place['price_range'].startswith(('10,000', '20,000', '30,000')):
-            score += 5
         
         # 결과 생성
         place_recommendation = {
@@ -544,46 +462,13 @@ def get_cluster_region_info():
             "recommended_stay": "2박 3일",
             "main_features": ["프리미엄리조트", "제주자연", "특별한경험"],
             "color": "#E74C3C"
-        },
-        6: {
-            "name": "경북 영주/영월 권역",
-            "description": "국립공원과 연계된 생태치유 전문지역",
-            "recommended_stay": "1박 2일",
-            "main_features": ["국립공원", "생태치유", "산림욕"],
-            "color": "#1ABC9C"
-        },
-        7: {
-            "name": "강원 홍천/원주 권역",
-            "description": "문화예술과 힐링이 조화된 복합 관광지역",
-            "recommended_stay": "1박 2일",
-            "main_features": ["문화예술", "힐링센터", "복합관광"],
-            "color": "#9B59B6"
-        },
-        8: {
-            "name": "강원 평창/정선 권역",
-            "description": "스키리조트 연계 사계절 웰니스 리조트",
-            "recommended_stay": "1박 2일",
-            "main_features": ["스키리조트", "사계절관광", "액티비티"],
-            "color": "#F39C12"
-        },
-        9: {
-            "name": "강원 동해안 권역",
-            "description": "동해안 자연환경과 온천을 활용한 해안형 웰니스",
-            "recommended_stay": "1박 2일",
-            "main_features": ["동해안경관", "천연온천", "해안힐링"],
-            "color": "#16A085"
         }
     }
 
 def create_factor_analysis_chart(factor_scores):
-    """12개 요인 점수 레이더 차트 생성"""
-    factor_names = [
-        "계획적정보추구", "웰니스중심", "여행경험축", "실용적현지탐색",
-        "편의인프라중시", "전통문화안전", "자연치유형", "프리미엄서비스",
-        "사회적여행", "디지털활용", "절차중시", "교통편의"
-    ]
-    
-    values = [factor_scores.get(f"요인{i}", 0) for i in range(1, 13)]
+    """간소화된 요인 점수 차트 생성 (3개 클러스터용)"""
+    factor_names = list(factor_scores.keys())
+    values = list(factor_scores.values())
     
     fig = go.Figure()
     
@@ -591,7 +476,7 @@ def create_factor_analysis_chart(factor_scores):
         r=values,
         theta=factor_names,
         fill='toself',
-        name='나의 요인 점수',
+        name='나의 여행 성향',
         line_color='#3498DB',
         fillcolor='rgba(52, 152, 219, 0.2)'
     ))
@@ -600,7 +485,7 @@ def create_factor_analysis_chart(factor_scores):
         polar=dict(
             radialaxis=dict(
                 visible=True,
-                range=[-2, 2],
+                range=[0, max(values) + 1],
                 tickfont=dict(size=10, color='#2C3E50'),
                 gridcolor='rgba(52, 152, 219, 0.3)'
             ),
@@ -610,7 +495,7 @@ def create_factor_analysis_chart(factor_scores):
             )
         ),
         showlegend=True,
-        title="12개 요인별 개인 성향 분석",
+        title="여행 성향 분석",
         font=dict(color='#2C3E50', size=12),
         plot_bgcolor='rgba(0,0,0,0)',
         paper_bgcolor='rgba(0,0,0,0)',
@@ -620,34 +505,34 @@ def create_factor_analysis_chart(factor_scores):
     return fig
 
 def create_cluster_comparison_chart(user_cluster, factor_scores):
-    """사용자와 클러스터 평균 비교 차트"""
+    """사용자와 클러스터 평균 비교 차트 (3개 클러스터용)"""
     cluster_info = get_cluster_info()
     cluster_data = cluster_info[user_cluster]
     
-    factors = list(range(1, 13))
-    user_scores = [factor_scores.get(f"요인{i}", 0) for i in factors]
-    cluster_key_factors = cluster_data["key_factors"]
+    # 간소화된 비교 차트
+    categories = ['체류기간', '지출수준', '방문경험', '문화관심']
+    user_scores = [factor_scores.get(cat, 0) for cat in categories]
     
-    # 클러스터 평균 점수 (주요 요인만 표시, 나머지는 0)
-    cluster_scores = []
-    for i in factors:
-        factor_key = f"요인{i}"
-        if factor_key in cluster_key_factors:
-            cluster_scores.append(cluster_key_factors[factor_key])
-        else:
-            cluster_scores.append(0)
+    # 클러스터 평균 점수 (임의 설정)
+    cluster_averages = {
+        0: [3, 1, 2, 2],  # 장기체류형: 긴 체류, 낮은 지출, 중간 경험, 문화관심
+        1: [2, 2, 1, 3],  # 중간형: 중간 체류, 중간 지출, 낮은 경험, 높은 문화관심
+        2: [1, 3, 3, 1]   # 고소비형: 짧은 체류, 높은 지출, 높은 경험, 낮은 문화관심
+    }
+    
+    cluster_scores = cluster_averages.get(user_cluster, [2, 2, 2, 2])
     
     fig = go.Figure()
     
     fig.add_trace(go.Bar(
-        x=[f"요인{i}" for i in factors],
+        x=categories,
         y=user_scores,
         name="나의 점수",
         marker_color='#3498DB'
     ))
     
     fig.add_trace(go.Bar(
-        x=[f"요인{i}" for i in factors],
+        x=categories,
         y=cluster_scores,
         name=f"{cluster_data['name']} 평균",
         marker_color=cluster_data['color'],
@@ -655,8 +540,8 @@ def create_cluster_comparison_chart(user_cluster, factor_scores):
     ))
     
     fig.update_layout(
-        title=f"나 vs {cluster_data['name']} 요인별 비교",
-        xaxis_title="12개 요인",
+        title=f"나 vs {cluster_data['name']} 비교",
+        xaxis_title="평가 항목",
         yaxis_title="점수",
         barmode='group',
         plot_bgcolor='rgba(0,0,0,0)',

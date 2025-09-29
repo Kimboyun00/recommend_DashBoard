@@ -3,6 +3,7 @@
 import streamlit as st
 import sqlite3
 import hashlib
+from utils import apply_global_styles
 
 # --- 데이터베이스 설정 ---
 def setup_database():
@@ -24,6 +25,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed"
 )
+
+# 전역 스타일 적용
+apply_global_styles()
 
 # --- 로그인 UI 스타일 ---
 def auth_css():
