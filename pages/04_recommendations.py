@@ -703,52 +703,54 @@ def render_top_recommendations(recommended_places):
     st.markdown("<h2 class='section-title'>📍 추천 관광지</h2>", unsafe_allow_html=True)
     
     # 주변 관광지 데이터 로드
-    nearby_spots_df = pd.read_csv('GIS/wellness_nearby_spots_list.csv')
+    try:
+        nearby_spots_df = pd.read_csv('GIS/wellness_nearby_spots_list.csv')
+    except Exception as e:
+        st.error(f"주변 관광지 데이터 로드 실패: {str(e)}")
+        nearby_spots_df = pd.DataFrame()
     
     for idx, place in enumerate(recommended_places, 1):
-        # 위도/경도로 주소 가져오기 (한글 주소로 변환)
-        try:
-            address = get_address_from_coordinates(
-                float(place['latitude']), 
-                float(place['longitude'])
-            )
-            # 주소가 영문으로 나오는 것을 방지
-            if 'Seoul Seoul' in address:
-                address = '서울특별시'
-            elif 'Incheon Incheon' in address:
-                address = '인천광역시'
-            # 필요한 다른 지역도 추가
-        except:
-            address = "주소 정보를 불러올 수 없습니다"
-        
-        # 주변 관광지 정보 가져오기
+        # 주변 관광지 정보 처리
         nearby_html = ""
-        try:
-            nearby_places = nearby_spots_df[nearby_spots_df['wellness_contentId'] == place['content_id']]
-            if not nearby_places.empty:
-                nearby_html = """
-                <div class="nearby-spots">
-                    <h4>🏷️ 주변 관광지</h4>
-                    <div class="nearby-spots-list">
-                """
-                for _, spot in nearby_places.head(3).iterrows():  # 상위 3개만 표시
-                    nearby_html += f"""
-                    <div class="nearby-spot-item">
-                        <span class="nearby-spot-name">{spot['nearby_title']}</span>
-                        <span class="nearby-spot-category">{spot['nearby_category1']}</span>
-                        <span class="nearby-spot-distance">{spot['distance']:.1f}km</span>
-                    </div>
+        if not nearby_spots_df.empty:
+            try:
+                # content_id로 주변 관광지 찾기
+                content_id = place.get('content_id', 0)
+                nearby_places = nearby_spots_df[nearby_spots_df['wellness_contentId'] == content_id]
+                
+                if not nearby_places.empty:
+                    nearby_html = """
+                    <div class="nearby-spots">
+                        <h4>🏷️ 주변 관광지</h4>
+                        <div class="nearby-spots-list">
                     """
-                nearby_html += "</div></div>"
-        except Exception as e:
-            st.error(f"주변 관광지 정보 로드 중 오류: {str(e)}")
-            nearby_html = ""
+                    
+                    # 상위 3개 주변 관광지만 표시
+                    for _, spot in nearby_places.head(3).iterrows():
+                        nearby_html += f"""
+                        <div class="nearby-spot-item">
+                            <span class="nearby-spot-name">{spot['nearby_title']}</span>
+                            <span class="nearby-spot-category">{spot['nearby_category1']}</span>
+                            <span class="nearby-spot-distance">{float(spot['distance']):.1f}km</span>
+                        </div>
+                        """
+                    nearby_html += "</div></div>"
+            except Exception as e:
+                st.write(f"주변 관광지 정보 처리 중 오류: {str(e)}")
+                nearby_html = ""
         
+        # 주소 처리
+        try:
+            address = CITY_MAPPING.get(place.get('region_code', ''), '위치 정보 없음')
+        except:
+            address = '위치 정보 없음'
+        
+        # 관광지 카드 표시
         with st.container():
             st.markdown(f"""
             <div class="recommendation-card">
                 <div class="ranking-badge">#{idx}</div>
-                <h3>{place['title']}</h3>
+                <h3>{place.get('title', '제목 없음')}</h3>
                 <p class="place-description">{place.get('description', '설명 정보가 없습니다.')}</p>
                 <div class="destination-detail">
                     <p class="address">📍 {address}</p>
