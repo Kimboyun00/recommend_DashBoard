@@ -208,11 +208,12 @@ def load_wellness_destinations():
         # 컬럼명 표준화 (실제 CSV 파일의 컬럼명에 맞춤)
         column_mapping = {
             'contentId': 'content_id',
-            'title_x': 'title',  # 조인 후 생성되는 컬럼명
+            'title_x': 'title',
+            'addr1': 'address',  # addr1을 address로 매핑
             'mapX': 'longitude',
             'mapY': 'latitude',
             'lDongRegnCd': 'region_code',
-            'wellnessThemaCd': 'wellness_theme',
+            'wellnessThemaCd': 'wellness_theme',  # wellnessThemaCd를 wellness_theme으로 매핑
             'score_cluster_0': 'cluster_0_score',
             'score_cluster_1': 'cluster_1_score',
             'score_cluster_2': 'cluster_2_score'
@@ -221,8 +222,18 @@ def load_wellness_destinations():
         # 컬럼명 변경
         df = df.rename(columns=column_mapping)
         
+        # addr2가 있고 addr1이 없는 경우 addr2를 address로 사용
+        if 'addr2' in df.columns and 'address' not in df.columns:
+            df['address'] = df['addr2']
+        elif 'address' not in df.columns:
+            df['address'] = '주소 정보 없음'  # 기본값 설정
+            
+        # wellness_theme이 없는 경우 기본값 설정
+        if 'wellness_theme' not in df.columns:
+            df['wellness_theme'] = 'A0202'  # 기본 테마 코드
+        
         # 필수 컬럼 확인
-        required_columns = ['title', 'content_id', 'wellness_theme', 'region_code']
+        required_columns = ['title', 'content_id', 'address', 'wellness_theme', 'region_code']
         missing_columns = [col for col in required_columns if col not in df.columns]
         
         if missing_columns:
@@ -230,15 +241,14 @@ def load_wellness_destinations():
             st.write("현재 사용 가능한 컬럼:", df.columns.tolist())
             return pd.DataFrame()
         
-        # 클러스터 점수가 없는 경우 기본값 설정
-        for i in range(3):
-            score_col = f'cluster_{i}_score'
-            if score_col not in df.columns:
-                df[score_col] = df.get(f'score_cluster_{i}', 0.5)
-        
         # NaN 값 처리
-        df['wellness_theme'] = df['wellness_theme'].fillna('A0202')  # 기본 테마 코드
-        df['region_code'] = df['region_code'].fillna(0)  # 기본 지역 코드
+        df['address'] = df['address'].fillna('주소 정보 없음')
+        df['wellness_theme'] = df['wellness_theme'].fillna('A0202')
+        df['region_code'] = df['region_code'].fillna(0)
+        
+        # 디버깅용 정보 출력
+        st.write("데이터 로드 완료")
+        st.write("사용 가능한 컬럼:", df.columns.tolist())
         
         return df
         
