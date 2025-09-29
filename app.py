@@ -111,7 +111,24 @@ def auth_page():
     left_space, form_col, right_space = st.columns((1.2, 1.2, 1.2))
 
     with form_col:
-        choice = st.radio("choice", ["로그인", "회원가입"], horizontal=True, label_visibility="collapsed")
+        # 웰니스 투어 로고 및 제목
+        st.markdown("""
+        <style>
+        .wellness-title {
+            font-size: 34px !important;
+            font-weight: bold;
+        }
+        </style>
+        <h1 class="wellness-title">🌿 WELLCOMING</h1>
+        """, unsafe_allow_html=True)
+        st.markdown('<p style="color: rgba(76,175,80,0.8); font-size: 1.2em; margin-bottom: 30px;">당신만의 맞춤형 힐링 여행을 찾아보세요</p>', unsafe_allow_html=True)
+        
+        st.markdown("""
+        <style>
+            div[data-testid="stRadio"] > label {display: none;}
+        </style>
+        """, unsafe_allow_html=True)
+        choice = st.radio("", ["로그인", "회원가입"], horizontal=True, label_visibility="collapsed")
         
         if 'choice_radio' in st.session_state and st.session_state.choice_radio == "로그인":
             choice = "로그인"
