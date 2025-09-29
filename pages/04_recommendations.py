@@ -433,10 +433,55 @@ def get_address_from_coordinates(lat, lon):
         result = rg.search((lat, lon))
         if result and len(result) > 0:
             location = result[0]
-            address = f"{location['admin1']} {location['admin2']} {location.get('name', '')}"
-            return address
+            admin1 = location['admin1']  # 시/도
+            admin2 = location['admin2']  # 구/군
+            
+            # 특별시, 광역시 처리
+            if admin1 == admin2:
+                if 'Seoul' in admin1:
+                    return '서울특별시'
+                elif 'Incheon' in admin1:
+                    return '인천광역시'
+                elif 'Busan' in admin1:
+                    return '부산광역시'
+                elif 'Daegu' in admin1:
+                    return '대구광역시'
+                elif 'Gwangju' in admin1:
+                    return '광주광역시'
+                elif 'Daejeon' in admin1:
+                    return '대전광역시'
+                elif 'Ulsan' in admin1:
+                    return '울산광역시'
+                elif 'Sejong' in admin1:
+                    return '세종특별자치시'
+            
+            # 도 처리
+            if 'do' in admin1:
+                if 'Gyeonggi-do' in admin1:
+                    return f'경기도 {admin2}'
+                elif 'Gangwon-do' in admin1:
+                    return f'강원도 {admin2}'
+                elif 'Chungcheongbuk-do' in admin1:
+                    return f'충청북도 {admin2}'
+                elif 'Chungcheongnam-do' in admin1:
+                    return f'충청남도 {admin2}'
+                elif 'Jeollabuk-do' in admin1:
+                    return f'전라북도 {admin2}'
+                elif 'Jeollanam-do' in admin1:
+                    return f'전라남도 {admin2}'
+                elif 'Gyeongsangbuk-do' in admin1:
+                    return f'경상북도 {admin2}'
+                elif 'Gyeongsangnam-do' in admin1:
+                    return f'경상남도 {admin2}'
+                elif 'Jeju-do' in admin1:
+                    return f'제주특별자치도 {admin2}'
+            
+            # 그 외의 경우
+            return f"{admin1} {admin2}"
+            
         return "주소 정보 없음"
-    except:
+    except Exception as e:
+        print(f"주소 변환 중 오류 발생: {str(e)}")
         return "주소 정보 없음"
     
 def create_region_distribution_chart(recommendations):
