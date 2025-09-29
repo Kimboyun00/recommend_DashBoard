@@ -738,9 +738,19 @@ def render_top_recommendations(recommended_places):
                 st.write(f"주변 관광지 정보 처리 중 오류: {str(e)}")
                 nearby_html = ""
         
-        # 주소 처리
+        # 위도/경도로 주소 가져오기
         try:
-            address = CITY_MAPPING.get(place.get('region_code', ''), '위치 정보 없음')
+            lat = float(place.get('latitude', place.get('mapY', 0)))
+            lon = float(place.get('longitude', place.get('mapX', 0)))
+            if lat != 0 and lon != 0:
+                address = get_address_from_coordinates(lat, lon)
+                # Seoul Seoul과 같은 중복 제거
+                for eng, kor in CITY_MAPPING.items():
+                    if eng in address:
+                        address = kor
+                        break
+            else:
+                address = '위치 정보 없음'
         except:
             address = '위치 정보 없음'
         
