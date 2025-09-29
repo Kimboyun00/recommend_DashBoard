@@ -433,11 +433,23 @@ def get_address_from_coordinates(lat, lon):
         result = rg.search((lat, lon))
         if result and len(result) > 0:
             location = result[0]
-            admin1 = location['admin1']  # 시/도
-            admin2 = location['admin2']  # 구/군
+            # 디버깅을 위한 전체 location 정보 출력
+            print("Location data:", location)
             
-            # 그대로 원본 주소 반환
-            return f"{admin1} {admin2}"
+            admin1 = location.get('admin1', '')
+            admin2 = location.get('admin2', '')
+            
+            # admin1과 admin2가 같은 경우 (특별시, 광역시)
+            if admin1 == admin2:
+                return admin1
+            # 둘 다 있는 경우
+            elif admin1 and admin2:
+                return f"{admin1} {admin2}"
+            # admin1만 있는 경우
+            elif admin1:
+                return admin1
+            else:
+                return "위치 정보 없음"
             
         return "주소 정보 없음"
     except Exception as e:
