@@ -1,4 +1,4 @@
-# pages/01_questionnaire.py - 개선된 밝은 테마 설문조사 페이지
+# pages/01_questionnaire.py - 7문항 관광객 유형 분류 설문조사
 import streamlit as st
 import time
 import sys
@@ -11,7 +11,7 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 try:
-    from utils import (questions, calculate_factor_scores, determine_cluster, 
+    from utils import (questions, calculate_cluster_scores, determine_cluster, 
                       validate_answers, show_footer, reset_survey_state, 
                       check_access_permissions, apply_global_styles)
 except ImportError as e:
@@ -30,8 +30,8 @@ except ImportError as e:
 
 # 페이지 설정
 st.set_page_config(
-    page_title="웰니스 관광 성향 설문",
-    page_icon="🌿",
+    page_title="한국 관광 성향 설문",
+    page_icon="🇰🇷",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -127,8 +127,8 @@ st.markdown("""
         color: #E74C3C;
     }
     
-    /* 요인 태그 */
-    .factor-tag {
+    /* 카테고리 태그 */
+    .category-tag {
         display: inline-block;
         background: linear-gradient(135deg, #3498DB, #5DADE2);
         color: white;
@@ -361,24 +361,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def get_factor_description(factor_key):
-    """요인별 설명 반환"""
-    descriptions = {
-        "요인1": "계획적 정보 추구형",
-        "요인2": "쇼핑 중심형", 
-        "요인3": "한국 여행 경험축",
-        "요인4": "실용적 현지 탐색형",
-        "요인5": "편의 인프라 중시형",
-        "요인6": "전통문화 안전 추구형",
-        "요인7": "패션 쇼핑형",
-        "요인8": "프리미엄 사회적 여행형",
-        "요인9": "성별 기반 쇼핑 선호형",
-        "요인10": "디지털 미디어 개인형",
-        "요인11": "절차 중시 자연 관광형",
-        "요인12": "교통 편의 미식형"
-    }
-    return descriptions.get(factor_key, "미정의 요인")
-
 def questionnaire_page():
     # 사이드바에 사용자 정보 및 진행 상황
     with st.sidebar:
@@ -386,10 +368,10 @@ def questionnaire_page():
         <div class="sidebar-user-info">
             <h3 style="color: #2980B9; margin-bottom: 12px; font-size: 1.1em;">👤 사용자 정보</h3>
             <p style="color: #3498DB; font-weight: 700; font-size: 1em; margin: 0;">
-                🌿 {st.session_state.username}님
+                🇰🇷 {st.session_state.username}님
             </p>
             <p style="color: #5D6D7E; font-size: 0.85em; margin: 4px 0 0 0;">
-                12개 요인 분석 시스템
+                한국 관광 성향 분류 시스템
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -418,34 +400,42 @@ def questionnaire_page():
                 st.session_state.answers[q_key] = st.session_state[radio_key]
 
     # 메인 제목
-    st.title("🌿 웰니스 관광 성향 진단 시스템")
+    st.title("🇰🇷 한국 관광 성향 분류 시스템")
     st.markdown("---")
     
     # 소개 메시지
     st.markdown("""
     <div class="intro-card">
-        <h3 style="color: #2980B9; margin-bottom: 16px; font-size: 1.5em; font-weight: 700;">🎯 12개 요인 기반 정밀 분석</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; text-align: left; margin: 16px 0;">
-            <div>
-                <h4 style="color: #3498DB; margin-bottom: 8px; display: flex; align-items: center; font-size: 1.1em;">
-                    <span style="font-size: 1.2em; margin-right: 6px;">🔬</span>과학적 분석
+        <h3 style="color: #2980B9; margin-bottom: 16px; font-size: 1.5em; font-weight: 700;">🎯 3가지 관광객 유형 분류</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: left; margin: 16px 0;">
+            <div style="background: rgba(46, 204, 113, 0.1); padding: 16px; border-radius: 12px;">
+                <h4 style="color: #2ECC71; margin-bottom: 8px; display: flex; align-items: center; font-size: 1.1em;">
+                    <span style="font-size: 1.2em; margin-right: 6px;">🏠</span>장기체류형
                 </h4>
                 <p style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0;">
-                    실제 2,591명의 외국인 관광객 데이터를 요인분석하여 개발된 검증된 시스템
+                    지인 방문 중심의 장기 체류형 저예산 관광객
                 </p>
             </div>
-            <div>
+            <div style="background: rgba(52, 152, 219, 0.1); padding: 16px; border-radius: 12px;">
                 <h4 style="color: #3498DB; margin-bottom: 8px; display: flex; align-items: center; font-size: 1.1em;">
-                    <span style="font-size: 1.2em; margin-right: 6px;">🎭</span>정밀 분류
+                    <span style="font-size: 1.2em; margin-right: 6px;">🎯</span>중간형
                 </h4>
                 <p style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0;">
-                    12개 핵심 요인으로 8가지 독특한 여행 성향 유형을 정확히 분류
+                    전형적인 균형잡힌 일반 관광객
+                </p>
+            </div>
+            <div style="background: rgba(231, 76, 60, 0.1); padding: 16px; border-radius: 12px;">
+                <h4 style="color: #E74C3C; margin-bottom: 8px; display: flex; align-items: center; font-size: 1.1em;">
+                    <span style="font-size: 1.2em; margin-right: 6px;">💎</span>고소비형
+                </h4>
+                <p style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0;">
+                    단기 집중형 프리미엄 재방문 고객
                 </p>
             </div>
         </div>
         <div style="background: rgba(52, 152, 219, 0.1); padding: 12px; border-radius: 10px; margin-top: 16px;">
             <p style="color: #2980B9; font-weight: 600; margin: 0; font-size: 1em;">
-                💡 각 질문은 특정 요인을 측정하여 당신만의 여행 패턴을 과학적으로 분석합니다
+                💡 단 7개 문항으로 당신의 한국 여행 스타일을 정확히 분석합니다
             </p>
         </div>
     </div>
@@ -458,9 +448,9 @@ def questionnaire_page():
         <div style="background: rgba(52, 152, 219, 0.08); padding: 16px; border-radius: 12px; border-left: 4px solid #3498DB;">
             <h4 style="color: #2980B9; margin-bottom: 8px; font-size: 1.1em;">💡 설문 작성 팁</h4>
             <ul style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0; padding-left: 16px;">
-                <li>직관적으로 가장 맞다고 생각하는 답변을 선택하세요</li>
-                <li>모든 문항은 여행 성향 분석에 중요한 역할을 합니다</li>
-                <li>정답은 없으니 솔직하게 답변해주세요</li>
+                <li>실제 여행 계획이나 경험을 바탕으로 답변하세요</li>
+                <li>가장 가까운 선택지를 고르시면 됩니다</li>
+                <li>모든 문항은 여행 유형 분류에 중요합니다</li>
             </ul>
         </div>
         """, unsafe_allow_html=True)
@@ -470,8 +460,8 @@ def questionnaire_page():
         <div style="background: rgba(46, 204, 113, 0.08); padding: 16px; border-radius: 12px; border-left: 4px solid #2ECC71;">
             <h4 style="color: #27AE60; margin-bottom: 8px; font-size: 1.1em;">📊 분석 결과</h4>
             <ul style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0; padding-left: 16px;">
-                <li>개인별 12개 요인 점수 제공</li>
-                <li>8개 클러스터 중 최적 유형 매칭</li>
+                <li>3가지 관광객 유형 중 최적 매칭</li>
+                <li>개인별 여행 성향 상세 분석</li>
                 <li>맞춤형 한국 관광지 추천</li>
             </ul>
         </div>
@@ -489,10 +479,10 @@ def questionnaire_page():
 
         title_class = "question-title error" if is_error else "question-title"
 
-        # 요인 태그
-        factor_desc = get_factor_description(question['factor'])
+        # 카테고리 태그
+        category = question['category']
         st.markdown(
-            f'<div class="factor-tag">{factor_desc} 문항</div>',
+            f'<div class="category-tag">{category}</div>',
             unsafe_allow_html=True
         )
 
@@ -532,7 +522,7 @@ def questionnaire_page():
             st.markdown(f"""
             <div class="progress-text">
                 🎉 모든 문항 완료! ({answered_count}/{len(questions)})
-                <br><small style="color: #3498DB; font-weight: 600;">이제 분석을 시작할 수 있습니다!</small>
+                <br><small style="color: #3498DB; font-weight: 600;">이제 관광 유형 분석을 시작할 수 있습니다!</small>
             </div>
             """, unsafe_allow_html=True)
         else:
@@ -549,22 +539,34 @@ def questionnaire_page():
     # 완료 버튼
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        button_text = "🎯 12개 요인 분석 시작하기" if progress_value == 1 else f"📝 설문 완료하기 ({answered_count}/{len(questions)})"
+        button_text = "🎯 관광 유형 분석 시작하기" if progress_value == 1 else f"📝 설문 완료하기 ({answered_count}/{len(questions)})"
         
         if st.button(button_text, type="primary", use_container_width=True, key="complete_survey"):
             if validate_answers():
                 try:
                     # 분석 시작 메시지
-                    with st.spinner("🧠 12개 요인 분석을 시작합니다..."):
+                    with st.spinner("🧠 관광 유형 분석을 시작합니다..."):
                         time.sleep(0.5)  # 사용자 경험을 위한 짧은 지연
                         
-                        # 요인 점수 계산
-                        factor_scores = calculate_factor_scores(st.session_state.answers)
-                        st.session_state.factor_scores = factor_scores
+                        # 클러스터 점수 계산
+                        cluster_scores = calculate_cluster_scores(st.session_state.answers)
+                        st.session_state.cluster_scores = cluster_scores
                         
                         # 클러스터 결정
                         cluster_result = determine_cluster(st.session_state.answers)
                         st.session_state.cluster_result = cluster_result
+                        
+                        # 호환성을 위한 factor_scores (단순화)
+                        factor_scores = {
+                            "체류기간": st.session_state.answers.get('q1', 0),
+                            "지출수준": st.session_state.answers.get('q2', 0), 
+                            "방문경험": st.session_state.answers.get('q3', 0),
+                            "숙박형태": st.session_state.answers.get('q4', 0),
+                            "문화관심": (st.session_state.answers.get('q5', 0) + st.session_state.answers.get('q6', 0)) / 2,
+                            "여행스타일": st.session_state.answers.get('q7', 0)
+                        }
+                        st.session_state.factor_scores = factor_scores
+                        
                         st.session_state.survey_completed = True
                         
                         # 성공 메시지
@@ -591,6 +593,7 @@ def questionnaire_page():
                                 오류 메시지: {str(e)}
                                 답변 수: {len(st.session_state.answers)}
                                 완료된 문항: {list(st.session_state.answers.keys())}
+                                클러스터 점수: {st.session_state.get('cluster_scores', 'N/A')}
                         """)
                         
                         # 재시도 버튼
