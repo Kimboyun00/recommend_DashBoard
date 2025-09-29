@@ -436,15 +436,17 @@ def get_address_from_coordinates(lat, lon):
             # 디버깅을 위한 전체 location 정보 출력
             print("Location data:", location)
             
-            admin1 = location.get('admin1', '')
-            admin2 = location.get('admin2', '')
+            admin1 = location.get('admin1', '')  # 시/도
+            admin2 = location.get('name', '')    # 시군구 (admin2 대신 name 사용)
             
-            # admin1과 admin2가 같은 경우 (특별시, 광역시)
-            if admin1 == admin2:
-                return admin1
-            # 둘 다 있는 경우
-            elif admin1 and admin2:
-                return f"{admin1} {admin2}"
+            # 둘 다 있는 경우에만 조합
+            if admin1 and admin2:
+                # admin1과 admin2가 같은 경우 (특별시, 광역시)
+                if admin1 == admin2:
+                    return admin1
+                # 그 외의 경우 (도 + 시군구)
+                else:
+                    return f"{admin1} {admin2}"
             # admin1만 있는 경우
             elif admin1:
                 return admin1
