@@ -202,7 +202,7 @@ st.markdown("""
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 20px;
         padding: 30px;
-        margin: 30px 0;
+        margin: 70px 0;
         transition: all 0.3s ease;
     }
     
