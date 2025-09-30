@@ -703,11 +703,13 @@ def enhanced_map_view_page():
     # 액션 버튼
     st.markdown("---")
     st.markdown('<h2 class="section-title">🎯 다음 단계</h2>', unsafe_allow_html=True)
+    st.markdown("")
     
+    # 버튼 컬럼 생성
     action_col1, action_col2, action_col3 = st.columns(3)
     
     with action_col1:
-        if st.button("📝 설문 다시하기", key=f"restart_survey_{PAGE_ID}"):
+        if st.button("📝 설문 다시하기", key=f"restart_survey_{PAGE_ID}", use_container_width=True):
             # 세션 상태 클리어
             for key in ['survey_completed', 'answers', 'score_breakdown', 'cluster_result', 'factor_scores']:
                 if key in st.session_state:
@@ -715,11 +717,11 @@ def enhanced_map_view_page():
             st.switch_page("pages/01_questionnaire.py")
     
     with action_col2:
-        if st.button("📊 상세 추천 결과", key=f"view_results_{PAGE_ID}"):
+        if st.button("📊 상세 추천 결과", key=f"view_results_{PAGE_ID}", use_container_width=True):
             st.switch_page("pages/04_recommendations.py")
     
     with action_col3:
-        if st.button("📈 통계 분석 보기", key=f"view_stats_{PAGE_ID}"):
+        if st.button("📈 통계 분석 보기", key=f"view_stats_{PAGE_ID}", use_container_width=True):
             st.switch_page("pages/06_statistics.py")
 
 def main():
