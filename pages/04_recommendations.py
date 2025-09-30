@@ -201,8 +201,9 @@ st.markdown("""
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 20px;
+        height: 80px;
         padding: 30px;
-        margin: 70px 0;
+        margin: 30px 0;
         transition: all 0.3s ease;
     }
     
