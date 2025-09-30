@@ -712,64 +712,70 @@ def render_top_recommendations(recommended_places):
         st.error(f"주변 관광지 데이터 로드 실패: {str(e)}")
         nearby_spots_df = pd.DataFrame()
     
+    # 2개의 컬럼으로 나누기
+    left_col, right_col = st.columns(2)
+    
     for idx, place in enumerate(recommended_places, 1):
-        # 위치 정보 처리
-        try:
-            lat = float(place.get('latitude', place.get('mapY', 0)))
-            lon = float(place.get('longitude', place.get('mapX', 0)))
-            if lat != 0 and lon != 0:
-                address = get_address_from_coordinates(lat, lon)  # get_korean_address 호출 제거
-            else:
-                address = '위치 정보 없음'
-        except:
-            address = '위치 정보 없음'
+        # 현재 표시할 컬럼 선택 (짝수/홀수 인덱스에 따라)
+        current_col = left_col if idx % 2 == 1 else right_col
         
-        # 주변 관광지 처리
-        nearby_spots_content = ""
-        if not nearby_spots_df.empty:
+        with current_col:
+            # 위치 정보 처리
             try:
-                # contentId로 주변 관광지 찾기
-                content_id = place.get('content_id', 0)
-                nearby_places = nearby_spots_df[nearby_spots_df['wellness_contentId'] == content_id]
-                
-                if not nearby_places.empty:
-                    nearby_places_list = []
-                    for _, spot in nearby_places.head(3).iterrows():
-                        spot_name = spot['nearby_title']
-                        spot_category = spot['nearby_category1']
-                        nearby_places_list.append(
-                            f'<div class="nearby-spot-item">'
-                            f'<span class="nearby-spot-name">{spot_name}</span>'
-                            f'<span class="nearby-spot-category">{spot_category}</span>'
-                            f'</div>'
-                        )
+                lat = float(place.get('latitude', place.get('mapY', 0)))
+                lon = float(place.get('longitude', place.get('mapX', 0)))
+                if lat != 0 and lon != 0:
+                    address = get_address_from_coordinates(lat, lon)
+                else:
+                    address = '위치 정보 없음'
+            except:
+                address = '위치 정보 없음'
+            
+            # 주변 관광지 처리
+            nearby_spots_content = ""
+            if not nearby_spots_df.empty:
+                try:
+                    content_id = place.get('content_id', 0)
+                    nearby_places = nearby_spots_df[nearby_spots_df['wellness_contentId'] == content_id]
                     
-                    if nearby_places_list:
-                        nearby_spots_content = (
-                            '<div class="nearby-spots">'
-                            '<h4>🏷️ 주변 관광지</h4>'
-                            '<div class="nearby-spots-list">'
-                            f"{''.join(nearby_places_list)}"
-                            '</div>'
-                            '</div>'
-                        )
-            except Exception as e:
-                st.write(f"주변 관광지 정보 처리 중 오류: {str(e)}")
-        
-        # 관광지 카드 표시
-        card_html = f"""
-        <div class="recommendation-card">
-            <div class="ranking-badge">#{idx}</div>
-            <h3>{place.get('title', '제목 없음')}</h3>
-            <p class="place-description">{place.get('description', '설명 정보가 없습니다.')}</p>
-            <div class="destination-detail">
-                <p class="address">📍 {address}</p>
-                {nearby_spots_content}
+                    if not nearby_places.empty:
+                        nearby_places_list = []
+                        for _, spot in nearby_places.head(3).iterrows():
+                            spot_name = spot['nearby_title']
+                            spot_category = spot['nearby_category1']
+                            nearby_places_list.append(
+                                f'<div class="nearby-spot-item">'
+                                f'<span class="nearby-spot-name">{spot_name}</span>'
+                                f'<span class="nearby-spot-category">{spot_category}</span>'
+                                f'</div>'
+                            )
+                        
+                        if nearby_places_list:
+                            nearby_spots_content = (
+                                '<div class="nearby-spots">'
+                                '<h4>🏷️ 주변 관광지</h4>'
+                                '<div class="nearby-spots-list">'
+                                f"{''.join(nearby_places_list)}"
+                                '</div>'
+                                '</div>'
+                            )
+                except Exception as e:
+                    st.write(f"주변 관광지 정보 처리 중 오류: {str(e)}")
+            
+            # 관광지 카드 표시
+            card_html = f"""
+            <div class="recommendation-card">
+                <div class="ranking-badge">#{idx}</div>
+                <h3>{place.get('title', '제목 없음')}</h3>
+                <p class="place-description">{place.get('description', '설명 정보가 없습니다.')}</p>
+                <div class="destination-detail">
+                    <p class="address">📍 {address}</p>
+                    {nearby_spots_content}
+                </div>
             </div>
-        </div>
-        """
-        
-        st.markdown(card_html, unsafe_allow_html=True)
+            """
+            
+            st.markdown(card_html, unsafe_allow_html=True)
 
 
 def render_analysis_charts(recommended_places):
