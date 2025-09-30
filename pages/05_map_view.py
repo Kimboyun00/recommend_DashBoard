@@ -276,7 +276,7 @@ def create_folium_map(places_to_show, center_lat=37.5, center_lon=127.0, zoom=7)
     # 관광지 마커들 생성
     for i, place in enumerate(places_to_show):
         # 현재 웰니스 관광지의 주변 관광지 찾기
-        nearby_places = []
+        nearby_places = pd.DataFrame()
         if not nearby_spots_df.empty:
             try:
                 content_id = place.get('content_id', 0)
@@ -323,7 +323,8 @@ def create_folium_map(places_to_show, center_lat=37.5, center_lon=127.0, zoom=7)
         # 주변 관광지 마커 생성
         if not nearby_places.empty:
             for _, spot in nearby_places.iterrows():
-                if 'nearby_lat' in spot.columns and 'nearby_lon' in spot.columns:
+                # 위도, 경도 데이터가 있는지 확인
+                if all(col in nearby_spots_df.columns for col in ['mapX', 'mapY']):
                     spot_popup = f"""
                     <div style="width: 250px;">
                         <h5 style="color: #689F38; margin-bottom: 8px;">
@@ -337,7 +338,7 @@ def create_folium_map(places_to_show, center_lat=37.5, center_lon=127.0, zoom=7)
                     """
                     
                     folium.Marker(
-                        [spot['nearby_lat'], spot['nearby_lon']],
+                        [float(spot['mapY']), float(spot['mapX'])],
                         popup=folium.Popup(spot_popup, max_width=300),
                         tooltip=spot['nearby_title'],
                         icon=folium.Icon(color='lightblue', icon='info', prefix='fa')
