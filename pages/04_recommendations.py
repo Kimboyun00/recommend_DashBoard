@@ -569,7 +569,7 @@ def render_wellness_recommendations():
         return
     
     st.markdown("<h2 class='section-title'>📍 추천 관광지</h2>", unsafe_allow_html=True)
-    
+    st.markdown("")
     # 필터 옵션
     col1, col2 = st.columns(2)
     with col1:
