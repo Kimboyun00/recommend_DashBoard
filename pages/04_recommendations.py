@@ -561,17 +561,6 @@ def render_wellness_recommendations():
     cluster_result = st.session_state.cluster_result
     cluster_info = get_cluster_info()[cluster_result['cluster']]
     
-    st.markdown(f"""
-    <div class="cluster-result-card">
-        <h2>🎯 추천 결과</h2>
-        <h3>{cluster_info['name']}</h3>
-        <p>{cluster_info['description']}</p>
-        <div class="info-tags">
-            {' '.join([f'<span class="info-tag">{char}</span>' for char in cluster_info['characteristics']])}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
     # 관광지 추천 계산
     recommended_places = calculate_recommendations_by_cluster(cluster_result)
     
