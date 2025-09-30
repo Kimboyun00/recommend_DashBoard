@@ -410,32 +410,32 @@ def questionnaire_page():
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; text-align: left; margin: 16px 0;">
             <div style="background: rgba(46, 204, 113, 0.1); padding: 16px; border-radius: 12px;">
                 <h4 style="color: #2ECC71; margin-bottom: 8px; display: flex; align-items: center; font-size: 1.1em;">
-                    <span style="font-size: 1.2em; margin-right: 6px;">🏠</span>장기체류형
+                    <span style="font-size: 1.2em; margin-right: 6px;">🏠</span>경제적 웰니스 광광객
                 </h4>
                 <p style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0;">
-                    지인 방문 중심의 장기 체류형 저예산 관광객
+                    문화체험에 관심있는 경제적인 관광객
                 </p>
             </div>
             <div style="background: rgba(52, 152, 219, 0.1); padding: 16px; border-radius: 12px;">
                 <h4 style="color: #3498DB; margin-bottom: 8px; display: flex; align-items: center; font-size: 1.1em;">
-                    <span style="font-size: 1.2em; margin-right: 6px;">🎯</span>중간형
+                    <span style="font-size: 1.2em; margin-right: 6px;">🎯</span>일반 웰니스 관광객
                 </h4>
                 <p style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0;">
-                    전형적인 균형잡힌 일반 관광객
+                    주로 고궁/전통문화에 관심있는 일반 관광객
                 </p>
             </div>
             <div style="background: rgba(231, 76, 60, 0.1); padding: 16px; border-radius: 12px;">
                 <h4 style="color: #E74C3C; margin-bottom: 8px; display: flex; align-items: center; font-size: 1.1em;">
-                    <span style="font-size: 1.2em; margin-right: 6px;">💎</span>고소비형
+                    <span style="font-size: 1.2em; margin-right: 6px;">💎</span>프리미엄 웰니스 관광객
                 </h4>
                 <p style="color: #2C3E50; font-size: 0.9em; line-height: 1.5; margin: 0;">
-                    단기 집중형 프리미엄 재방문 고객
+                    'Time Poor-Money Rich' 특성을 가진 소수 고소비자 관광객
                 </p>
             </div>
         </div>
         <div style="background: rgba(52, 152, 219, 0.1); padding: 12px; border-radius: 10px; margin-top: 16px;">
             <p style="color: #2980B9; font-weight: 600; margin: 0; font-size: 1em;">
-                💡 단 7개 문항으로 당신의 한국 여행 스타일을 정확히 분석합니다
+                💡 7개 문항으로 당신의 웰니스 여행 스타일을 분석합니다
             </p>
         </div>
     </div>

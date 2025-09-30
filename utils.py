@@ -146,13 +146,13 @@ def get_cluster_info():
     """3개 클러스터 정보"""
     return {
         0: {
-            "name": "장기체류 지인방문형",
-            "english_name": "Long-stay Social Visitor", 
-            "description": "한국에 오래 머물며 지인과의 만남을 중시하고, 저예산으로 문화를 천천히 체험하는 유형입니다.",
+            "name": "경제적 웰니스 관광객",
+            "english_name": "Economic Wellness Tourist", 
+            "description": "한국에 오래 머물며, 저예산으로 문화를 천천히 체험하는 유형입니다.",
             "characteristics": ["장기 체류", "지인 방문", "저예산", "문화 체험"],
-            "color": "#2ECC71",
-            "percentage": 25.8,
-            "count": 669,
+            "color": "#3498DB",
+            "percentage": 10.9,
+            "count": 282,
             "key_factors": {
                 "체류기간": "21일 이상",
                 "지출수준": "저예산형",
@@ -161,13 +161,13 @@ def get_cluster_info():
             }
         },
         1: {
-            "name": "전형적 중간형 관광객",
-            "english_name": "Typical Balanced Tourist",
+            "name": "일반 웰니스 관광객",
+            "english_name": "General Wellness Tourist",
             "description": "일반적인 관광 일정과 예산으로 한국의 주요 명소와 문화를 균형있게 체험하는 대표적인 관광객 유형입니다.",
             "characteristics": ["표준 일정", "균형 예산", "문화 관심", "호텔 선호"],
-            "color": "#3498DB",
-            "percentage": 52.4,
-            "count": 1358,
+            "color": "#2ECC71",
+            "percentage": 81.0,
+            "count": 2099,
             "key_factors": {
                 "체류기간": "7-10일",
                 "지출수준": "중간 예산형",
@@ -176,13 +176,13 @@ def get_cluster_info():
             }
         },
         2: {
-            "name": "단기 고소비 재방문층",
-            "english_name": "Short-stay Premium Repeater",
+            "name": "프리미엄 웰니스 관광객",
+            "english_name": "Premium Wellness Tourist",
             "description": "짧은 기간 동안 고예산으로 쇼핑, 미식 등을 집중적으로 즐기는 경험 많은 재방문 고객입니다.",
             "characteristics": ["단기 집중", "고예산", "쇼핑 중심", "효율 추구"],
-            "color": "#E74C3C",
-            "percentage": 21.8,
-            "count": 564,
+            "color": "#E37745",
+            "percentage": 8.1,
+            "count": 210,
             "key_factors": {
                 "체류기간": "1-6일",
                 "지출수준": "고예산형",
