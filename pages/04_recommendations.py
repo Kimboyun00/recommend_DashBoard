@@ -796,24 +796,20 @@ def recommendations_page():
     action_col1, action_col2, action_col3 = st.columns(3)
     
     with action_col1:
-        st.button("🗺️ 지도에서 관광지 보기", key="btn_map", use_container_width=True, 
-                 on_click=lambda: st.switch_page("pages/05_map_view.py"))
+        if st.button("🗺️ 지도에서 관광지 보기", key="btn_map", use_container_width=True):
+            st.switch_page("pages/05_map_view.py")
     
     with action_col2:
-        st.button("📈 상세 통계 분석", key="btn_stats", use_container_width=True,
-                 on_click=lambda: st.switch_page("pages/06_statistics.py"))
+        if st.button("📈 상세 통계 분석", key="btn_stats", use_container_width=True):
+            st.switch_page("pages/06_statistics.py")
     
     with action_col3:
-        st.button("📝 설문 다시하기", key="btn_survey", use_container_width=True,
-                 on_click=lambda: clear_session_and_redirect())
-
-def clear_session_and_redirect():
-    """세션 상태 클리어 및 설문 페이지로 이동"""
-    # 세션 상태 클리어
-    for key in ['survey_completed', 'answers', 'factor_scores', 'cluster_result']:
-        if key in st.session_state:
-            del st.session_state[key]
-    st.switch_page("pages/01_questionnaire.py")
+        if st.button("📝 설문 다시하기", key="btn_survey", use_container_width=True):
+            # 세션 상태 클리어
+            for key in ['survey_completed', 'answers', 'factor_scores', 'cluster_result']:
+                if key in st.session_state:
+                    del st.session_state[key]
+            st.switch_page("pages/01_questionnaire.py")
 
 # 메인 실행
 if __name__ == "__main__":
