@@ -568,6 +568,8 @@ def render_wellness_recommendations():
         st.warning("⚠️ 추천 가능한 관광지를 찾을 수 없습니다.")
         return
     
+    st.markdown("<h2 class='section-title'>📍 추천 관광지</h2>", unsafe_allow_html=True)
+    
     # 필터 옵션
     col1, col2 = st.columns(2)
     with col1:
@@ -602,7 +604,6 @@ def render_wellness_recommendations():
 
 def render_top_recommendations(recommended_places):
     """상위 추천 관광지 표시"""
-    st.markdown("<h2 class='section-title'>📍 추천 관광지</h2>", unsafe_allow_html=True)
     
     try:
         # 주변 관광지 데이터 로드
