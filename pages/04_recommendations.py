@@ -468,94 +468,7 @@ def get_address_from_coordinates(lat, lon):
         print(f"주소 변환 중 오류 발생: {str(e)}")
         return "주소 정보 없음"
     
-def create_region_distribution_chart(recommendations):
-    """지역별 추천 분포 차트"""
-    if not recommendations:
-        return None
-        
-    # 클러스터별 개수 계산
-    cluster_counts = {}
-    cluster_region_info = get_cluster_region_info()
-    
-    for place in recommendations:
-        cluster_id = place.get('cluster_region', 1)
-        if cluster_id in cluster_region_info:
-            region_name = cluster_region_info[cluster_id]['name']
-            cluster_counts[region_name] = cluster_counts.get(region_name, 0) + 1
-    
-    if not cluster_counts:
-        return None
-    
-    fig = px.bar(
-        x=list(cluster_counts.keys()),
-        y=list(cluster_counts.values()),
-        title="지역별 추천 관광지 분포",
-        color=list(cluster_counts.values()),
-        color_continuous_scale=['#E8F5E8', '#4CAF50', '#2E7D32']
-    )
-    
-    fig.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font_color='#2E7D32',
-        title_font_size=16,
-        xaxis_tickangle=-45,
-        height=400,
-        showlegend=False
-    )
-    
-    return fig
 
-def create_price_rating_scatter(recommendations):
-    """가격대별 평점 산점도"""
-    if not recommendations:
-        return None
-    
-    # 가격 데이터 정리
-    price_numeric = []
-    ratings = []
-    names = []
-    types = []
-    
-    for place in recommendations:
-        try:
-            price_str = place['price_range']
-            if '무료' in price_str:
-                price_avg = 0
-            else:
-                # 가격 범위에서 평균값 계산
-                prices = [int(p.replace(',', '').replace('원', '')) for p in price_str.split('-') if p.replace(',', '').replace('원', '').isdigit()]
-                price_avg = sum(prices) / len(prices) if prices else 50000
-            
-            price_numeric.append(price_avg)
-            ratings.append(place['rating'])
-            names.append(place['name'])
-            types.append(place['type'])
-            
-        except:
-            continue
-    
-    if not price_numeric:
-        return None
-    
-    fig = px.scatter(
-        x=price_numeric,
-        y=ratings,
-        color=types,
-        size=[50] * len(price_numeric),
-        hover_name=names,
-        title="가격대별 평점 분석",
-        labels={'x': '평균 가격 (원)', 'y': '평점 (10점 만점)'}
-    )
-    
-    fig.update_layout(
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)',
-        font_color='#2E7D32',
-        height=500
-    )
-    
-    return fig
 
 def render_cluster_analysis_result():
     """클러스터 분석 결과 렌더링"""
@@ -694,9 +607,6 @@ def render_wellness_recommendations():
     # 추천 결과 표시
     render_top_recommendations(filtered_places)
     
-    # 분석 차트 표시
-    render_analysis_charts(filtered_places)
-    
     # 다운로드 섹션
     render_download_section(filtered_places, cluster_result)
 
@@ -778,33 +688,6 @@ def render_top_recommendations(recommended_places):
             st.markdown(card_html, unsafe_allow_html=True)
 
 
-def render_analysis_charts(recommended_places):
-    """분석 차트 렌더링"""
-    if not recommended_places:
-        return
-        
-    st.markdown('<h2 class="section-title">📈 추천 결과 상세 분석</h2>', unsafe_allow_html=True)
-    
-    chart_col1, chart_col2 = st.columns(2)
-    
-    with chart_col1:
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        region_chart = create_region_distribution_chart(recommended_places)
-        if region_chart:
-            st.plotly_chart(region_chart, use_container_width=True, config={'displayModeBar': False})
-        else:
-            st.info("지역별 분포 데이터가 부족합니다.")
-        st.markdown('</div>', unsafe_allow_html=True)
-    
-    with chart_col2:
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
-        price_chart = create_price_rating_scatter(recommended_places)
-        if price_chart:
-            st.plotly_chart(price_chart, use_container_width=True, config={'displayModeBar': False})
-        else:
-            st.info("가격-평점 분석 데이터가 부족합니다.")
-        st.markdown('</div>', unsafe_allow_html=True)
-
 def render_download_section(recommended_places, cluster_result):
     """다운로드 섹션"""
     st.markdown('<h2 class="section-title">📥 결과 다운로드</h2>', unsafe_allow_html=True)
@@ -813,7 +696,7 @@ def render_download_section(recommended_places, cluster_result):
     <div class="download-section">
         <h4 style="color: #2E7D32; margin-bottom: 20px; font-size: 1.6em;">📊 개인 맞춤 추천 결과 저장</h4>
         <p style="color: #666; margin-bottom: 25px; font-size: 1.1em; line-height: 1.6;">
-            12개 요인 분석 결과와 맞춤형 관광지 추천 리스트를 CSV 파일로 다운로드하여<br>
+            웰니스 성향 분석 결과와 맞춤형 관광지 추천 리스트를 CSV 파일로 다운로드하여<br>
             여행 계획 수립과 일정 관리에 활용하세요.
         </p>
     </div>
@@ -902,9 +785,6 @@ def recommendations_page():
     if recommended_places:
         # 상위 추천 관광지 상세 표시
         render_top_recommendations(recommended_places)
-        
-        # 분석 차트
-        # render_analysis_charts(recommended_places)
         
         # 다운로드 섹션
         render_download_section(recommended_places, cluster_result)
