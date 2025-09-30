@@ -852,15 +852,23 @@ def render_survey_summary():
         return
         
     with st.expander("📋 나의 설문 응답 요약", expanded=False):
-        response_col1 = st.columns(1)
+        response_col1, response_col2 = st.columns(2)
         
         with response_col1:
-            st.markdown("### 📝 응답 내역 (1-6번)")
-            for i, (q_key, answer_idx) in enumerate(list(st.session_state.answers.items())[:7]):
+            st.markdown("### 📝 응답 내역 (1-4번)")
+            for i, (q_key, answer_idx) in enumerate(list(st.session_state.answers.items())[:4]):
                 if q_key in questions and answer_idx is not None:
                     question_data = questions[q_key]
                     answer_text = question_data['options'][answer_idx]
                     st.markdown(f"**Q{i+1}:** {answer_text}")
+        
+        with response_col2:
+            st.markdown("### 📝 응답 내역 (5-7번)")
+            for i, (q_key, answer_idx) in enumerate(list(st.session_state.answers.items())[4:]):
+                if q_key in questions and answer_idx is not None:
+                    question_data = questions[q_key]
+                    answer_text = question_data['options'][answer_idx]
+                    st.markdown(f"**Q{i+7}:** {answer_text}")
     
 def recommendations_page():
     """메인 추천 결과 페이지"""
