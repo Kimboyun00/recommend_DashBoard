@@ -882,7 +882,9 @@ def recommendations_page():
             st.switch_page("pages/01_questionnaire.py")
         return
     
-    # 12개 요인 분석
+    st.markdown("---")
+
+    # 7개 문항 분석
     render_factor_analysis()
     
     # 웰니스 관광지 추천
