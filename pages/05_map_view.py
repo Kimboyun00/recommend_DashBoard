@@ -249,6 +249,13 @@ st.markdown("""
 def create_folium_map(places_to_show, center_lat=37.5, center_lon=127.0, zoom=7):
     """Folium 기반 상세 지도 생성"""
     
+    # 주변 관광지 데이터 로드
+    try:
+        nearby_spots_df = pd.read_csv('GIS/wellness_nearby_spots_list.csv')
+    except Exception as e:
+        st.error(f"주변 관광지 데이터 로드 실패: {str(e)}")
+        nearby_spots_df = pd.DataFrame()
+    
     # 지도 생성
     m = folium.Map(
         location=[center_lat, center_lon],
@@ -268,7 +275,30 @@ def create_folium_map(places_to_show, center_lat=37.5, center_lon=127.0, zoom=7)
     
     # 관광지 마커들 생성
     for i, place in enumerate(places_to_show):
-        # 팝업 HTML 생성
+        # 현재 웰니스 관광지의 주변 관광지 찾기
+        nearby_places = []
+        if not nearby_spots_df.empty:
+            try:
+                content_id = place.get('content_id', 0)
+                nearby_places = nearby_spots_df[nearby_spots_df['wellness_contentId'] == content_id].head(3)
+            except Exception as e:
+                print(f"주변 관광지 검색 중 오류: {str(e)}")
+        
+        # 주변 관광지 정보 HTML 생성
+        nearby_html = ""
+        if not nearby_places.empty:
+            nearby_html = "<div style='margin-top: 10px; padding-top: 10px; border-top: 1px solid #4CAF50;'>"
+            nearby_html += "<strong style='color: #2E7D32;'>🏷️ 주변 관광지</strong><br>"
+            for _, spot in nearby_places.iterrows():
+                nearby_html += f"""
+                <div style='margin: 5px 0; padding: 5px; background-color: #F1F8E9; border-radius: 4px;'>
+                    <span style='font-weight: 600;'>{spot['nearby_title']}</span><br>
+                    <small style='color: #689F38;'>{spot['nearby_category1']}</small>
+                </div>
+                """
+            nearby_html += "</div>"
+        
+        # 메인 관광지 팝업 HTML 생성
         popup_html = f"""
         <div style="width: 350px; font-family: 'Noto Sans KR', sans-serif;">
             <h4 style="color: #2E7D32; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 5px;">
@@ -278,16 +308,40 @@ def create_folium_map(places_to_show, center_lat=37.5, center_lon=127.0, zoom=7)
                 <strong>📝 설명:</strong><br>
                 <span style="line-height: 1.4;">{place.get('description', '설명 정보가 없습니다.')[:150]}{'...' if len(place.get('description', '')) > 150 else ''}</span>
             </div>
+            {nearby_html}
         </div>
         """
         
-        # 마커 생성
+        # 메인 관광지 마커 생성
         folium.Marker(
             [place['latitude'], place['longitude']],
             popup=folium.Popup(popup_html, max_width=400),
             tooltip=f"#{i+1} {place['title']}",
             icon=folium.Icon(color='green', icon='info-sign')
         ).add_to(m)
+        
+        # 주변 관광지 마커 생성
+        if not nearby_places.empty:
+            for _, spot in nearby_places.iterrows():
+                if 'nearby_lat' in spot.columns and 'nearby_lon' in spot.columns:
+                    spot_popup = f"""
+                    <div style="width: 250px;">
+                        <h5 style="color: #689F38; margin-bottom: 8px;">
+                            {spot['nearby_title']}
+                        </h5>
+                        <p style="color: #666;">
+                            <strong>유형:</strong> {spot['nearby_category1']}<br>
+                            <strong>주변 관광지:</strong> {place['title']}
+                        </p>
+                    </div>
+                    """
+                    
+                    folium.Marker(
+                        [spot['nearby_lat'], spot['nearby_lon']],
+                        popup=folium.Popup(spot_popup, max_width=300),
+                        tooltip=spot['nearby_title'],
+                        icon=folium.Icon(color='lightblue', icon='info', prefix='fa')
+                    ).add_to(m)
     
     return m
 
