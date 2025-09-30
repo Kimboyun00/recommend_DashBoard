@@ -688,6 +688,9 @@ def render_wellness_recommendations():
         region_filter
     )
     
+    # 세션 상태에 저장 (지도 뷰에서 사용)
+    st.session_state['recommended_places'] = filtered_places
+    
     # 추천 결과 표시
     render_top_recommendations(filtered_places)
     

@@ -659,124 +659,73 @@ def _get_recommended_df():
 
 def enhanced_map_view_page():
     """개선된 지도 뷰 페이지 메인 함수"""
-    wellness_df = _get_recommended_df()
-    if wellness_df.empty:
-        return  # 데이터 없으면 아래 로직 건너뜀
+    # 추천 결과 가져오기
+    if 'recommended_places' not in st.session_state:
+        st.warning("⚠️ 먼저 '추천' 페이지에서 결과를 확인해주세요.")
+        if st.button("👉 추천 결과 보기"):
+            st.switch_page("pages/04_recommendations.py")
+        return
+    
+    recommended_places = st.session_state['recommended_places']
     
     # 헤더
     st.markdown('<h1 class="page-title">🗺️ 맞춤형 웰니스 여행지 지도</h1>', unsafe_allow_html=True)
     
-    # 지도 설정
-    num_places, map_type, map_center, show_categories = render_map_settings(wellness_df)
-    
-    # 사용자 클러스터 분석 표시
-    cluster_result = render_user_cluster_analysis()
-    
-    if not cluster_result:
-        st.error("❌ 클러스터 분석 결과가 없습니다. 설문을 다시 진행해주세요.")
-        if st.button("📝 설문하러 가기", key=f"survey_redirect_{PAGE_ID}"):
-            st.switch_page("pages/01_questionnaire.py")
-        return
-    
-    # 추천 결과 가져오기
-    try:
-        recommended_places = calculate_recommendations_by_cluster(cluster_result)
-        if not recommended_places:
-            st.warning("⚠️ 추천 결과가 없습니다. 다른 설정을 시도해보세요.")
-            return
-            
-    except Exception as e:
-        st.error(f"❌ 추천 계산 중 오류: {str(e)}")
-        return
-    
-    # 카테고리 필터링
-    filtered_places = []
-    for place in recommended_places:
-        if show_categories.get(place['type'], True):
-            filtered_places.append(place)
-    
-    # 표시할 관광지 수 제한
-    places_to_show = filtered_places[:num_places]
-    
-    if not places_to_show:
-        st.warning("⚠️ 표시할 관광지가 없습니다. 카테고리 필터를 확인해주세요.")
-        return
-    
-    # 지도 중심점 설정
-    center_coords = {
-        "전체 보기": (36.5, 127.8, 7),
-        "수도권": (37.5, 126.9, 9),
-        "제주도": (33.4, 126.5, 10),
-        "강원도": (37.8, 128.5, 9),
-        "경상도": (35.8, 128.6, 8)
-    }
-    
-    center_lat, center_lon, zoom = center_coords[map_center]
-    
-    # 지도 표시
-    st.markdown("---")
+    # 지도 타입 선택
+    map_type = st.radio(
+        "지도 유형 선택",
+        ["상세 지도 (Folium)", "분석 지도 (Plotly)"],
+        horizontal=True
+    )
     
     if map_type == "상세 지도 (Folium)":
-        st.markdown('<h2 class="section-title">🌍 상세 관광지 지도</h2>', unsafe_allow_html=True)
-        
+        # Folium 지도 생성
         try:
-            st.markdown('<div class="map-container">', unsafe_allow_html=True)
-            
-            folium_map = create_folium_map(places_to_show, center_lat, center_lon, zoom)
-            
-            map_data = st_folium(
-                folium_map, 
-                width=1200, 
-                height=600, 
-                returned_objects=["last_object_clicked"],
-                key=f"folium_map_{PAGE_ID}"
+            m = create_folium_map(
+                recommended_places,
+                center_lat=36.5,  # 한국 중심 위도
+                center_lon=127.5,  # 한국 중심 경도
+                zoom=7
             )
             
-            # 클릭된 마커 정보 표시
-            if map_data['last_object_clicked']:
-                clicked_data = map_data['last_object_clicked']
-                if clicked_data and 'lat' in clicked_data and 'lng' in clicked_data:
-                    # 클릭된 위치와 가장 가까운 관광지 찾기
-                    clicked_lat, clicked_lon = clicked_data['lat'], clicked_data['lng']
-                    min_distance = float('inf')
-                    closest_place = None
-                    
-                    for place in places_to_show:
-                        distance = ((place['lat'] - clicked_lat) ** 2 + (place['lon'] - clicked_lon) ** 2) ** 0.5
-                        if distance < min_distance:
-                            min_distance = distance
-                            closest_place = place
-                    
-                    if closest_place and min_distance < 0.1:  # 0.1도 이내
-                        st.info(f"🏛️ **선택된 관광지**: {closest_place['name']} ({closest_place['type']})")
-            
+            # 지도 표시
+            st.markdown('<div class="map-container">', unsafe_allow_html=True)
+            folium_map = st_folium(
+                m,
+                width=1200,
+                height=600,
+                returned_objects=["last_object_clicked"]
+            )
             st.markdown('</div>', unsafe_allow_html=True)
             
+            # 클릭된 마커 정보 표시
+            if folium_map['last_object_clicked']:
+                clicked = folium_map['last_object_clicked']
+                if clicked and 'lat' in clicked and 'lng' in clicked:
+                    # 클릭된 위치와 가장 가까운 관광지 찾기
+                    nearest_place = min(
+                        recommended_places,
+                        key=lambda x: ((x['latitude'] - clicked['lat'])**2 + 
+                                     (x['longitude'] - clicked['lng'])**2)**0.5
+                    )
+                    st.info(f"🏛️ 선택된 관광지: {nearest_place['title']}")
+                    
         except Exception as e:
-            st.error(f"❌ 상세 지도 로딩 중 오류: {str(e)}")
+            st.error(f"❌ 지도 생성 중 오류 발생: {str(e)}")
     
-    else:  # Plotly 지도
-        st.markdown('<h2 class="section-title">📊 분석 지도 (인터랙티브)</h2>', unsafe_allow_html=True)
-        
+    else:
+        # Plotly 지도 생성
         try:
-            st.markdown('<div class="map-container">', unsafe_allow_html=True)
-            
-            plotly_map = create_plotly_map(places_to_show)
-            if plotly_map:
-                st.plotly_chart(plotly_map, use_container_width=True, config={'displayModeBar': True})
+            fig = create_plotly_map(recommended_places)
+            if fig:
+                st.plotly_chart(fig, use_container_width=True)
             else:
                 st.error("❌ 분석 지도를 생성할 수 없습니다.")
-            
-            st.markdown('</div>', unsafe_allow_html=True)
-            
         except Exception as e:
-            st.error(f"❌ 분석 지도 로딩 중 오류: {str(e)}")
+            st.error(f"❌ 분석 지도 생성 중 오류 발생: {str(e)}")
     
     # 통계 대시보드
-    render_statistics_dashboard(places_to_show)
-    
-    # 다운로드 섹션
-    render_download_section(places_to_show, cluster_result)
+    render_statistics_dashboard(recommended_places)
     
     # 액션 버튼
     st.markdown("---")

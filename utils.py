@@ -141,6 +141,22 @@ questions = {
     }
 }
 
+def calculate_distance(lat1, lon1, lat2, lon2):
+    """두 지점 간의 거리 계산 (km)"""
+    from math import radians, sin, cos, sqrt, atan2
+    
+    R = 6371  # 지구 반경 (km)
+    
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    distance = R * c
+    
+    return distance
+
 # 3개 클러스터 정보 (기존 8개에서 3개로 축소)
 def get_cluster_info():
     """3개 클러스터 정보"""
