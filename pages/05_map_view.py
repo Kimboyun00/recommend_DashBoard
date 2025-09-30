@@ -266,65 +266,27 @@ def create_folium_map(places_to_show, center_lat=37.5, center_lon=127.0, zoom=7)
         icon=folium.Icon(color='red', icon='plane', prefix='fa')
     ).add_to(m)
     
-    # 타입별 색상 매핑
-    color_map = {
-        "스파/온천": "blue",
-        "산림/자연치유": "green", 
-        "웰니스 리조트": "purple",
-        "체험/교육": "orange",
-        "리조트/호텔": "pink",
-        "문화/예술": "lightgreen",
-        "힐링/테라피": "lightblue",
-        "한방/전통의학": "darkgreen",
-        "레저/액티비티": "red",
-        "기타": "gray"
-    }
-    
     # 관광지 마커들 생성
     for i, place in enumerate(places_to_show):
         # 팝업 HTML 생성
         popup_html = f"""
         <div style="width: 350px; font-family: 'Noto Sans KR', sans-serif;">
             <h4 style="color: #2E7D32; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 5px;">
-                #{i+1} {place['name']}
+                #{i+1} {place['title']}
             </h4>
-            <div style="margin: 10px 0;">
-                <strong>🏷️ 유형:</strong> <span style="color: #4CAF50; font-weight: 600;">{place['type']}</span>
-            </div>
-            <div style="margin: 10px 0;">
-                <strong>⭐ 평점:</strong> <span style="color: #FF9800; font-weight: 600;">{place['rating']}/10</span>
-            </div>
-            <div style="margin: 10px 0;">
-                <strong>📍 거리:</strong> {place['distance_from_incheon']}km
-            </div>
-            <div style="margin: 10px 0;">
-                <strong>💰 가격:</strong> {place['price_range']}
-            </div>
-            <div style="margin: 10px 0;">
-                <strong>🚗 자차:</strong> {place.get('travel_time_car', '정보없음')} ({place.get('travel_cost_car', '정보없음')})
-            </div>
-            <div style="margin: 10px 0;">
-                <strong>🚇 대중교통:</strong> {place.get('travel_time_train', '정보없음')} ({place.get('travel_cost_train', '정보없음')})
-            </div>
-            <div style="margin: 10px 0;">
-                <strong>🎯 추천점수:</strong> <span style="color: #2E7D32; font-weight: 700;">{place['recommendation_score']:.1f}점</span>
-            </div>
             <div style="margin: 15px 0; padding: 10px; background-color: #f5f5f5; border-radius: 8px;">
                 <strong>📝 설명:</strong><br>
-                <span style="line-height: 1.4;">{place['description'][:150]}{'...' if len(place['description']) > 150 else ''}</span>
+                <span style="line-height: 1.4;">{place.get('description', '설명 정보가 없습니다.')[:150]}{'...' if len(place.get('description', '')) > 150 else ''}</span>
             </div>
-            {'<div style="margin: 10px 0; color: #4CAF50; font-weight: 600;">✅ 완벽매칭</div>' if place.get('cluster_match') else ''}
         </div>
         """
         
-        # 마커 색상 결정
-        marker_color = color_map.get(place['type'], 'gray')
-        
+        # 마커 생성
         folium.Marker(
-            [place['lat'], place['lon']],
+            [place['latitude'], place['longitude']],
             popup=folium.Popup(popup_html, max_width=400),
-            tooltip=f"#{i+1} {place['name']} ({place['type']})",
-            icon=folium.Icon(color=marker_color, icon='info-sign')
+            tooltip=f"#{i+1} {place['title']}",
+            icon=folium.Icon(color='green', icon='info-sign')
         ).add_to(m)
     
     return m
@@ -522,24 +484,15 @@ def render_statistics_dashboard(places_to_show):
     st.markdown('<h2 class="section-title">📊 추천 결과 통계</h2>', unsafe_allow_html=True)
     
     # 기본 통계 계산
-    avg_distance = np.mean([place['distance_from_incheon'] for place in places_to_show])
-    avg_rating = np.mean([place['rating'] for place in places_to_show])
-    avg_score = np.mean([place['recommendation_score'] for place in places_to_show])
-    cluster_matches = sum(1 for place in places_to_show if place.get('cluster_match', False))
-    
-    # 타입별 분포
-    type_counts = {}
-    for place in places_to_show:
-        place_type = place['type']
-        type_counts[place_type] = type_counts.get(place_type, 0) + 1
+    num_places = len(places_to_show)
     
     # 통계 카드들
-    stat_col1, stat_col2, stat_col3, stat_col4 = st.columns(4)
+    stat_col1, stat_col2 = st.columns(2)
     
     with stat_col1:
         st.markdown(f"""
         <div class="stats-card">
-            <div class="stats-number">{len(places_to_show)}</div>
+            <div class="stats-number">{num_places}</div>
             <div class="stats-label">추천 관광지</div>
         </div>
         """, unsafe_allow_html=True)
@@ -547,64 +500,29 @@ def render_statistics_dashboard(places_to_show):
     with stat_col2:
         st.markdown(f"""
         <div class="stats-card">
-            <div class="stats-number">{avg_distance:.0f}km</div>
-            <div class="stats-label">평균 거리</div>
+            <div class="stats-number">{len(set([place['region_code'] for place in places_to_show]))}</div>
+            <div class="stats-label">추천 지역 수</div>
         </div>
         """, unsafe_allow_html=True)
     
-    with stat_col3:
-        st.markdown(f"""
-        <div class="stats-card">
-            <div class="stats-number">{avg_rating:.1f}</div>
-            <div class="stats-label">평균 평점</div>
-        </div>
-        """, unsafe_allow_html=True)
+    # 지역별 분포 차트
+    region_counts = {}
+    for place in places_to_show:
+        region = place.get('region_code', 'Unknown')
+        region_counts[region] = region_counts.get(region, 0) + 1
     
-    with stat_col4:
-        st.markdown(f"""
-        <div class="stats-card">
-            <div class="stats-number">{cluster_matches}</div>
-            <div class="stats-label">완벽 매칭</div>
-        </div>
-        """, unsafe_allow_html=True)
-    
-    # 차트 섹션
-    chart_col1, chart_col2 = st.columns(2)
-    
-    with chart_col1:
-        # 타입별 분포 차트
-        if type_counts:
-            fig_pie = px.pie(
-                values=list(type_counts.values()),
-                names=list(type_counts.keys()),
-                title="추천 관광지 유형별 분포"
-            )
-            fig_pie.update_layout(
-                plot_bgcolor='rgba(0,0,0,0)',
-                paper_bgcolor='rgba(0,0,0,0)',
-                font_color='#2E7D32'
-            )
-            st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
-    
-    with chart_col2:
-        # 거리별 평점 산점도
-        distances = [place['distance_from_incheon'] for place in places_to_show]
-        ratings = [place['rating'] for place in places_to_show]
-        names = [place['name'] for place in places_to_show]
-        
-        fig_scatter = px.scatter(
-            x=distances,
-            y=ratings,
-            hover_name=names,
-            title="거리 vs 평점 분석",
-            labels={'x': '거리 (km)', 'y': '평점 (10점 만점)'}
+    if region_counts:
+        fig_pie = px.pie(
+            values=list(region_counts.values()),
+            names=list(region_counts.keys()),
+            title="추천 관광지 지역별 분포"
         )
-        fig_scatter.update_layout(
+        fig_pie.update_layout(
             plot_bgcolor='rgba(0,0,0,0)',
             paper_bgcolor='rgba(0,0,0,0)',
             font_color='#2E7D32'
         )
-        st.plotly_chart(fig_scatter, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(fig_pie, use_container_width=True, config={'displayModeBar': False})
 
 def render_download_section(places_to_show, cluster_result):
     """다운로드 섹션 렌더링"""
