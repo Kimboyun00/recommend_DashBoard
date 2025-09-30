@@ -768,23 +768,28 @@ def recommendations_page():
     # 7개 문항 분석
     render_factor_analysis()
     
+    st.markdown("---")
+
     # 웰니스 관광지 추천
     recommended_places = render_wellness_recommendations()
     
     if recommended_places:
         # 상위 추천 관광지 상세 표시
         render_top_recommendations(recommended_places)
-        
+
+        st.markdown("---")
+
         # 다운로드 섹션
         render_download_section(recommended_places, cluster_result)
-    
+
+    st.markdown("---")
     # 설문 응답 요약
     render_survey_summary()
     
     # 액션 버튼
     st.markdown("---")
     st.markdown('<h2 class="section-title">🎯 다음 단계</h2>', unsafe_allow_html=True)
-    
+    st.markdown("")
     action_col1, action_col2, action_col3 = st.columns(3)
     
     with action_col1:
