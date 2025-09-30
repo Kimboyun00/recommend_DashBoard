@@ -904,7 +904,7 @@ def recommendations_page():
         render_top_recommendations(recommended_places)
         
         # 분석 차트
-        render_analysis_charts(recommended_places)
+        # render_analysis_charts(recommended_places)
         
         # 다운로드 섹션
         render_download_section(recommended_places, cluster_result)
