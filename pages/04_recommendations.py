@@ -109,6 +109,7 @@ st.markdown("""
         border: 3px solid rgba(76, 175, 80, 0.4);
         border-radius: 25px;
         padding: 40px;
+        min-height: 430px;
         margin: 30px 0;
         text-align: center;
         box-shadow: 0 20px 60px rgba(76, 175, 80, 0.15);
@@ -201,7 +202,7 @@ st.markdown("""
         backdrop-filter: blur(20px);
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 20px;
-        height: 430px;
+        min-height: 430px;
         padding: 30px;
         margin: 30px 0;
         transition: all 0.3s ease;
@@ -425,6 +426,14 @@ st.markdown("""
         line-height: 1.6;
         margin: 15px 0;
     }
+    
+    div.chart-container-anchor + div [data-testid="stPlotlyChart"] {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -607,7 +616,7 @@ def render_cluster_analysis_result():
     return cluster_result
 
 def render_factor_analysis():
-    """12개 요인 분석 렌더링"""
+    """7개 문항 분석 렌더링"""
     if 'factor_scores' not in st.session_state:
         return
         
@@ -615,21 +624,20 @@ def render_factor_analysis():
     cluster_result = st.session_state.cluster_result
     user_cluster = cluster_result['cluster']
     
-    st.markdown('<h2 class="section-title">📊 12개 요인별 개인 분석</h2>', unsafe_allow_html=True)
+    st.markdown('<h2 class="section-title">📊 7개 문항별 개인 분석</h2>', unsafe_allow_html=True)
     
     chart_col1, chart_col2 = st.columns(2)
     
     with chart_col1:
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        # 박스 스타일을 적용할 앵커
+        st.markdown('<div class="chart-container-anchor"></div>', unsafe_allow_html=True)
         factor_chart = create_factor_analysis_chart(factor_scores)
         st.plotly_chart(factor_chart, use_container_width=True, config={'displayModeBar': False})
-        st.markdown('</div>', unsafe_allow_html=True)
-    
+
     with chart_col2:
-        st.markdown('<div class="chart-container">', unsafe_allow_html=True)
+        st.markdown('<div class="chart-container-anchor"></div>', unsafe_allow_html=True)
         comparison_chart = create_cluster_comparison_chart(user_cluster, factor_scores)
         st.plotly_chart(comparison_chart, use_container_width=True, config={'displayModeBar': False})
-        st.markdown('</div>', unsafe_allow_html=True)
 
 def render_wellness_recommendations():
     """웰니스 관광지 추천 결과 표시"""
