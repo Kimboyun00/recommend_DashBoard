@@ -202,7 +202,7 @@ st.markdown("""
         border: 2px solid rgba(76, 175, 80, 0.4);
         border-radius: 20px;
         padding: 30px;
-        margin: 25px 0;
+        margin: 30px 0;
         transition: all 0.3s ease;
     }
     
@@ -596,7 +596,7 @@ def render_cluster_analysis_result():
                     <strong>📈 전체 비율:</strong> {cluster_data['percentage']}% ({cluster_data['count']:,}명)
                 </p>
                 <p style="color: #2E7D32; font-weight: 600; margin: 12px 0; font-size: 1.1em;">
-                    <strong>🎯 주요 키워드:</strong> 
+                    <strong>🎯 주요 키워드 : </strong> 
                     {', '.join(list(cluster_data['key_factors'].keys())[:3])}
                 </p>
             </div>
