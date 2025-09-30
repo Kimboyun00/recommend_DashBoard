@@ -690,7 +690,7 @@ def render_wellness_recommendations():
     
     # 세션 상태에 저장 (지도 뷰에서 사용)
     st.session_state['recommended_places'] = filtered_places
-    
+
     # 추천 결과 표시
     render_top_recommendations(filtered_places)
     
@@ -852,23 +852,15 @@ def render_survey_summary():
         return
         
     with st.expander("📋 나의 설문 응답 요약", expanded=False):
-        response_col1, response_col2 = st.columns(2)
+        response_col1 = st.columns(1)
         
         with response_col1:
             st.markdown("### 📝 응답 내역 (1-6번)")
-            for i, (q_key, answer_idx) in enumerate(list(st.session_state.answers.items())[:6]):
+            for i, (q_key, answer_idx) in enumerate(list(st.session_state.answers.items())[:7]):
                 if q_key in questions and answer_idx is not None:
                     question_data = questions[q_key]
                     answer_text = question_data['options'][answer_idx]
                     st.markdown(f"**Q{i+1}:** {answer_text}")
-        
-        with response_col2:
-            st.markdown("### 📝 응답 내역 (7-12번)")
-            for i, (q_key, answer_idx) in enumerate(list(st.session_state.answers.items())[6:]):
-                if q_key in questions and answer_idx is not None:
-                    question_data = questions[q_key]
-                    answer_text = question_data['options'][answer_idx]
-                    st.markdown(f"**Q{i+7}:** {answer_text}")
     
 def recommendations_page():
     """메인 추천 결과 페이지"""
