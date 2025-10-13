@@ -163,7 +163,7 @@ def auth_page():
                 margin: 20px 0;
                 padding: 15px;
                 background: rgba(255, 255, 255, 0.15);
-                border: 1px solid rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(0, 0, 0, 0.3);
                 border-radius: 10px;
                 backdrop-filter: blur(10px);">
                 <p style="
