@@ -157,6 +157,17 @@ def auth_page():
             username = st.text_input("아이디", key="login_user", placeholder="아이디를 입력하세요")
             password = st.text_input("비밀번호", type="password", key="login_pass", placeholder="비밀번호를 입력하세요")
             
+            # 테스트 계정 정보 추가
+            st.markdown("""
+            <div style="margin-top: 20px; padding: 10px; border-radius: 5px; background-color: rgba(255, 255, 255, 0.1);">
+                <p style="color: rgba(255,255,255,0.7); font-size: 0.9em; margin: 0;">
+                    🔑 테스트 계정: <br>
+                    아이디: wellness<br>
+                    비밀번호: 1234
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            
             if st.button("로그인", key="login_btn"):
                 is_authenticated = False
                 if username == "wellness" and password == "1234":
