@@ -162,18 +162,19 @@ def auth_page():
             <div style="
                 margin: 20px 0;
                 padding: 15px;
-                background: rgba(255, 255, 255, 0.05);
-                border: 1px solid rgba(255, 255, 255, 0.1);
+                background: rgba(255, 255, 255, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.2);
                 border-radius: 10px;
                 backdrop-filter: blur(10px);">
                 <p style="
-                    color: rgba(255,255,255,0.8);
+                    color: #000000;
                     font-size: 0.9em;
+                    font-weight: 500;
                     margin: 0;
                     text-align: left;">
                     🔑 테스트 계정 정보<br>
-                    ㆍ아이디: <span style="color: #8BC34A;">wellness</span><br>
-                    ㆍ비밀번호: <span style="color: #8BC34A;">1234</span>
+                    ㆍ아이디: <span style="color: #2E7D32; font-weight: 600;">wellness</span><br>
+                    ㆍ비밀번호: <span style="color: #2E7D32; font-weight: 600;">1234</span>
                 </p>
             </div>
             """, unsafe_allow_html=True)
