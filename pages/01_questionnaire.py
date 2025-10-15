@@ -400,7 +400,7 @@ def questionnaire_page():
                 st.session_state.answers[q_key] = st.session_state[radio_key]
 
     # 메인 제목
-    st.title("🇰🇷 한국 관광 성향 분류 시스템")
+    st.title("🌿 웰니스 관광 성향 진단 시스템")
     st.markdown("---")
     
     # 소개 메시지
