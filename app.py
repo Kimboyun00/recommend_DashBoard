@@ -20,7 +20,7 @@ def hash_password(password):
 
 # --- 페이지 기본 설정 ---
 st.set_page_config(
-    page_title="웰커밍 투어성향 테스트 - 로그인",
+    page_title="웰니스 투어성향 테스트 - 로그인",
     page_icon="🌿",
     layout="wide",
     initial_sidebar_state="collapsed"

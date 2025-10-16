@@ -30,7 +30,7 @@ except ImportError as e:
 
 # 페이지 설정
 st.set_page_config(
-    page_title="한국 관광 성향 설문",
+    page_title="웰니스 관광 성향 설문",
     page_icon="🇰🇷",
     layout="wide",
     initial_sidebar_state="expanded"
